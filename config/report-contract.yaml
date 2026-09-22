@@ -1,4 +1,4 @@
-version: 1
+version: 2
 purpose: Compare KIVI and InfiniGen for enterprise IT document review
 technologies: [KIVI, InfiniGen]
 roles: [research, market, stakeholder, domain, synthesis]
@@ -9,7 +9,7 @@ report:
   synthesis_claim_count: 2
   retain_all_body_claims: true
   evidence: verbatim_source_quotes_with_page_or_web_section
-  output_format: markdown
+  output_format: [markdown, pdf]
   final_status: human_review_pending
 retrieval:
   paper_pool_page_limit: 200

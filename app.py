@@ -43,7 +43,7 @@ def main():
     parser = argparse.ArgumentParser(description="KIVI/InfiniGen evidence-based report agent")
     parser.add_argument("--config", default="config/run.yaml")
     parser.add_argument("--prepare", action="store_true", help="Download sources and build local embeddings, no GPT calls")
-    parser.add_argument("--render", type=Path, help="Rewrite Markdown from a saved, validated run, no GPT calls")
+    parser.add_argument("--render", type=Path, help="Rewrite Markdown and PDF from a saved, validated run, no GPT calls")
     parser.add_argument("--refresh-web", action="store_true")
     recovery = parser.add_mutually_exclusive_group()
     recovery.add_argument("--reuse-calls", type=Path, help="Rerun current graph; reuse only exact successful requests when non-code inputs match")

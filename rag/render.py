@@ -1,12 +1,12 @@
 from pathlib import Path
-from html import escape
+from html import escape, unescape
 import re
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, KeepTogether
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, KeepTogether, Table, TableStyle
 from pypdf import PdfReader
 
 from rag.budget import write_json
@@ -60,7 +60,23 @@ def filename(settings, kind):
 
 
 def render_report(out, report, joined, sources, settings, config):
-    """Write a concise comparison plus complete, auditable Markdown annexes."""
+    """Complete only when both formats and their review sheets have been written."""
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    pending = {"format": ["markdown", "pdf"], "pdf_generated": False, "render_status": "started"}
+    for name in ("document_validation.json", "pdf_validation.json"):
+        write_json(out / name, pending)
+    try:
+        return _render_report(out, report, joined, sources, settings, config)
+    except Exception as exc:
+        failure = {**pending, "render_status": "failed", "render_error": str(exc), "semantic_review": "pending"}
+        for name in ("document_validation.json", "pdf_validation.json"):
+            write_json(out / name, failure)
+        raise
+
+
+def _render_report(out, report, joined, sources, settings, config):
+    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
     import hashlib
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -179,97 +195,110 @@ def render_report(out, report, joined, sources, settings, config):
                            "**근거 주장:** " + (", ".join(f"[{cid}](citation_review.md#{cid})" for cid in decision["claim_ids"]) or "없음"),
                            "", "**사람 검수:** 미검수", ""])
     (out / "gap_review.md").write_text("\n".join(gap_review))
-    write_json(out / "document_validation.json", {"format": "markdown", "pdf_generated": False,
-        "summary_characters": len("\n".join(summary)), "pdf_half_page": "user_conversion_review_pending",
+    pdf_path, pdf_checks = _write_pdf(out, document, settings)
+    pdf_checks.update(used_sources=used_sources, used_claims=used_claims, used_evidence=used_evidence)
+    write_json(out / "pdf_validation.json", pdf_checks)
+    write_json(out / "document_validation.json", {"format": ["markdown", "pdf"], "pdf_generated": True,
+        "summary_characters": len("\n".join(summary)), "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
         "used_sources": used_sources, "used_claims": used_claims, "used_evidence": used_evidence,
         "body_unique_claims": len(body_seen), "gap_count": len(gap_records),
         "resolved_gaps": sum(decisions.get(g["id"], {}).get("status") == "resolved" for g in gap_records),
         "semantic_review": "pending", "renderer_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-        "format_decision": "User requested Markdown only on 2026-09-21; PDF conversion belongs to user"})
-    return {"markdown": str(path), "citation_review": str(out / "citation_review.md"), "gap_review": str(out / "gap_review.md")}
+        "format_decision": "Markdown and PDF generated from the same report; semantic review remains pending"})
+    return {"markdown": str(path), "pdf": str(pdf_path), "citation_review": str(out / "citation_review.md"), "gap_review": str(out / "gap_review.md")}
+
+
+def _pdf_inline(text):
+    """Translate the renderer's small Markdown subset without interpreting source HTML."""
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = unescape(text.replace("<br>", "\n"))
+    text = escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
+    text = re.sub(r"`([^`]+)`", r"\1", text)
+    return text.replace("\n", "<br/>")
+
+
+def _write_pdf(out, document, settings):
+    """Render the exact Markdown body; never rewrite reports or review annexes."""
+    import hashlib
+    from tempfile import NamedTemporaryFile
+
+    fonts(settings)
+    st = styles()
+    st["label"] = ParagraphStyle("claim-label", parent=st["body"], keepWithNext=True)
+    st["cell"] = ParagraphStyle("cell", parent=st["body"], fontSize=8.5, leading=13, spaceAfter=0)
+    width = A4[0] - 108  # Frame padding inside the 48pt margins.
+    lines = document.splitlines()
+    story, summary_flowables = [], []
+    in_summary, first_chapter = True, True
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("**대상 기술:**"):
+            in_summary = False
+        if line.startswith("| "):
+            rows = []
+            while i < len(lines) and lines[i].startswith("| "):
+                cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
+                if not all(re.fullmatch(r"[-: ]+", c) for c in cells):
+                    rows.append([Paragraph(_pdf_inline(c), st["cell"]) for c in cells])
+                i += 1
+            n = len(rows[0])
+            widths = [width * .16, width * .42, width * .42] if n == 3 else [width / n] * n
+            table = Table(rows, colWidths=widths, repeatRows=1, splitByRow=1, splitInRow=1, hAlign="LEFT")
+            table.setStyle(TableStyle([
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#EAF3F3")),
+                ("GRID", (0, 0), (-1, -1), .3, colors.HexColor("#C9D7DF")),
+                ("LEFTPADDING", (0, 0), (-1, -1), 7), ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+                ("TOPPADDING", (0, 0), (-1, -1), 7), ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+            ]))
+            story.extend([table, Spacer(1, 10)])
+            continue
+        flowable = None
+        if line.startswith("# "):
+            if not first_chapter:
+                story.append(PageBreak())
+            first_chapter = False
+            flowable = Paragraph(_pdf_inline(line[2:]), st["h1"])
+        elif line.startswith("## "):
+            flowable = Paragraph(_pdf_inline(line[3:]), st["h2"])
+        elif line.strip():
+            flowable = Paragraph(_pdf_inline(line), st["label"] if re.fullmatch(r"\*\*[^*]+\*\*", line) else st["body"])
+        if flowable:
+            story.append(flowable)
+            if in_summary:
+                summary_flowables.append(flowable)
+        i += 1
+    summary_height = sum(f.wrap(width, A4[1])[1] + f.getSpaceBefore() + f.getSpaceAfter()
+                         for f in summary_flowables)
+    summary_bottom = 48 + summary_height
+    if summary_bottom > A4[1] / 2:
+        raise ValueError("SUMMARY exceeds half of the physical page; revise the summary selection")
+    # The PDF explains where its linked Markdown annexes live without adding a new chapter.
+    story.insert(len(summary_flowables), Paragraph(
+        "상세 조건·원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
+    path = out / filename(settings, "Output")
+    with NamedTemporaryFile(dir=out, suffix=".pdf", delete=False) as handle:
+        temporary = Path(handle.name)
+    try:
+        SimpleDocTemplate(str(temporary), pagesize=A4, leftMargin=48, rightMargin=48,
+                          topMargin=42, bottomMargin=55, title="KV Cache 다관점 평가", author="SKALA team").build(
+                              story, onFirstPage=footer, onLaterPages=footer)
+        reader = PdfReader(temporary)
+        if "SUMMARY" not in reader.pages[0].extract_text() or not any("REFERENCE" in page.extract_text() for page in reader.pages) or not document.rsplit("\n# ", 1)[-1].startswith("REFERENCE\n"):
+            raise ValueError("PDF chapter layout validation failed")
+        checks = {"summary_height_pt": round(summary_height, 2), "summary_bottom_pt": round(summary_bottom, 2),
+                  "half_page_limit_pt": A4[1] / 2, "pdf_pages": len(reader.pages), "pdf_generated": True,
+                  "pdf_sha256": hashlib.sha256(temporary.read_bytes()).hexdigest(),
+                  "markdown_sha256": hashlib.sha256(document.encode()).hexdigest(),
+                  "visual_review": "pending", "semantic_review": "pending"}
+        temporary.replace(path)
+        return path, checks
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def render_pdf_report(out, report, joined, sources, settings, config):
-    """Legacy explicit export helper; never used by the submission pipeline."""
-    out = Path(out)
-    out.mkdir(parents=True, exist_ok=True)
-    fonts(settings)
-    st = styles()
-    claims, evidence = joined["claims"], joined["evidence"]
-    used_claims = list(dict.fromkeys(report["summary_claim_ids"] + [c for section in report["sections"] for c in section["claim_ids"]]))
-    used_evidence = list(dict.fromkeys(e for c in used_claims for e in claims[c]["evidence_ids"]))
-    used_sources = sorted({evidence[e]["source_id"] for e in used_evidence})
-    numbering = {source: i + 1 for i, source in enumerate(used_sources)}
-
-    def citations(claim):
-        refs = []
-        for eid in claim["evidence_ids"]:
-            ev = evidence[eid]
-            where = f"p.{ev['page']}" if ev.get("page") else ev["section"]
-            refs.append(f"[{numbering[ev['source_id']]}, {where}]")
-        return " ".join(dict.fromkeys(refs))
-
-    summary = [Paragraph("SUMMARY", st["h1"])]
-    md = ["# SUMMARY", ""]
-    for cid in report["summary_claim_ids"]:
-        c = claims[cid]
-        text = f"[{LABELS[c['kind']]}] {c['text']} {citations(c)}"
-        summary.append(Paragraph(escape(text), st["body"]))
-        md.extend([text, ""])
-    width = A4[0] - 96
-    summary_height = sum(f.wrap(width - 12, A4[1])[1] + f.getSpaceBefore() + f.getSpaceAfter() for f in summary)
-    if summary_height > A4[1] / 2 - 48:
-        raise ValueError("SUMMARY exceeds half of the physical page; revise the summary selection")
-    story = summary + [Spacer(1, 8), Paragraph("KIVI × InfiniGen", st["title"]),
-        Paragraph(escape(config["domain"]), st["body"]),
-        Paragraph("공개 근거 기반 다관점 평가 · 사람이 인용의 의미와 제출 정보를 확인하기 전 검토본", st["small"]),
-        Paragraph(escape(config["scenario"]), st["small"]), PageBreak()]
-
-    for section in report["sections"]:
-        story.append(Paragraph(escape(section["title"]), st["h1"]))
-        md.extend(["# " + section["title"], ""])
-        for cid in section["claim_ids"]:
-            c = claims[cid]
-            heading = f"{c['technology']} · {LABELS[c['kind']]} · {cid}"
-            story.append(Paragraph(escape(heading), st["h2"]))
-            story.append(Paragraph(escape(c["text"] + " " + citations(c)), st["body"]))
-            md.extend([f"## {heading}", c["text"] + " " + citations(c), ""])
-            for label, key in (("조건", "conditions"), ("한계", "caveats")):
-                if c[key].strip():
-                    line = f"{label}: {c[key]}"
-                    story.append(Paragraph(escape(line), st["small"]))
-                    md.extend([line, ""])
-        if section["title"] == "관점 간 상충과 한계":
-            for gap in joined["gaps"]:
-                story.append(Paragraph(escape("조사 한계: " + gap), st["small"]))
-                md.extend(["조사 한계: " + gap, ""])
-        story.append(PageBreak())
-
-    story.append(Paragraph("REFERENCE", st["h1"]))
-    md.extend(["# REFERENCE", ""])
-    for source_id in used_sources:
-        source = sources[source_id]
-        info = f"[{numbering[source_id]}] {source['authors']}. {source['title']}. {source.get('date', 'unknown')}. 버전 {source.get('version', 'unknown')}. 조회 {source['accessed_at'][:10]}."
-        story.extend([Paragraph(escape(info), st["body"]), Paragraph(escape(source["url"]), st["small"]), Spacer(1, 8)])
-        md.extend([info, source["url"], ""])
-    path = out / filename(settings, "Output")
-    SimpleDocTemplate(str(path), pagesize=A4, leftMargin=48, rightMargin=48, topMargin=42, bottomMargin=55,
-                      title="KV Cache 다관점 평가", author="SKALA team (review)").build(story, onFirstPage=footer, onLaterPages=footer)
-    (out / "report.md").write_text("\n".join(md))
-    reader = PdfReader(path)
-    if "SUMMARY" not in reader.pages[0].extract_text() or not any("REFERENCE" in p.extract_text() for p in reader.pages[-2:]):
-        raise ValueError("PDF chapter layout validation failed")
-    checks = {"summary_height_pt": round(summary_height, 2), "half_page_limit_pt": A4[1] / 2,
-              "pdf_pages": len(reader.pages), "used_sources": used_sources, "used_claims": used_claims,
-              "used_evidence": used_evidence, "visual_review": "pending", "semantic_review": "pending"}
-    write_json(out / "pdf_validation.json", checks)
-    # Full quotations stay in a separate human review sheet, not the report reference chapter.
-    review = ["# 인용 검수", "", "아래 각 주장을 원문·조건과 대조하세요. 자동 검사는 구절 존재만 확인합니다.", ""]
-    for cid in used_claims:
-        c = claims[cid]
-        review.extend(["## " + cid, c["text"], "", "판정: 미검수", ""])
-        for eid in c["evidence_ids"]:
-            ev = evidence[eid]
-            review.extend([f"- {eid} | {ev['source_id']} | 물리 페이지 {ev.get('page')} | {ev['section']}", "> " + ev["quote"], ""])
-    (out / "citation_review.md").write_text("\n".join(review))
-    return {"pdf": str(path), "markdown": str(out / "report.md"), "citation_review": str(out / "citation_review.md")}
+    """Compatibility entry point with the same dual-format contract."""
+    return render_report(out, report, joined, sources, settings, config)

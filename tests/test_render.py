@@ -7,7 +7,7 @@ import pytest
 from reportlab.lib.pagesizes import A4
 
 from rag.evidence import validate_assessment
-from rag.render import filename, render_pdf_report as render_report
+from rag.render import filename, render_report
 from rag.schemas import Reference
 from rag.settings import Settings
 
@@ -64,7 +64,7 @@ def test_pdf_and_markdown_cite_only_used_sources_and_keep_review_quotes(tmp_path
     review = Path(paths["citation_review"]).read_text()
     checks = json.loads((tmp_path / "pdf_validation.json").read_text())
     first_page = reader.pages[0].extract_text()
-    assert first_page.index("SUMMARY") < first_page.index("KIVI × InfiniGen")
+    assert first_page.index("SUMMARY") < first_page.index("대상 기술")
     assert "REFERENCE" in reader.pages[-1].extract_text()
     assert checks["used_sources"] == ["source-1", "source-2"]
     assert checks["used_claims"] == ["claim-1", "claim-2"]
@@ -73,7 +73,7 @@ def test_pdf_and_markdown_cite_only_used_sources_and_keep_review_quotes(tmp_path
     for text in (pdf_text, markdown):
         assert "KIVI Source Title" in text and "InfiniGen Source Title" in text
         assert "Unused Source Title" not in text and "example.invalid/3" not in text
-        assert "[1, p.1]" in text and "[2, p.2]" in text
+        assert "[1, 물리 p.1]" in text and "[2, 물리 p.2]" in text
         assert "2024" in text and "2026-09-21" in text and "v1" in text
     assert "Quoted source evidence for KIVI." in review
     assert "evidence-1 | source-1 | 물리 페이지 1" in review
@@ -84,10 +84,10 @@ def test_pdf_and_markdown_cite_only_used_sources_and_keep_review_quotes(tmp_path
 def test_summary_over_half_a_page_is_rejected_before_pdf_creation(tmp_path, report_fixture):
     report, joined, sources, settings, config = report_fixture
     joined["claims"]["claim-1"]["text"] = "요약은 물리 페이지의 절반을 넘어서는 안 됩니다. " * 300
-    with pytest.raises(ValueError, match="SUMMARY exceeds half"):
+    with pytest.raises(ValueError, match="SUMMARY"):
         render_report(tmp_path, report, joined, sources, settings, config)
     assert not list(tmp_path.glob("*.pdf"))
-    assert not (tmp_path / "pdf_validation.json").exists()
+    assert json.loads((tmp_path / "pdf_validation.json").read_text())["pdf_generated"] is False
 
 
 @pytest.mark.parametrize("quote", ["", "too short", "This quotation is absent from the actual source."])

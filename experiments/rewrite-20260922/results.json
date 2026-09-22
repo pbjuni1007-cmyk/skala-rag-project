@@ -1,0 +1,1456 @@
+{
+  "unique_pairs": 4,
+  "unique_improved": 1,
+  "unique_unchanged": 1,
+  "unique_regressed": 2,
+  "scope": "controlled replay of observed queries; known-item diagnostic, not independent holdout",
+  "paid_model_calls": 0,
+  "results": [
+    {
+      "id": "20260921T100118-6dfbc0-infinigen",
+      "technology": "InfiniGen",
+      "before": {
+        "chunk_ids": [
+          "infinigen:p2:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p11:t0",
+          "infinigen:p9:t0",
+          "infinigen:p13:t0",
+          "infinigen:p1:t750",
+          "infinigen:p6:t250",
+          "infinigen:p9:t750",
+          "infinigen:p1:t0",
+          "infinigen:p10:t500",
+          "infinigen:p14:t500",
+          "infinigen:p6:t500",
+          "infinigen:p2:t250",
+          "infinigen:p6:t750",
+          "infinigen:p11:t250",
+          "infinigen:p13:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p11:t750",
+          "infinigen:p11:t1250",
+          "infinigen:p1:t1000"
+        ],
+        "context_tokens": 6495,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 6,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "after": {
+        "chunk_ids": [
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p11:t0",
+          "infinigen:p9:t0",
+          "infinigen:p6:t500",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p6:t250",
+          "infinigen:p1:t750",
+          "infinigen:p9:t1250",
+          "infinigen:p6:t750",
+          "infinigen:p10:t500",
+          "infinigen:p17:t0",
+          "infinigen:p14:t1000",
+          "infinigen:p13:t500",
+          "infinigen:p10:t250",
+          "infinigen:p11:t750",
+          "infinigen:p10:t750",
+          "infinigen:p16:t1250"
+        ],
+        "context_tokens": 6495,
+        "complete_count": 4,
+        "total": 10,
+        "condition_count": 5,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": false,
+            "spans": [
+              true,
+              false
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "new_chunk_ids": [
+        "infinigen:p10:t250",
+        "infinigen:p10:t750",
+        "infinigen:p13:t500",
+        "infinigen:p16:t1250",
+        "infinigen:p17:t0",
+        "infinigen:p3:t0",
+        "infinigen:p9:t1250"
+      ],
+      "complete_delta": -1,
+      "condition_delta": -1
+    },
+    {
+      "id": "20260921T100118-6dfbc0-kivi",
+      "technology": "KIVI",
+      "before": {
+        "chunk_ids": [
+          "kivi:p3:t0",
+          "kivi:p1:t0",
+          "kivi:p5:t0",
+          "kivi:p7:t0",
+          "kivi:p9:t0",
+          "kivi:p8:t0",
+          "kivi:p10:t0",
+          "kivi:p14:t0",
+          "kivi:p12:t0",
+          "kivi:p7:t1000",
+          "kivi:p2:t500",
+          "kivi:p6:t0",
+          "kivi:p8:t500",
+          "kivi:p9:t500",
+          "kivi:p2:t250",
+          "kivi:p13:t250",
+          "kivi:p6:t1250",
+          "kivi:p7:t750",
+          "kivi:p6:t1000",
+          "kivi:p5:t1000",
+          "kivi:p1:t250",
+          "kivi:p8:t750",
+          "kivi:p13:t0"
+        ],
+        "context_tokens": 6442,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 10,
+        "condition_total": 15,
+        "questions": [
+          {
+            "id": "K1",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K2",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "K3",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K4",
+            "complete": false,
+            "spans": [
+              false,
+              true
+            ]
+          },
+          {
+            "id": "K5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "K7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K-Fig5-precision",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          }
+        ]
+      },
+      "after": {
+        "chunk_ids": [
+          "kivi:p3:t0",
+          "kivi:p1:t0",
+          "kivi:p6:t0",
+          "kivi:p8:t0",
+          "kivi:p7:t0",
+          "kivi:p9:t0",
+          "kivi:p5:t0",
+          "kivi:p10:t0",
+          "kivi:p14:t0",
+          "kivi:p2:t500",
+          "kivi:p7:t500",
+          "kivi:p8:t500",
+          "kivi:p9:t500",
+          "kivi:p13:t250",
+          "kivi:p5:t1000",
+          "kivi:p6:t250",
+          "kivi:p9:t1000",
+          "kivi:p14:t500",
+          "kivi:p8:t250",
+          "kivi:p5:t750",
+          "kivi:p7:t750",
+          "kivi:p7:t1000",
+          "kivi:p8:t750"
+        ],
+        "context_tokens": 6481,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 10,
+        "condition_total": 15,
+        "questions": [
+          {
+            "id": "K1",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K2",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K4",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "K7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K-Fig5-precision",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          }
+        ]
+      },
+      "new_chunk_ids": [
+        "kivi:p14:t500",
+        "kivi:p5:t750",
+        "kivi:p6:t250",
+        "kivi:p7:t500",
+        "kivi:p8:t250",
+        "kivi:p9:t1000"
+      ],
+      "complete_delta": 0,
+      "condition_delta": 0
+    },
+    {
+      "id": "20260921T100525-27ea3e-infinigen",
+      "technology": "InfiniGen",
+      "before": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p13:t0",
+          "infinigen:p15:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p2:t0",
+          "infinigen:p1:t1000",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p14:t500",
+          "infinigen:p6:t250",
+          "infinigen:p1:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p9:t0",
+          "infinigen:p17:t0",
+          "infinigen:p11:t1000",
+          "infinigen:p11:t750",
+          "infinigen:p10:t250",
+          "infinigen:p12:t750",
+          "infinigen:p11:t1250"
+        ],
+        "context_tokens": 6495,
+        "complete_count": 2,
+        "total": 10,
+        "condition_count": 3,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": false,
+            "spans": [
+              false,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "after": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p12:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p9:t0",
+          "infinigen:p2:t0",
+          "infinigen:p9:t750",
+          "infinigen:p11:t750",
+          "infinigen:p6:t250",
+          "infinigen:p6:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p8:t500",
+          "infinigen:p12:t750",
+          "infinigen:p2:t250",
+          "infinigen:p10:t750",
+          "infinigen:p6:t500",
+          "infinigen:p13:t750",
+          "infinigen:p11:t500",
+          "infinigen:p9:t1250",
+          "infinigen:p4:t1250"
+        ],
+        "context_tokens": 6467,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 6,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "new_chunk_ids": [
+        "infinigen:p10:t750",
+        "infinigen:p11:t500",
+        "infinigen:p12:t0",
+        "infinigen:p13:t750",
+        "infinigen:p4:t1250",
+        "infinigen:p6:t500",
+        "infinigen:p6:t750",
+        "infinigen:p8:t500",
+        "infinigen:p9:t1250"
+      ],
+      "complete_delta": 3,
+      "condition_delta": 3
+    },
+    {
+      "id": "20260921T103300-917c01-infinigen",
+      "technology": "InfiniGen",
+      "before": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p13:t0",
+          "infinigen:p15:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p2:t0",
+          "infinigen:p1:t1000",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p14:t500",
+          "infinigen:p6:t250",
+          "infinigen:p1:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p9:t0",
+          "infinigen:p17:t0",
+          "infinigen:p11:t1000",
+          "infinigen:p11:t750",
+          "infinigen:p10:t250",
+          "infinigen:p12:t750",
+          "infinigen:p11:t1250"
+        ],
+        "context_tokens": 6495,
+        "complete_count": 2,
+        "total": 10,
+        "condition_count": 3,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": false,
+            "spans": [
+              false,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "after": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p12:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p9:t0",
+          "infinigen:p2:t0",
+          "infinigen:p9:t750",
+          "infinigen:p11:t750",
+          "infinigen:p6:t250",
+          "infinigen:p6:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p8:t500",
+          "infinigen:p12:t750",
+          "infinigen:p2:t250",
+          "infinigen:p10:t750",
+          "infinigen:p6:t500",
+          "infinigen:p13:t750",
+          "infinigen:p11:t500",
+          "infinigen:p9:t1250",
+          "infinigen:p4:t1250"
+        ],
+        "context_tokens": 6467,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 6,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "new_chunk_ids": [
+        "infinigen:p10:t750",
+        "infinigen:p11:t500",
+        "infinigen:p12:t0",
+        "infinigen:p13:t750",
+        "infinigen:p4:t1250",
+        "infinigen:p6:t500",
+        "infinigen:p6:t750",
+        "infinigen:p8:t500",
+        "infinigen:p9:t1250"
+      ],
+      "complete_delta": 3,
+      "condition_delta": 3
+    },
+    {
+      "id": "20260921T103742-b26f39-infinigen",
+      "technology": "InfiniGen",
+      "before": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p13:t0",
+          "infinigen:p15:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p2:t0",
+          "infinigen:p1:t1000",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p14:t500",
+          "infinigen:p6:t250",
+          "infinigen:p1:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p9:t0",
+          "infinigen:p17:t0",
+          "infinigen:p11:t1000",
+          "infinigen:p11:t750",
+          "infinigen:p10:t250",
+          "infinigen:p12:t750",
+          "infinigen:p11:t1250"
+        ],
+        "context_tokens": 6495,
+        "complete_count": 2,
+        "total": 10,
+        "condition_count": 3,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": false,
+            "spans": [
+              false,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "after": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p12:t0",
+          "infinigen:p5:t0",
+          "infinigen:p7:t0",
+          "infinigen:p9:t0",
+          "infinigen:p2:t0",
+          "infinigen:p9:t750",
+          "infinigen:p11:t750",
+          "infinigen:p6:t250",
+          "infinigen:p6:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p8:t500",
+          "infinigen:p12:t750",
+          "infinigen:p2:t250",
+          "infinigen:p10:t750",
+          "infinigen:p6:t500",
+          "infinigen:p13:t750",
+          "infinigen:p11:t500",
+          "infinigen:p9:t1250",
+          "infinigen:p4:t1250"
+        ],
+        "context_tokens": 6467,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 6,
+        "condition_total": 12,
+        "questions": [
+          {
+            "id": "I1",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I2",
+            "complete": false,
+            "spans": [
+              false,
+              false
+            ]
+          },
+          {
+            "id": "I3",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I4",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "I7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "I1-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "I-Fig17-setup",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          }
+        ]
+      },
+      "new_chunk_ids": [
+        "infinigen:p10:t750",
+        "infinigen:p11:t500",
+        "infinigen:p12:t0",
+        "infinigen:p13:t750",
+        "infinigen:p4:t1250",
+        "infinigen:p6:t500",
+        "infinigen:p6:t750",
+        "infinigen:p8:t500",
+        "infinigen:p9:t1250"
+      ],
+      "complete_delta": 3,
+      "condition_delta": 3
+    },
+    {
+      "id": "20260922T024141-f6e6db-kivi",
+      "technology": "KIVI",
+      "before": {
+        "chunk_ids": [
+          "kivi:p3:t0",
+          "kivi:p1:t0",
+          "kivi:p4:t0",
+          "kivi:p6:t0",
+          "kivi:p7:t0",
+          "kivi:p9:t0",
+          "kivi:p8:t0",
+          "kivi:p2:t0",
+          "kivi:p5:t0",
+          "kivi:p8:t500",
+          "kivi:p9:t500",
+          "kivi:p2:t250",
+          "kivi:p6:t1250",
+          "kivi:p2:t500",
+          "kivi:p1:t250",
+          "kivi:p7:t750",
+          "kivi:p14:t0",
+          "kivi:p5:t250",
+          "kivi:p2:t750",
+          "kivi:p6:t250",
+          "kivi:p8:t750",
+          "kivi:p7:t1000",
+          "kivi:p13:t500"
+        ],
+        "context_tokens": 6466,
+        "complete_count": 5,
+        "total": 10,
+        "condition_count": 10,
+        "condition_total": 15,
+        "questions": [
+          {
+            "id": "K1",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "K2",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K4",
+            "complete": false,
+            "spans": [
+              false,
+              true
+            ]
+          },
+          {
+            "id": "K5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "K7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K-Fig5-precision",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          }
+        ]
+      },
+      "after": {
+        "chunk_ids": [
+          "kivi:p3:t0",
+          "kivi:p1:t0",
+          "kivi:p8:t0",
+          "kivi:p10:t0",
+          "kivi:p7:t0",
+          "kivi:p9:t0",
+          "kivi:p5:t0",
+          "kivi:p6:t0",
+          "kivi:p2:t500",
+          "kivi:p9:t500",
+          "kivi:p8:t500",
+          "kivi:p7:t1000",
+          "kivi:p6:t250",
+          "kivi:p14:t500",
+          "kivi:p7:t750",
+          "kivi:p1:t250",
+          "kivi:p2:t250",
+          "kivi:p14:t750",
+          "kivi:p2:t750",
+          "kivi:p13:t250",
+          "kivi:p6:t1000",
+          "kivi:p8:t750"
+        ],
+        "context_tokens": 6425,
+        "complete_count": 4,
+        "total": 10,
+        "condition_count": 9,
+        "condition_total": 15,
+        "questions": [
+          {
+            "id": "K1",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K2",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3",
+            "complete": true,
+            "spans": [
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K4",
+            "complete": false,
+            "spans": [
+              false,
+              true
+            ]
+          },
+          {
+            "id": "K5",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K6",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          },
+          {
+            "id": "K7",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K8",
+            "complete": false,
+            "spans": [
+              false
+            ]
+          },
+          {
+            "id": "K3-expanded",
+            "complete": true,
+            "spans": [
+              true,
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "id": "K-Fig5-precision",
+            "complete": true,
+            "spans": [
+              true
+            ]
+          }
+        ]
+      },
+      "new_chunk_ids": [
+        "kivi:p10:t0",
+        "kivi:p13:t250",
+        "kivi:p14:t500",
+        "kivi:p14:t750",
+        "kivi:p6:t1000"
+      ],
+      "complete_delta": -1,
+      "condition_delta": -1
+    }
+  ],
+  "improved": 3,
+  "unchanged": 1,
+  "regressed": 2,
+  "config": {
+    "domain": "기업의 IT 사업 문서 검토를 지원하는 Agentic AI",
+    "scenario": "공개 AiPMO 사례를 참고한 RFP·계약·사업 문서 검토. 장문과 반복 요청은 팀의 적용 가정이며 SK AX 내부 구조·기술 도입 사실이 아님.",
+    "technologies": [
+      "KIVI",
+      "InfiniGen"
+    ],
+    "chunk_tokens": 300,
+    "overlap_tokens": 50,
+    "top_k": 5,
+    "evidence_token_budget": 6500,
+    "adjacent_token_budget": 2800,
+    "assessment_evidence_token_budget": 6500,
+    "source_discovery_config": "config/source-discovery.yaml",
+    "papers": [
+      {
+        "id": "kivi",
+        "technology": "KIVI",
+        "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache",
+        "authors": "Zirui Liu et al.",
+        "version": "2402.02750v2",
+        "date": "2024",
+        "url": "https://arxiv.org/pdf/2402.02750v2"
+      },
+      {
+        "id": "infinigen",
+        "technology": "InfiniGen",
+        "title": "InfiniGen: Efficient Generative Inference of Large Language Models with Dynamic KV Cache Management",
+        "authors": "Wonbeom Lee et al.",
+        "version": "2406.19707v1",
+        "date": "2024",
+        "url": "https://arxiv.org/pdf/2406.19707v1"
+      }
+    ],
+    "web": [
+      {
+        "id": "kivi_repo",
+        "title": "KIVI official repository README",
+        "authors": "KIVI authors",
+        "url": "https://raw.githubusercontent.com/jy-yuan/KIVI/main/README.md"
+      },
+      {
+        "id": "infinigen_repo",
+        "title": "InfiniGen official repository README",
+        "authors": "SNU Computer Architecture Lab",
+        "url": "https://raw.githubusercontent.com/snu-comparch/InfiniGen/main/README.md"
+      },
+      {
+        "id": "hf_kv",
+        "title": "Hugging Face Transformers KV cache strategies",
+        "authors": "Hugging Face",
+        "url": "https://huggingface.co/docs/transformers/kv_cache"
+      },
+      {
+        "id": "aipmo",
+        "title": "SK AX AiPMO",
+        "authors": "SK AX",
+        "url": "https://www.skax.co.kr/ax-services/aipmo"
+      }
+    ]
+  },
+  "source_hashes": {
+    "pairs": "b428da24c13095f53fb04f16174e27acd9c0863b15c10e7810a67c1935bf0913",
+    "dataset": "ee8599e4f171e7489c71e9e1789c141708e2e98dfaf801c11e5f606c41f234ca",
+    "pages": "dffa79e8eed1793f16c217c624af55d6d2f93c629f41d815643082657275fca3",
+    "runner": "34839e8a19af0d7527fa5dadb4c25c4a4a63cfc24a5532a51a9bec4970b2d4d9"
+  }
+}

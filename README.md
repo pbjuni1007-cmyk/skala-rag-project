@@ -21,13 +21,13 @@ uv run python app.py
 ```bash
 uv run python -m pytest -q                    # API 없이 회귀 검사
 uv run python scripts/evaluate.py            # 준비한 인덱스의 검색 검사
-uv run python app.py --render outputs/<실행ID> # 저장한 결과로 Markdown 재작성
+uv run python app.py --render outputs/<실행ID> # 저장한 결과로 Markdown·PDF 재작성
 uv run python app.py --resume outputs/<실행ID> # 동일 코드·입력의 완료 응답 재사용
 ```
 
 코드를 수정한 뒤에는 `--reuse-calls outputs/<실행ID>`를 사용할 수 있습니다. 자료·검색 정책·모델·설정·의존성·공개 보고서 명세가 같아야 하며, 정확히 같은 요청의 정상 완료 응답만 재사용합니다. 변경된 요청은 새로 생성하고 현재 검증을 다시 거칩니다. 조건이 달라졌으면 복구 옵션 없이 새로 실행합니다.
 
-결과는 `outputs/<실행ID>/`의 `report.md`, `citation_review.md`, `gap_review.md`에 저장됩니다. 주장·인용·출처·실행 설정도 JSON으로 보존합니다. `human_review_pending`은 생성과 자동 검증을 마치고 인용 의미 검수를 기다리는 상태입니다. 프로그램과 `--render`는 Markdown만 생성하며 PDF는 생성하지 않습니다. 팀이 내용 검수 후 PDF로 변환합니다. 저장 루트는 `RAG_OUTPUT_DIR`로 바꿀 수 있습니다.
+결과는 `outputs/<실행ID>/`의 `report.md`, `citation_review.md`, `gap_review.md`에 저장됩니다. 주장·인용·출처·실행 설정도 JSON으로 보존합니다. `human_review_pending`은 생성과 자동 검증을 마치고 인용 의미 검수를 기다리는 상태입니다. 일반 실행과 `--render`는 같은 보고서 내용으로 `.md`와 `.pdf`를 함께 생성합니다. PDF는 `RAG-Output_<캠퍼스>_<반>_<팀원>.pdf`이며 제출 정보가 없으면 `RAG-Output_review.pdf`로 저장합니다. `--render`는 추가 GPT 호출 없이 저장된 결과를 다시 출력합니다. PDF 생성에 실패하면 실행은 `incomplete`로 종료됩니다. 팀은 생성된 PDF의 의미와 페이지 배치를 검수합니다. 저장 루트는 `RAG_OUTPUT_DIR`로 바꿀 수 있습니다.
 
 `reports/latest/`는 검토·편집한 공유용 사본으로, 새 실행 때 자동 갱신되지 않습니다. 새 결과를 공유할 때는 해당 실행의 보고서와 두 검수표를 함께 검토해 옮기고 `run.json`의 실행 ID와 파일 해시를 갱신합니다. 실행 원본은 `outputs/<실행ID>/`에 보존합니다.
 
@@ -46,7 +46,7 @@ flowchart LR
  D --> J
  J --> Y[종합·보고서]
  Y --> V[구조·인용 검증]
- V --> O[Markdown·검수표]
+ V --> O[Markdown·PDF·검수표]
 ```
 
 | 역할 | 판단과 결과 |
@@ -86,7 +86,7 @@ KIVI 15페이지와 InfiniGen 18페이지를 물리 페이지 단위로 추출�
 | `app.py`, `rag/graph.py`, `rag/schemas.py` | 실행 진입점, 역할별 그래프, 공유 State와 구조화 응답 |
 | `rag/corpus.py`, `rag/source_discovery.py` | 원문 수집·청킹·임베딩·검색·출처 관리 |
 | `rag/llm.py`, `rag/budget.py`, `rag/request_budget.py`, `rag/repair.py` | API 호출·입력 한도·비용·제한된 오류 수정 |
-| `rag/evidence.py`, `rag/render.py` | 주장·인용·보고서 구조 검증과 Markdown 작성 |
+| `rag/evidence.py`, `rag/render.py` | 주장·인용·보고서 구조 검증과 Markdown·PDF 작성 |
 | `config/`, `eval/`, `tests/` | 실행·보고서 명세, 고정 검색 질문, 회귀 검사 |
 | `scripts/`, `experiments/` | 로컬 검색 실험 도구와 측정 결과 |
 | `docs/`, `reports/latest/` | 설계·기술 기록과 최신 보고서·검수표 |

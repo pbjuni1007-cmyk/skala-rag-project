@@ -1,0 +1,19 @@
+version: 1
+purpose: Compare KIVI and InfiniGen for enterprise IT document review
+technologies: [KIVI, InfiniGen]
+roles: [research, market, stakeholder, domain, synthesis]
+report:
+  sections: [기술 성숙도, 시장성, 이해관계자, 도메인 적용, 관점 간 상충과 한계]
+  summary_claim_count: [2, 3]
+  summary_includes: [synthesis, followup_perspective]
+  synthesis_claim_count: 2
+  retain_all_body_claims: true
+  evidence: verbatim_source_quotes_with_page_or_web_section
+  output_format: markdown
+  final_status: human_review_pending
+retrieval:
+  paper_pool_page_limit: 200
+  core_facets: [mechanism, limitation, conditions, maturity]
+  research_search_rounds: 2
+  perspective_reassessment_rounds: 1
+  sources: fixed_papers_and_registered_official_web_snapshots

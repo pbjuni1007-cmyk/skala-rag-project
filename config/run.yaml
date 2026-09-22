@@ -1,0 +1,42 @@
+domain: 기업의 IT 사업 문서 검토를 지원하는 Agentic AI
+scenario: 공개 AiPMO 사례를 참고한 RFP·계약·사업 문서 검토. 장문과 반복 요청은 팀의 적용 가정이며 SK AX 내부 구조·기술 도입 사실이 아님.
+technologies: [KIVI, InfiniGen]
+chunk_tokens: 300
+overlap_tokens: 50
+top_k: 5
+evidence_token_budget: 6500
+adjacent_token_budget: 2800
+assessment_evidence_token_budget: 6500
+source_discovery_config: config/source-discovery.yaml
+papers:
+  - id: kivi
+    technology: KIVI
+    title: "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+    authors: "Zirui Liu et al."
+    version: 2402.02750v2
+    date: '2024'
+    url: https://arxiv.org/pdf/2402.02750v2
+  - id: infinigen
+    technology: InfiniGen
+    title: "InfiniGen: Efficient Generative Inference of Large Language Models with Dynamic KV Cache Management"
+    authors: "Wonbeom Lee et al."
+    version: 2406.19707v1
+    date: '2024'
+    url: https://arxiv.org/pdf/2406.19707v1
+web:
+  - id: kivi_repo
+    title: KIVI official repository README
+    authors: KIVI authors
+    url: https://raw.githubusercontent.com/jy-yuan/KIVI/main/README.md
+  - id: infinigen_repo
+    title: InfiniGen official repository README
+    authors: SNU Computer Architecture Lab
+    url: https://raw.githubusercontent.com/snu-comparch/InfiniGen/main/README.md
+  - id: hf_kv
+    title: Hugging Face Transformers KV cache strategies
+    authors: Hugging Face
+    url: https://huggingface.co/docs/transformers/kv_cache
+  - id: aipmo
+    title: SK AX AiPMO
+    authors: SK AX
+    url: https://www.skax.co.kr/ax-services/aipmo

@@ -1,0 +1,23 @@
+[project]
+name = "skala-kv-rag"
+version = "0.1.0"
+description = "Evidence-first KIVI and InfiniGen report agent"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "langgraph>=1.0,<2",
+  "pydantic>=2.10,<3",
+  "PyYAML>=6,<7",
+  "pypdf>=5,<7",
+  "reportlab>=4,<5",
+  "sentence-transformers>=3,<6",
+  "numpy>=1.26,<3",
+  "beautifulsoup4>=4.12,<5",
+  "tiktoken>=0.8,<1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

@@ -1,0 +1,15 @@
+flowchart TD
+    START([시작: 자료·임베딩 준비]) --> RESEARCH[기술 조사·성숙도 / LLM 역할 1]
+    RESEARCH -->|research_ok| MARKET[시장성 평가 / 역할 2]
+    RESEARCH -->|research_ok| STAKEHOLDER[이해관계자 평가 / 역할 3]
+    RESEARCH -->|research_ok| DOMAIN[도메인 적용 / 역할 4]
+    RESEARCH -->|incomplete| FAIL([실패 기록 후 종료])
+    MARKET --> JOIN[세 관점 완료 후 합류 / 코드]
+    STAKEHOLDER --> JOIN
+    DOMAIN --> JOIN
+    JOIN -->|joined: failed 없음| SYNTHESIS[종합·보고서 구성 / 역할 5]
+    JOIN -->|incomplete: failed 있음| FAIL
+    SYNTHESIS -->|validated| RENDER[Markdown·인용·공백 검수표 / 코드]
+    SYNTHESIS -->|incomplete| FAIL
+    RENDER -->|작성 성공| REVIEW([human_review_pending: 사람 검수])
+    RENDER -->|작성 실패| FAIL

@@ -31,7 +31,7 @@ uv run python app.py --resume outputs/<실행ID> # 동일 코드·입력의 완�
 
 `reports/latest/`는 검토·편집한 공유용 사본으로, 새 실행 때 자동 갱신되지 않습니다. 새 결과를 공유할 때는 해당 실행의 보고서와 두 검수표를 함께 검토해 옮기고 `run.json`의 실행 ID와 파일 해시를 갱신합니다. 실행 원본은 `outputs/<실행ID>/`에 보존합니다.
 
-제출용 PDF: [설계서](output/pdf/RAG-Design_판교-7반_김기현+김도현+박병준+홍수정.pdf) · [평가 보고서](output/pdf/RAG-Output_판교_7반_김기현+김도현+박병준+홍수정.pdf). PDF의 상세 검수 링크는 팀 점검용 스냅샷 저장소로 연결됩니다.
+제출용 PDF: [설계서](output/pdf/RAG-Design_판교-7반_김기현+김도현+박병준+홍수정.pdf) · [평가 보고서](output/pdf/RAG-Output_판교_7반_김기현+김도현+박병준+홍수정.pdf). 원본 Markdown: [설계서](docs/design-report.md) · [평가 보고서](reports/latest/report.md). PDF의 상세 검수 링크도 이 저장소의 문서로 연결됩니다. 설계의 최신 내용은 Markdown 정본을 기준으로 확인합니다.
 
 ## 역할과 흐름
 

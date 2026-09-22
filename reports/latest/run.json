@@ -1,0 +1,47 @@
+{
+  "run_id": "20260922T024515-dc9b07",
+  "status": "human_review_pending",
+  "model": "gpt-5.6-luna",
+  "reasoning_profile": "balanced",
+  "effective_reasoning_efforts": {
+    "research_queries": "low",
+    "rewrite": "low",
+    "retrieval_review": "low",
+    "research": "medium",
+    "market": "medium",
+    "stakeholder": "medium",
+    "domain": "medium",
+    "market_reassessment_facet_costs": "medium",
+    "synthesis_report_repair": "low",
+    "synthesis_report": "max",
+    "synthesis_gaps_0": "max",
+    "unknown": "max"
+  },
+  "code_sha256": "607e820fbe3dd1178cec7167c2bbcb5ee912261e7f1ed775645e015cbd211927",
+  "report_contract_sha256": "3833c95b6d53824d6a6840b5af9aaf7810885d297886fb50a77b7d6ea3e53795",
+  "claims": 28,
+  "evidence_quotes_checked": 92,
+  "summary_characters": 801,
+  "semantic_review": "pending",
+  "files": {
+    "report.md": "20c64d3f04fdcbe512f881fdaf4cabc0e863e6c6992c892234275f04a5c85796",
+    "citation_review.md": "14d7d0324b64708b22311f9c54bd29417da9e2f14162583b535eb582e842b8c3",
+    "gap_review.md": "43c9371f58b4c5315851a446ab8af4714d63dbeda3e64331fef29a237a87c215"
+  },
+  "publication": {
+    "kind": "editorially_reviewed_copy",
+    "source_run_id": "20260922T024515-dc9b07",
+    "source_files": {
+      "report.md": "72ba13a2de58ee51649367a092ad654a75958e48ebf26b797162799e668c0b2c",
+      "citation_review.md": "b4327f6b8de3c79a4822814c137cee0572f95b45647faf928f1b9b307492a684",
+      "gap_review.md": "43c9371f58b4c5315851a446ab8af4714d63dbeda3e64331fef29a237a87c215",
+      "state.json": "eb33cddce66aa4800325cae56079ab2ae43e46896d7da4067d0b224739ec6ec4"
+    },
+    "changes": [
+      "domain-5 separates reported mechanism from application inference",
+      "Unresolved gaps grouped into five topics; all 19 gap IDs preserved",
+      "Web reference title and site names corrected from saved source metadata"
+    ],
+    "semantic_review": "targeted_edits_completed_full_team_review_pending"
+  }
+}

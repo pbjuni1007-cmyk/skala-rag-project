@@ -1,0 +1,613 @@
+{
+  "schema_version": 1,
+  "status": "human_review_pending",
+  "usage": "Known-item diagnostic, not a new holdout; no change to prior questions or experiment scores.",
+  "pages_sha256": "dffa79e8eed1793f16c217c624af55d6d2f93c629f41d815643082657275fca3",
+  "source_research_sha256": "27a2e0625f64352a2cd98a21ed9dd1f3af997e9fc9d9ea14398d35819ec15421",
+  "source_run": "20260922T005542-1c8a7b",
+  "queries": {
+    "KIVI": [
+      {
+        "technology": "KIVI",
+        "facet": "mechanism",
+        "query": "KIVI asymmetric 2-bit KV cache quantization per-channel keys per-token values residual cache mechanism"
+      },
+      {
+        "technology": "KIVI",
+        "facet": "limitation",
+        "query": "KIVI accuracy degradation sensitivity to bit width residual cache size and workload"
+      },
+      {
+        "technology": "KIVI",
+        "facet": "conditions",
+        "query": "KIVI efficiency Figure 5 NVIDIA A100 ShareGPT benchmark latency memory throughput conditions"
+      },
+      {
+        "technology": "KIVI",
+        "facet": "maturity",
+        "query": "KIVI implementation repository version license and experimental validation across language models"
+      }
+    ],
+    "InfiniGen": [
+      {
+        "technology": "InfiniGen",
+        "facet": "mechanism",
+        "query": "InfiniGen predictive KV cache prefetching selective loading across GPU CPU memory hierarchy mechanism"
+      },
+      {
+        "technology": "InfiniGen",
+        "facet": "limitation",
+        "query": "InfiniGen accuracy and latency tradeoffs under alpha tuning selective fetching and eviction policies"
+      },
+      {
+        "technology": "InfiniGen",
+        "facet": "conditions",
+        "query": "InfiniGen Section 5.1 experimental setup A6000 CPU PCIe models benchmark conditions"
+      },
+      {
+        "technology": "InfiniGen",
+        "facet": "maturity",
+        "query": "InfiniGen implementation evaluation scope across models workloads and measured or simulated memory systems"
+      }
+    ]
+  },
+  "assessments": {
+    "KIVI": {
+      "claims": [
+        {
+          "references": [
+            {
+              "chunk_id": "kivi:p2:t0",
+              "quote": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+            },
+            {
+              "chunk_id": "kivi:p2:t250",
+              "quote": "KIVI quantizes key cache per-channel and quantizes value cache per-token."
+            },
+            {
+              "chunk_id": "kivi:p2:t500",
+              "quote": "A new plug-and-play 2bit KV cache quantization algorithm without any fine-tuning, KIVI, with hardware-friendly implementation."
+            },
+            {
+              "chunk_id": "kivi:p2:t500",
+              "quote": "We only apply group-wise quanti- zation to the grouped key cache and value cache, while the residual key cache and value cache are kept in full precision."
+            },
+            {
+              "chunk_id": "kivi:p2:t500",
+              "quote": "The grouped and residual parts can be combined using tiled matrix multiplication when computing attention scores."
+            }
+          ]
+        },
+        {
+          "references": [
+            {
+              "chunk_id": "kivi:p6:t0",
+              "quote": "Llama and Mistral model is based on multi-head attention, while Falcon is based on multi-query attention (Shazeer, 2019)."
+            },
+            {
+              "chunk_id": "kivi:p6:t1250",
+              "quote": "Thus, in Table 3, 4bit KIVI is needed to maintain the accuracy, while 2bit KIVI may have a large accuracy drop in this case."
+            },
+            {
+              "chunk_id": "kivi:p7:t750",
+              "quote": "performance significantly decreases when the group size reaches 128."
+            },
+            {
+              "chunk_id": "kivi:p7:t750",
+              "quote": "there is no consistent pattern between residual lengths and model accuracy."
+            }
+          ]
+        },
+        {
+          "references": [
+            {
+              "chunk_id": "kivi:p7:t750",
+              "quote": "To evaluate the wall-clock time efficiency ofKIVI, follow- ing vLLM (Kwon et al., 2023), we synthesize workloads based on ShareGPT"
+            },
+            {
+              "chunk_id": "kivi:p7:t1000",
+              "quote": "we synthesize workloads based on ShareGPT (sha, 2023), which contain input and output texts of real LLM services. On average, the data set has an input prompt length lprompt of 161 and an output length lgen of 338 (Kwon et al., 2023)."
+            },
+            {
+              "chunk_id": "kivi:p8:t500",
+              "quote": "size until out of memory and report the peak memory usage and throughput between KIVI (with residual length 32 and 128) and FP16 baseline for the Llama-2-7B model. The hardware here is a single NVIDIA A100 GPU (80GB)."
+            },
+            {
+              "chunk_id": "kivi:p8:t500",
+              "quote": "As shown in Figure 5, with similar maximum memory us- age, KIVI enables up to 4× larger batch size and gives 2.35×∼ 3.47× larger throughput."
+            }
+          ]
+        },
+        {
+          "references": [
+            {
+              "chunk_id": "kivi:p6:t0",
+              "quote": "using CUDA. We also implement the group-wise quantization ker- nel in Triton."
+            },
+            {
+              "chunk_id": "kivi:p2:t500",
+              "quote": "We conduct an extensive evaluation for KIVI with Llama, Mistral, and Falcon on popular generation tasks."
+            },
+            {
+              "chunk_id": "kivi:p9:t0",
+              "quote": "Table 4: Performance evaluation of KIVI on various models across a range of benchmarks in LongBench."
+            },
+            {
+              "chunk_id": "kivi:p1:t250",
+              "quote": "The source code is available at https://github.com/jy-yuan/KIVI."
+            }
+          ]
+        }
+      ]
+    },
+    "InfiniGen": {
+      "claims": [
+        {
+          "references": [
+            {
+              "chunk_id": "infinigen:p2:t0",
+              "quote": "At Layer i− 1 of the decoding stage, InfiniGen speculates on the attention pattern of the next layer (Layeri) using the atten- tion input of Layer i− 1, a partial query weight, and a partial key cache of Layer i."
+            },
+            {
+              "chunk_id": "infinigen:p1:t750",
+              "quote": "Second, it leverages the CPU memory capacity and maintains the KV cache pool on the CPU, rather than on the GPU, to ensure that the critical KV cache values can be identified for all outputs and layers with a large window size while alleviating the concerns about limited GPU memory capacity for long content generation."
+            }
+          ]
+        },
+        {
+          "references": [
+            {
+              "chunk_id": "infinigen:p11:t0",
+              "quote": "Table 2: Perplexity on WikiText-2 and PTB with 2048 sequence length with or without KV cache memory limits. Lower is better. Scheme OPT-6.7B OPT-13B OPT-30B Llama-2-7B Llama-2-13B Wiki PTB Wiki PTB Wiki PTB Wiki PTB Wiki PTB 100% 11.68 13.86 10.55 12.78 10.14 12.31 5.69 22.53 5.25 31.94 80-FIFO% 19.64 16.82 30.99 33.84"
+            },
+            {
+              "chunk_id": "infinigen:p12:t750",
+              "quote": "Figure 17: Accuracy and inference latency across (a) alpha values and (b) partial weight ratios."
+            },
+            {
+              "chunk_id": "infinigen:p13:t0",
+              "quote": "Note that the amount of KV cache to transfer is not related to the partial weight ratio. However, increasing the partial weight ratio results in higher memory consumption for partial weights and key cache (e.g., doubling the ratio doubles the memory consumption overhead)."
+            },
+            {
+              "chunk_id": "infinigen:p13:t0",
+              "quote": "The accuracy also does not noticeably differ beyond a ratio of 0.3. In our work, we opt for a partial weight ratio of 0.3 to achieve better accuracy while considering memory consumption overhead."
+            }
+          ]
+        },
+        {
+          "references": [
+            {
+              "chunk_id": "infinigen:p12:t750",
+              "quote": "Model Size. Figure 16(b) shows the speedup of INT4, H2O, and InfiniGen over FlexGen on three different model sizes. We use 1920 input tokens and 128 output tokens with a batch size of 4 for the experiment."
+            },
+            {
+              "chunk_id": "infinigen:p9:t750",
+              "quote": "We run the experiments on a system equipped with an NVIDIA RTX A6000 GPU [44] with 48GB of memory and an Intel Xeon Gold 6136 processor with 96GB of DDR4-2666 memory. PCIe 3.0×16 interconnects the CPU and GPU."
+            }
+          ]
+        },
+        {
+          "references": [
+            {
+              "chunk_id": "infinigen:p2:t250",
+              "quote": "We implement InfiniGen on a modern offloading-based inference system [57] and evaluate it on two representative LLMs with varying model sizes, batch sizes, and sequence lengths."
+            },
+            {
+              "chunk_id": "infinigen:p9:t750",
+              "quote": "We use five few-shot tasks from the lm-evaluation-harness benchmark [23]: COPA [54], Open- BookQA [42], WinoGrande [55], PIQA [8], and RTE [62]."
+            },
+            {
+              "chunk_id": "infinigen:p9:t750",
+              "quote": "The language modeling datasets used are WikiText-2 [41] and Penn Treebank (PTB) [38]."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "K1",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 5,
+          "start": 1439,
+          "end": 1529,
+          "quote": "key cache should be quantized per-channel and value cache should be quan- tized per-token.",
+          "quote_sha256": "593e8bc55b362cec5cb04b9ed8d2190f121c58a7b48ce2cf2304f0402ee010af",
+          "page_sha256": "9b865eab030d583e2a11854f9273177efa58b0be737fc7093d257712b04293d8"
+        }
+      ]
+    },
+    {
+      "id": "K2",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 4601,
+          "end": 4871,
+          "quote": "Since Falcon-7B adopts multi-query attention and only has one head for KV cache, it is already highly compressed compared to Llama- based models. Thus, in Table 3, 4bit KIVI is needed to maintain the accuracy, while 2bit KIVI may have a large accuracy drop in this case.",
+          "quote_sha256": "3d25d5dae946e66c881874e698929ebe49fdc2ca10a70ea634facd94ebf16dbb",
+          "page_sha256": "33bb1ce5cf34327b598e7ec1536fcf89402618168c53b560bf5716c7e1836f14"
+        }
+      ]
+    },
+    {
+      "id": "K3",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 3237,
+          "end": 3357,
+          "quote": "On average, the data set has an input prompt length lprompt of 161 and an output length lgen of 338 (Kwon et al., 2023).",
+          "quote_sha256": "ce66d0fb5ba1feb43518cf0de3f0c78ebff7116398d85c406e11b29b4b374660",
+          "page_sha256": "4a9d23150420362f78e6e86a13cabc318e54d8159c3e9de21fee2043c3b84c75"
+        },
+        {
+          "source_id": "kivi",
+          "page": 8,
+          "start": 1632,
+          "end": 1849,
+          "quote": "size until out of memory and report the peak memory usage and throughput between KIVI (with residual length 32 and 128) and FP16 baseline for the Llama-2-7B model. The hardware here is a single NVIDIA A100 GPU (80GB).",
+          "quote_sha256": "0e2778bfa5a75202d7b32696fc3437f6c376b4327262201930b3b173a2f14d69",
+          "page_sha256": "80268f125b8070c9223a8334660b681e8ea4951b61e3ede3bfafdb0aea3b8ac9"
+        }
+      ]
+    },
+    {
+      "id": "K4",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 1941,
+          "end": 2175,
+          "quote": "We fix the residual length at 128 and vary the group sizes to 32, 64, and 128. From Table 5, we observe that group sizes 32 and 64 yield similar results, whereas the performance significantly decreases when the group size reaches 128.",
+          "quote_sha256": "f8e856f55cad1b938dbd84aded55ae90ed3cc3e20603ae3b700095a0217d286c",
+          "page_sha256": "4a9d23150420362f78e6e86a13cabc318e54d8159c3e9de21fee2043c3b84c75"
+        },
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 2423,
+          "end": 2764,
+          "quote": "We fix the group size at 32 and vary the residual length across 32, 64, 96, and 128. As shown in Table 5, there is no consistent pattern between residual lengths and model accuracy. Namely, while a resid- ual length of 128 achieves good results, 32 and 96 yield similar outcomes, but a residual length of 64 results in the worst performance.",
+          "quote_sha256": "dafbc9abe073ceb04eb2263a0b4c0c7cd8a28f7cfdae941972a4da37f94f49aa",
+          "page_sha256": "4a9d23150420362f78e6e86a13cabc318e54d8159c3e9de21fee2043c3b84c75"
+        }
+      ]
+    },
+    {
+      "id": "I1",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 6,
+          "start": 3276,
+          "end": 3572,
+          "quote": "In detail, we use the attention input of the previous Trans- former layer to speculate and prefetch the keys and values of the important tokens for the current layer. The speculation is done by performing a minimal rehearsal of attention computa- tion of the current layer in the preceding layer.",
+          "quote_sha256": "326f18eff71e793a2b63687dbd5406d67b8b65c13d3d7eebb0838a2958130d3d",
+          "page_sha256": "a71b02a75bce9c42814a41776bd4b823a352dbbe0707dc54f85b178d1a71d868"
+        }
+      ]
+    },
+    {
+      "id": "I2",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 12,
+          "start": 4192,
+          "end": 4360,
+          "quote": "We use the OPT-6.7B model with 1920 input tokens, 128 output tokens, and a batch size of 8. The accuracy is evaluated with the WinoGrande task in lm-evaluation-harness.",
+          "quote_sha256": "fe3280c66db301cdaffa8f34e1d4bbf938a8beb077d2368ba82e333f21b0ab6d",
+          "page_sha256": "ce11056568fedc8250abc387a89bd2a0aa6f6f830a37077fdf5229cd62a49ef8"
+        },
+        {
+          "source_id": "infinigen",
+          "page": 12,
+          "start": 4556,
+          "end": 4683,
+          "quote": "Increasing alpha results in fetching more KV entries to the GPU, thus increasing inference latency but also improving accuracy.",
+          "quote_sha256": "ca99cb96a6952493c7ba11d684c3dad333881aa7615844e003b06237093e47b4",
+          "page_sha256": "ce11056568fedc8250abc387a89bd2a0aa6f6f830a37077fdf5229cd62a49ef8"
+        }
+      ]
+    },
+    {
+      "id": "I3",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 9,
+          "start": 3317,
+          "end": 3770,
+          "quote": "We use Open Pre-trained Transformer (OPT) models [77] with 6.7B, 13B, and 30B parameters for evaluation. The 7B and 13B models of Llama- 2 [60] are also used to demonstrate that InfiniGen works effectively across different model architectures. We run the experiments on a system equipped with an NVIDIA RTX A6000 GPU [44] with 48GB of memory and an Intel Xeon Gold 6136 processor with 96GB of DDR4-2666 memory. PCIe 3.0×16 interconnects the CPU and GPU.",
+          "quote_sha256": "af76456ed10dd3b840c601799707f0c7e8f829cf9e34069d4b50ffc89e30ba96",
+          "page_sha256": "6dff27404aa3e0f856e9b6b0e32f00eb8ef136b730d512654bf818474d77b959"
+        }
+      ]
+    },
+    {
+      "id": "I4",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 13,
+          "start": 3599,
+          "end": 3798,
+          "quote": "Figure 19 shows the perplexity of the Llama-2-7B-32K model, which can process up to 32K tokens, across the relative cache sizes and sequence lengths. We use the WikiText-2 dataset for the experiment.",
+          "quote_sha256": "8941b2749fff9448bff799adab1782ea1244e257adcae8cf4cc116403381d6f2",
+          "page_sha256": "f4781463f5a06b0069955041bc575fa9f89ac12e6dc79f2c4b0a5582b026e1e5"
+        }
+      ]
+    },
+    {
+      "id": "K5",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 5,
+          "start": 2547,
+          "end": 2806,
+          "quote": "During the decoding process, each newly arrived key cache tK is added to XKr and once XKr reaches R tokens, which is a hyperparameter - residual length, we quantize and concatenate it with the previously quantized Q(XKG). Then we reset XKr to an empty tensor.",
+          "quote_sha256": "475fedcfe7fda68d7c6c38d5a66e5df98108f219bb6b686b37eff3fa7fc53183",
+          "page_sha256": "9b865eab030d583e2a11854f9273177efa58b0be737fc7093d257712b04293d8"
+        }
+      ]
+    },
+    {
+      "id": "K6",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 534,
+          "end": 797,
+          "quote": "To minimize the overhead, we have fused the dequantization process with matrix multiplication, e.g., Q_MatMul in Figure 3, using CUDA. We also implement the group-wise quantization ker- nel in Triton. Our method is fully compatible with weight- only quantization.",
+          "quote_sha256": "f5f5a7cfa9a33894f750e16755165294fc13d3f790a23467ede4a3a09bc0b224",
+          "page_sha256": "33bb1ce5cf34327b598e7ec1536fcf89402618168c53b560bf5716c7e1836f14"
+        }
+      ]
+    },
+    {
+      "id": "K7",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 2408,
+          "end": 2623,
+          "quote": "1The closed-end tasks such as MMLU are not ideal to evaluate KIVI since they only involve one decoding step and directly fetch the output logits, which is not suitable for studying the impact of compressed KV cache.",
+          "quote_sha256": "19dd292db00f851d8894c0b69fa49b315f6f31f8d06776a4123c6e0870ec00de",
+          "page_sha256": "33bb1ce5cf34327b598e7ec1536fcf89402618168c53b560bf5716c7e1836f14"
+        }
+      ]
+    },
+    {
+      "id": "K8",
+      "technology": "KIVI",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 2260,
+          "end": 2365,
+          "quote": "The maximum sequence length in LongBench was set to 8192 for the Mistral model and 4096 for other models.",
+          "quote_sha256": "aa3c98726232537c94fe78746f50d6fd8c676502d8452f66c93e5ef4c16a77ec",
+          "page_sha256": "33bb1ce5cf34327b598e7ec1536fcf89402618168c53b560bf5716c7e1836f14"
+        }
+      ]
+    },
+    {
+      "id": "I5",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 9,
+          "start": 2745,
+          "end": 2997,
+          "quote": "In the case of the counter-based policy, the pool manager increments a counter for each prefetched KV entry and selects a victim with the smallest count in the KV cache pool. If any counter becomes saturated, all the counter values are reduced by half.",
+          "quote_sha256": "9e4329993e95512c396233ef982bdd12b26b35002c729a0760fe2eb9a59fbafd",
+          "page_sha256": "6dff27404aa3e0f856e9b6b0e32f00eb8ef136b730d512654bf818474d77b959"
+        }
+      ]
+    },
+    {
+      "id": "I6",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 9,
+          "start": 900,
+          "end": 1077,
+          "quote": "InfiniGen initiates speculation and prefetching from Layer 1 because the outliers, which are essential for exploiting input similarity, emerge during the computation in Layer 0.",
+          "quote_sha256": "50046c7db0d28257cbbfaa7e350c668ec79a8f961224f1bae161f9675ac1d826",
+          "page_sha256": "6dff27404aa3e0f856e9b6b0e32f00eb8ef136b730d512654bf818474d77b959"
+        }
+      ]
+    },
+    {
+      "id": "I7",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 13,
+          "start": 2066,
+          "end": 2223,
+          "quote": "For a ratio of 0.3, the sizes of the partial query weight and key cache are only 2.5% and 15% of the total model parameters and total KV cache, respectively.",
+          "quote_sha256": "cd1053ccc7e7f26f9932a510bcb07cf19bfe049a7a93f93bf8f0a050e0f89109",
+          "page_sha256": "f4781463f5a06b0069955041bc575fa9f89ac12e6dc79f2c4b0a5582b026e1e5"
+        }
+      ]
+    },
+    {
+      "id": "I8",
+      "technology": "InfiniGen",
+      "group": "legacy_registered_spans",
+      "required": false,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 14,
+          "start": 723,
+          "end": 1039,
+          "quote": "We observe that the prior approaches that perma- nently eliminate tokens while they are unimportant could lose the critical contexts if they become important again at later iterations. In contrast, InfiniGen can preserve model perfor- mance by keeping the temporarily unimportant KV entries for potential future use.",
+          "quote_sha256": "9040e47accd91a2f0e58e06217856154d10408c34ddf546f1cba26c57e869a83",
+          "page_sha256": "c5f991b89463bdbd2ce27187ff004fbfe82567578d2fbeba95f5e44164f41b97"
+        }
+      ]
+    },
+    {
+      "id": "K3-expanded",
+      "technology": "KIVI",
+      "group": "known_condition_diagnostic",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 3237,
+          "end": 3357,
+          "quote": "On average, the data set has an input prompt length lprompt of 161 and an output length lgen of 338 (Kwon et al., 2023).",
+          "quote_sha256": "ce66d0fb5ba1feb43518cf0de3f0c78ebff7116398d85c406e11b29b4b374660",
+          "page_sha256": "4a9d23150420362f78e6e86a13cabc318e54d8159c3e9de21fee2043c3b84c75"
+        },
+        {
+          "source_id": "kivi",
+          "page": 8,
+          "start": 1632,
+          "end": 1849,
+          "quote": "size until out of memory and report the peak memory usage and throughput between KIVI (with residual length 32 and 128) and FP16 baseline for the Llama-2-7B model. The hardware here is a single NVIDIA A100 GPU (80GB).",
+          "quote_sha256": "0e2778bfa5a75202d7b32696fc3437f6c376b4327262201930b3b173a2f14d69",
+          "page_sha256": "80268f125b8070c9223a8334660b681e8ea4951b61e3ede3bfafdb0aea3b8ac9"
+        },
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 3034,
+          "end": 3236,
+          "quote": "To evaluate the wall-clock time efficiency ofKIVI, follow- ing vLLM (Kwon et al., 2023), we synthesize workloads based on ShareGPT (sha, 2023), which contain input and output texts of real LLM services.",
+          "quote_sha256": "e3b46adf2eebec625eb302c73542b0a224772552da3bc64f72f5592b3af48772",
+          "page_sha256": "4a9d23150420362f78e6e86a13cabc318e54d8159c3e9de21fee2043c3b84c75"
+        },
+        {
+          "source_id": "kivi",
+          "page": 8,
+          "start": 2249,
+          "end": 2405,
+          "quote": "Figure 5: Memory usage and throughput comparison be- tween 2bit KIVI and 16bit baseline. KIVI can achieve higher throughput by enabling a larger batch size.",
+          "quote_sha256": "612c0dad6fb6d3fcbec2e504add42abdda915296e4247c5781e51430b6d358b2",
+          "page_sha256": "80268f125b8070c9223a8334660b681e8ea4951b61e3ede3bfafdb0aea3b8ac9"
+        }
+      ]
+    },
+    {
+      "id": "I1-expanded",
+      "technology": "InfiniGen",
+      "group": "known_condition_diagnostic",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 6,
+          "start": 3276,
+          "end": 3572,
+          "quote": "In detail, we use the attention input of the previous Trans- former layer to speculate and prefetch the keys and values of the important tokens for the current layer. The speculation is done by performing a minimal rehearsal of attention computa- tion of the current layer in the preceding layer.",
+          "quote_sha256": "326f18eff71e793a2b63687dbd5406d67b8b65c13d3d7eebb0838a2958130d3d",
+          "page_sha256": "a71b02a75bce9c42814a41776bd4b823a352dbbe0707dc54f85b178d1a71d868"
+        },
+        {
+          "source_id": "infinigen",
+          "page": 2,
+          "start": 306,
+          "end": 673,
+          "quote": "At Layer i− 1 of the decoding stage, InfiniGen speculates on the attention pattern of the next layer (Layeri) using the atten- tion input of Layer i− 1, a partial query weight, and a partial key cache of Layer i. Based on the speculated attention pat- tern, InfiniGen prefetches the essential KV cache entries from the CPU memory for attention computation at Layer i.",
+          "quote_sha256": "43df707e8184dfe506c4d58d415d6d3a411210ac2f6f6034c2305e473ac42534",
+          "page_sha256": "8cf6f6a5955137ad686efb7e17c17bfcb084a086b18895cbe387c5683f12a857"
+        }
+      ]
+    },
+    {
+      "id": "I-Fig17-setup",
+      "technology": "InfiniGen",
+      "group": "known_condition_diagnostic",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 12,
+          "start": 4192,
+          "end": 4360,
+          "quote": "We use the OPT-6.7B model with 1920 input tokens, 128 output tokens, and a batch size of 8. The accuracy is evaluated with the WinoGrande task in lm-evaluation-harness.",
+          "quote_sha256": "fe3280c66db301cdaffa8f34e1d4bbf938a8beb077d2368ba82e333f21b0ab6d",
+          "page_sha256": "ce11056568fedc8250abc387a89bd2a0aa6f6f830a37077fdf5229cd62a49ef8"
+        }
+      ]
+    },
+    {
+      "id": "K-Fig5-precision",
+      "technology": "KIVI",
+      "group": "known_condition_diagnostic",
+      "required": true,
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 8,
+          "start": 2249,
+          "end": 2405,
+          "quote": "Figure 5: Memory usage and throughput comparison be- tween 2bit KIVI and 16bit baseline. KIVI can achieve higher throughput by enabling a larger batch size.",
+          "quote_sha256": "612c0dad6fb6d3fcbec2e504add42abdda915296e4247c5781e51430b6d358b2",
+          "page_sha256": "80268f125b8070c9223a8334660b681e8ea4951b61e3ede3bfafdb0aea3b8ac9"
+        }
+      ]
+    }
+  ]
+}

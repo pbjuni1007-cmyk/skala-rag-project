@@ -1,0 +1,10 @@
+[
+  {"id":"K1","technology":"KIVI","query":"How does KIVI use per-channel key quantization and per-token value quantization?","pages":[4,5,6],"markers":["per-channel","per-token"]},
+  {"id":"K2","technology":"KIVI","query":"What accuracy limitations does KIVI 2-bit have on Falcon-7B compared with FP16? Table 3","pages":[6,8],"markers":["Falcon","KIVI"]},
+  {"id":"K3","technology":"KIVI","query":"What hardware, input and output sequence lengths, batch size and baseline are used for throughput efficiency Figure 5?","pages":[7,8],"markers":["A100","throughput"]},
+  {"id":"K4","technology":"KIVI","query":"How do group size and residual length affect KIVI GSM8K performance in Table 5?","pages":[7,8],"markers":["residual","group"]},
+  {"id":"I1","technology":"InfiniGen","query":"How does InfiniGen dynamically prefetch selected KV cache from CPU memory using partial weights and attention speculation?","pages":[6,7,8,9],"markers":["prefetch","partial"]},
+  {"id":"I2","technology":"InfiniGen","query":"What is the tradeoff between alpha threshold, model accuracy and inference latency in sensitivity study section 6.1?","pages":[12,13],"markers":["alpha","latency"]},
+  {"id":"I3","technology":"InfiniGen","query":"What models GPU CPU memory and PCIe configuration are used in the experimental setup section 5.1?","pages":[9,10],"markers":["A6000","PCIe"]},
+  {"id":"I4","technology":"InfiniGen","query":"What does section 6.3 evaluate for long context Llama-2-7B-32K WikiText-2 perplexity?","pages":[13,14],"markers":["WikiText","32K"]}
+]

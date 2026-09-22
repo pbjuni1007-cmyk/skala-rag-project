@@ -1,0 +1,483 @@
+{
+  "schema_version": 1,
+  "independent_questions": 16,
+  "language_queries": 32,
+  "ground_truth_note": "Source spans and required conditions fixed before any model run; complete evidence is exact character coverage across top-5 same-source/page chunks. Keyword/page proxy is not semantic truth.",
+  "questions": [
+    {
+      "id": "K1",
+      "technology": "KIVI",
+      "subset": "existing",
+      "queries": {
+        "en": "How does KIVI use per-channel key quantization and per-token value quantization?",
+        "ko": "KIVI는 키의 채널별 양자화와 값의 토큰별 양자화를 어떻게 사용하는가?"
+      },
+      "proxy_pages": [
+        4,
+        5,
+        6
+      ],
+      "proxy_markers": [
+        "per-channel",
+        "per-token"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 5,
+          "start": 1439,
+          "end": 1529,
+          "quote": "key cache should be quantized per-channel and value cache should be quan- tized per-token."
+        }
+      ],
+      "required_conditions": [
+        "key cache should be quantized per-channel and value cache should be quan- tized per-token."
+      ]
+    },
+    {
+      "id": "K2",
+      "technology": "KIVI",
+      "subset": "existing",
+      "queries": {
+        "en": "What accuracy limitations does KIVI 2-bit have on Falcon-7B compared with FP16? Table 3",
+        "ko": "표 3에서 Falcon-7B의 KIVI 2비트 정확도는 FP16과 비교해 어떤 한계가 있는가?"
+      },
+      "proxy_pages": [
+        6,
+        8
+      ],
+      "proxy_markers": [
+        "Falcon",
+        "KIVI"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 4601,
+          "end": 4871,
+          "quote": "Since Falcon-7B adopts multi-query attention and only has one head for KV cache, it is already highly compressed compared to Llama- based models. Thus, in Table 3, 4bit KIVI is needed to maintain the accuracy, while 2bit KIVI may have a large accuracy drop in this case."
+        }
+      ],
+      "required_conditions": [
+        "Since Falcon-7B adopts multi-query attention and only has one head for KV cache, it is already highly compressed compared to Llama- based models. Thus, in Table 3, 4bit KIVI is needed to maintain the accuracy, while 2bit KIVI may have a large accuracy drop in this case."
+      ]
+    },
+    {
+      "id": "K3",
+      "technology": "KIVI",
+      "subset": "existing",
+      "queries": {
+        "en": "What hardware, input and output sequence lengths, batch size and baseline are used for throughput efficiency Figure 5?",
+        "ko": "그림 5의 처리량 평가에서 장비, 입출력 길이, 배치 크기와 기준선은 무엇인가?"
+      },
+      "proxy_pages": [
+        7,
+        8
+      ],
+      "proxy_markers": [
+        "A100",
+        "throughput"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 3237,
+          "end": 3357,
+          "quote": "On average, the data set has an input prompt length lprompt of 161 and an output length lgen of 338 (Kwon et al., 2023)."
+        },
+        {
+          "source_id": "kivi",
+          "page": 8,
+          "start": 1632,
+          "end": 1849,
+          "quote": "size until out of memory and report the peak memory usage and throughput between KIVI (with residual length 32 and 128) and FP16 baseline for the Llama-2-7B model. The hardware here is a single NVIDIA A100 GPU (80GB)."
+        }
+      ],
+      "required_conditions": [
+        "On average, the data set has an input prompt length lprompt of 161 and an output length lgen of 338 (Kwon et al., 2023).",
+        "size until out of memory and report the peak memory usage and throughput between KIVI (with residual length 32 and 128) and FP16 baseline for the Llama-2-7B model. The hardware here is a single NVIDIA A100 GPU (80GB)."
+      ]
+    },
+    {
+      "id": "K4",
+      "technology": "KIVI",
+      "subset": "existing",
+      "queries": {
+        "en": "How do group size and residual length affect KIVI GSM8K performance in Table 5?",
+        "ko": "표 5에서 그룹 크기와 잔여 길이가 KIVI의 GSM8K 성능에 어떤 영향을 주는가?"
+      },
+      "proxy_pages": [
+        7,
+        8
+      ],
+      "proxy_markers": [
+        "residual",
+        "group"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 1941,
+          "end": 2175,
+          "quote": "We fix the residual length at 128 and vary the group sizes to 32, 64, and 128. From Table 5, we observe that group sizes 32 and 64 yield similar results, whereas the performance significantly decreases when the group size reaches 128."
+        },
+        {
+          "source_id": "kivi",
+          "page": 7,
+          "start": 2423,
+          "end": 2764,
+          "quote": "We fix the group size at 32 and vary the residual length across 32, 64, 96, and 128. As shown in Table 5, there is no consistent pattern between residual lengths and model accuracy. Namely, while a resid- ual length of 128 achieves good results, 32 and 96 yield similar outcomes, but a residual length of 64 results in the worst performance."
+        }
+      ],
+      "required_conditions": [
+        "We fix the residual length at 128 and vary the group sizes to 32, 64, and 128. From Table 5, we observe that group sizes 32 and 64 yield similar results, whereas the performance significantly decreases when the group size reaches 128.",
+        "We fix the group size at 32 and vary the residual length across 32, 64, 96, and 128. As shown in Table 5, there is no consistent pattern between residual lengths and model accuracy. Namely, while a resid- ual length of 128 achieves good results, 32 and 96 yield similar outcomes, but a residual length of 64 results in the worst performance."
+      ]
+    },
+    {
+      "id": "I1",
+      "technology": "InfiniGen",
+      "subset": "existing",
+      "queries": {
+        "en": "How does InfiniGen dynamically prefetch selected KV cache from CPU memory using partial weights and attention speculation?",
+        "ko": "InfiniGen은 부분 가중치와 어텐션 예측으로 CPU의 KV 캐시를 어떻게 선택해서 미리 가져오는가?"
+      },
+      "proxy_pages": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "proxy_markers": [
+        "prefetch",
+        "partial"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 6,
+          "start": 3276,
+          "end": 3572,
+          "quote": "In detail, we use the attention input of the previous Trans- former layer to speculate and prefetch the keys and values of the important tokens for the current layer. The speculation is done by performing a minimal rehearsal of attention computa- tion of the current layer in the preceding layer."
+        }
+      ],
+      "required_conditions": [
+        "In detail, we use the attention input of the previous Trans- former layer to speculate and prefetch the keys and values of the important tokens for the current layer. The speculation is done by performing a minimal rehearsal of attention computa- tion of the current layer in the preceding layer."
+      ]
+    },
+    {
+      "id": "I2",
+      "technology": "InfiniGen",
+      "subset": "existing",
+      "queries": {
+        "en": "What is the tradeoff between alpha threshold, model accuracy and inference latency in sensitivity study section 6.1?",
+        "ko": "6.1절에서 알파 임계값과 모델 정확도, 추론 지연 사이의 관계는 무엇인가?"
+      },
+      "proxy_pages": [
+        12,
+        13
+      ],
+      "proxy_markers": [
+        "alpha",
+        "latency"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 12,
+          "start": 4192,
+          "end": 4360,
+          "quote": "We use the OPT-6.7B model with 1920 input tokens, 128 output tokens, and a batch size of 8. The accuracy is evaluated with the WinoGrande task in lm-evaluation-harness."
+        },
+        {
+          "source_id": "infinigen",
+          "page": 12,
+          "start": 4556,
+          "end": 4683,
+          "quote": "Increasing alpha results in fetching more KV entries to the GPU, thus increasing inference latency but also improving accuracy."
+        }
+      ],
+      "required_conditions": [
+        "We use the OPT-6.7B model with 1920 input tokens, 128 output tokens, and a batch size of 8. The accuracy is evaluated with the WinoGrande task in lm-evaluation-harness.",
+        "Increasing alpha results in fetching more KV entries to the GPU, thus increasing inference latency but also improving accuracy."
+      ]
+    },
+    {
+      "id": "I3",
+      "technology": "InfiniGen",
+      "subset": "existing",
+      "queries": {
+        "en": "What models GPU CPU memory and PCIe configuration are used in the experimental setup section 5.1?",
+        "ko": "5.1절 실험의 모델, GPU, CPU 메모리와 PCIe 구성은 무엇인가?"
+      },
+      "proxy_pages": [
+        9,
+        10
+      ],
+      "proxy_markers": [
+        "A6000",
+        "PCIe"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 9,
+          "start": 3317,
+          "end": 3770,
+          "quote": "We use Open Pre-trained Transformer (OPT) models [77] with 6.7B, 13B, and 30B parameters for evaluation. The 7B and 13B models of Llama- 2 [60] are also used to demonstrate that InfiniGen works effectively across different model architectures. We run the experiments on a system equipped with an NVIDIA RTX A6000 GPU [44] with 48GB of memory and an Intel Xeon Gold 6136 processor with 96GB of DDR4-2666 memory. PCIe 3.0×16 interconnects the CPU and GPU."
+        }
+      ],
+      "required_conditions": [
+        "We use Open Pre-trained Transformer (OPT) models [77] with 6.7B, 13B, and 30B parameters for evaluation. The 7B and 13B models of Llama- 2 [60] are also used to demonstrate that InfiniGen works effectively across different model architectures. We run the experiments on a system equipped with an NVIDIA RTX A6000 GPU [44] with 48GB of memory and an Intel Xeon Gold 6136 processor with 96GB of DDR4-2666 memory. PCIe 3.0×16 interconnects the CPU and GPU."
+      ]
+    },
+    {
+      "id": "I4",
+      "technology": "InfiniGen",
+      "subset": "existing",
+      "queries": {
+        "en": "What does section 6.3 evaluate for long context Llama-2-7B-32K WikiText-2 perplexity?",
+        "ko": "6.3절은 긴 문맥 Llama-2-7B-32K와 WikiText-2 perplexity를 어떻게 평가하는가?"
+      },
+      "proxy_pages": [
+        13,
+        14
+      ],
+      "proxy_markers": [
+        "WikiText",
+        "32K"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 13,
+          "start": 3599,
+          "end": 3798,
+          "quote": "Figure 19 shows the perplexity of the Llama-2-7B-32K model, which can process up to 32K tokens, across the relative cache sizes and sequence lengths. We use the WikiText-2 dataset for the experiment."
+        }
+      ],
+      "required_conditions": [
+        "Figure 19 shows the perplexity of the Llama-2-7B-32K model, which can process up to 32K tokens, across the relative cache sizes and sequence lengths. We use the WikiText-2 dataset for the experiment."
+      ]
+    },
+    {
+      "id": "K5",
+      "technology": "KIVI",
+      "subset": "new",
+      "queries": {
+        "en": "What happens to recent keys when the residual buffer fills during decoding?",
+        "ko": "디코딩 중 잔여 버퍼가 차면 최근 키는 어떻게 처리되는가?"
+      },
+      "proxy_pages": [
+        5
+      ],
+      "proxy_markers": [
+        "During"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 5,
+          "start": 2547,
+          "end": 2806,
+          "quote": "During the decoding process, each newly arrived key cache tK is added to XKr and once XKr reaches R tokens, which is a hyperparameter - residual length, we quantize and concatenate it with the previously quantized Q(XKG). Then we reset XKr to an empty tensor."
+        }
+      ],
+      "required_conditions": [
+        "During the decoding process, each newly arrived key cache tK is added to XKr and once XKr reaches R tokens, which is a hyperparameter - residual length, we quantize and concatenate it with the previously quantized Q(XKG). Then we reset XKr to an empty tensor."
+      ]
+    },
+    {
+      "id": "K6",
+      "technology": "KIVI",
+      "subset": "new",
+      "queries": {
+        "en": "How is dequantization implemented efficiently, and can the method coexist with weight compression?",
+        "ko": "역양자화를 효율적으로 구현한 방법과 가중치 압축과의 병용 가능성은 무엇인가?"
+      },
+      "proxy_pages": [
+        6
+      ],
+      "proxy_markers": [
+        "To"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 534,
+          "end": 797,
+          "quote": "To minimize the overhead, we have fused the dequantization process with matrix multiplication, e.g., Q_MatMul in Figure 3, using CUDA. We also implement the group-wise quantization ker- nel in Triton. Our method is fully compatible with weight- only quantization."
+        }
+      ],
+      "required_conditions": [
+        "To minimize the overhead, we have fused the dequantization process with matrix multiplication, e.g., Q_MatMul in Figure 3, using CUDA. We also implement the group-wise quantization ker- nel in Triton. Our method is fully compatible with weight- only quantization."
+      ]
+    },
+    {
+      "id": "K7",
+      "technology": "KIVI",
+      "subset": "new",
+      "queries": {
+        "en": "Why are closed-ended benchmarks unsuitable for evaluating this cache compression method?",
+        "ko": "닫힌 형태의 벤치마크가 이 캐시 압축 방법 평가에 부적합한 이유는 무엇인가?"
+      },
+      "proxy_pages": [
+        6
+      ],
+      "proxy_markers": [
+        "1The"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 2408,
+          "end": 2623,
+          "quote": "1The closed-end tasks such as MMLU are not ideal to evaluate KIVI since they only involve one decoding step and directly fetch the output logits, which is not suitable for studying the impact of compressed KV cache."
+        }
+      ],
+      "required_conditions": [
+        "1The closed-end tasks such as MMLU are not ideal to evaluate KIVI since they only involve one decoding step and directly fetch the output logits, which is not suitable for studying the impact of compressed KV cache."
+      ]
+    },
+    {
+      "id": "K8",
+      "technology": "KIVI",
+      "subset": "new",
+      "queries": {
+        "en": "What maximum context lengths are used for different models in the LongBench evaluation?",
+        "ko": "LongBench 평가에서 모델별 최대 문맥 길이는 무엇인가?"
+      },
+      "proxy_pages": [
+        6
+      ],
+      "proxy_markers": [
+        "The"
+      ],
+      "evidence": [
+        {
+          "source_id": "kivi",
+          "page": 6,
+          "start": 2260,
+          "end": 2365,
+          "quote": "The maximum sequence length in LongBench was set to 8192 for the Mistral model and 4096 for other models."
+        }
+      ],
+      "required_conditions": [
+        "The maximum sequence length in LongBench was set to 8192 for the Mistral model and 4096 for other models."
+      ]
+    },
+    {
+      "id": "I5",
+      "technology": "InfiniGen",
+      "subset": "new",
+      "queries": {
+        "en": "How does the cache pool choose entries to evict when host memory reaches its limit?",
+        "ko": "호스트 메모리가 한도에 도달하면 캐시 풀은 제거할 항목을 어떻게 고르는가?"
+      },
+      "proxy_pages": [
+        9
+      ],
+      "proxy_markers": [
+        "In"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 9,
+          "start": 2745,
+          "end": 2997,
+          "quote": "In the case of the counter-based policy, the pool manager increments a counter for each prefetched KV entry and selects a victim with the smallest count in the KV cache pool. If any counter becomes saturated, all the counter values are reduced by half."
+        }
+      ],
+      "required_conditions": [
+        "In the case of the counter-based policy, the pool manager increments a counter for each prefetched KV entry and selects a victim with the smallest count in the KV cache pool. If any counter becomes saturated, all the counter values are reduced by half."
+      ]
+    },
+    {
+      "id": "I6",
+      "technology": "InfiniGen",
+      "subset": "new",
+      "queries": {
+        "en": "Why does cache speculation not begin in the first Transformer layer?",
+        "ko": "캐시 예측이 첫 Transformer 층에서 시작하지 않는 이유는 무엇인가?"
+      },
+      "proxy_pages": [
+        9
+      ],
+      "proxy_markers": [
+        "InfiniGen"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 9,
+          "start": 900,
+          "end": 1077,
+          "quote": "InfiniGen initiates speculation and prefetching from Layer 1 because the outliers, which are essential for exploiting input similarity, emerge during the computation in Layer 0."
+        }
+      ],
+      "required_conditions": [
+        "InfiniGen initiates speculation and prefetching from Layer 1 because the outliers, which are essential for exploiting input similarity, emerge during the computation in Layer 0."
+      ]
+    },
+    {
+      "id": "I7",
+      "technology": "InfiniGen",
+      "subset": "new",
+      "queries": {
+        "en": "What extra storage is needed for speculation and what setting determines that overhead?",
+        "ko": "예측에 필요한 추가 저장 공간은 무엇이며 어떤 설정에 따라 달라지는가?"
+      },
+      "proxy_pages": [
+        13
+      ],
+      "proxy_markers": [
+        "For"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 13,
+          "start": 2066,
+          "end": 2223,
+          "quote": "For a ratio of 0.3, the sizes of the partial query weight and key cache are only 2.5% and 15% of the total model parameters and total KV cache, respectively."
+        }
+      ],
+      "required_conditions": [
+        "For a ratio of 0.3, the sizes of the partial query weight and key cache are only 2.5% and 15% of the total model parameters and total KV cache, respectively."
+      ]
+    },
+    {
+      "id": "I8",
+      "technology": "InfiniGen",
+      "subset": "new",
+      "queries": {
+        "en": "Why can permanently removing currently unimportant entries damage later generation?",
+        "ko": "현재 중요하지 않은 항목을 영구 제거하면 이후 생성에 문제가 생길 수 있는 이유는 무엇인가?"
+      },
+      "proxy_pages": [
+        14
+      ],
+      "proxy_markers": [
+        "We"
+      ],
+      "evidence": [
+        {
+          "source_id": "infinigen",
+          "page": 14,
+          "start": 723,
+          "end": 1039,
+          "quote": "We observe that the prior approaches that perma- nently eliminate tokens while they are unimportant could lose the critical contexts if they become important again at later iterations. In contrast, InfiniGen can preserve model perfor- mance by keeping the temporarily unimportant KV entries for potential future use."
+        }
+      ],
+      "required_conditions": [
+        "We observe that the prior approaches that perma- nently eliminate tokens while they are unimportant could lose the critical contexts if they become important again at later iterations. In contrast, InfiniGen can preserve model perfor- mance by keeping the temporarily unimportant KV entries for potential future use."
+      ]
+    }
+  ]
+}

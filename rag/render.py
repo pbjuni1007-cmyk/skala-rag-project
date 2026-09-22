@@ -10,6 +10,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, 
 from pypdf import PdfReader
 
 from rag.budget import write_json
+from rag.conflicts import conflicts_for_joined, conflict_review_markdown
 
 LABELS = {"source_fact": "출처 사실", "author_reported_result": "저자 보고 결과", "team_inference": "팀 추론",
           "scenario": "적용 가정", "unknown": "미확인"}
@@ -81,6 +82,7 @@ def _render_report(out, report, joined, sources, settings, config):
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     claims, evidence = joined["claims"], joined["evidence"]
+    conflict_records = conflicts_for_joined(joined)
     used_claims = list(dict.fromkeys(report["summary_claim_ids"] + [c for section in report["sections"] for c in section["claim_ids"]]))
     used_evidence = list(dict.fromkeys(e for c in used_claims for e in claims[c]["evidence_ids"]))
     used_sources = sorted({evidence[e]["source_id"] for e in used_evidence})
@@ -160,6 +162,7 @@ def _render_report(out, report, joined, sources, settings, config):
             else:
                 md.extend(["종합 단계의 해소 판단과 근거를 공백 검수표에 정리했습니다.", ""])
             md.extend(["공백별 판단 근거와 후속 확인 항목: [공백 검수표](gap_review.md).", ""])
+            md.extend(["상충의 원문·관련 주장 후보·조건·해소 상태: [상충 검수표](conflict_review.md).", ""])
     md.extend(["# REFERENCE", ""])
     for sid in used_sources:
         source = sources[sid]
@@ -175,7 +178,8 @@ def _render_report(out, report, joined, sources, settings, config):
     path.write_text(document)
     (out / "report.md").write_text(document)
 
-    review_claims = list(dict.fromkeys(used_claims + [cid for d in decisions.values() for cid in d["claim_ids"]]))
+    review_claims = list(dict.fromkeys(used_claims + [cid for d in decisions.values() for cid in d["claim_ids"]]
+                        + [cid for r in conflict_records for cid in r["candidate_claim_ids"] + r["verified_claim_ids"]]))
     review = ["# 인용 검수", "", "각 주장의 전체 본문·실험조건·한계를 원문과 대조하는 검수표입니다. 현재 의미 검수는 대기 중입니다.", ""]
     for cid in review_claims:
         c = claims[cid]
@@ -195,6 +199,8 @@ def _render_report(out, report, joined, sources, settings, config):
                            "**근거 주장:** " + (", ".join(f"[{cid}](citation_review.md#{cid})" for cid in decision["claim_ids"]) or "없음"),
                            "", "**사람 검수:** 미검수", ""])
     (out / "gap_review.md").write_text("\n".join(gap_review))
+    (out / "conflict_review.md").write_text(conflict_review_markdown(conflict_records, claims))
+    write_json(out / "conflict_records.json", conflict_records)
     pdf_path, pdf_checks = _write_pdf(out, document, settings)
     pdf_checks.update(used_sources=used_sources, used_claims=used_claims, used_evidence=used_evidence)
     write_json(out / "pdf_validation.json", pdf_checks)
@@ -202,10 +208,13 @@ def _render_report(out, report, joined, sources, settings, config):
         "summary_characters": len("\n".join(summary)), "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
         "used_sources": used_sources, "used_claims": used_claims, "used_evidence": used_evidence,
         "body_unique_claims": len(body_seen), "gap_count": len(gap_records),
+        "conflict_count": len(conflict_records),
+        "resolved_conflicts": sum(r["status"] == "resolved" for r in conflict_records),
         "resolved_gaps": sum(decisions.get(g["id"], {}).get("status") == "resolved" for g in gap_records),
         "semantic_review": "pending", "renderer_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "format_decision": "Markdown and PDF generated from the same report; semantic review remains pending"})
-    return {"markdown": str(path), "pdf": str(pdf_path), "citation_review": str(out / "citation_review.md"), "gap_review": str(out / "gap_review.md")}
+    return {"markdown": str(path), "pdf": str(pdf_path), "citation_review": str(out / "citation_review.md"),
+            "gap_review": str(out / "gap_review.md"), "conflict_review": str(out / "conflict_review.md")}
 
 
 def _pdf_inline(text):

@@ -1,3 +1,5 @@
+from rag.tracing import traced_node, submit
+from rag.conflicts import build_conflict_records, conflict_record_errors
 from pathlib import Path
 from copy import deepcopy
 from itertools import zip_longest
@@ -300,7 +302,7 @@ class Pipeline:
                 {(t, f) for t in self.config["technologies"] for f in ("mechanism", "limitation", "conditions", "maturity")} and len(q["queries"]) == 8 else ["Exactly 8 technology/facet pairs required"])
             workers = min(2, self.settings.integer("RAG_MAX_CONCURRENCY", 1))
             with ThreadPoolExecutor(max_workers=workers) as pool:
-                futures = [pool.submit(self.research_technology, tech, [q for q in query_plan["queries"] if q["technology"] == tech])
+                futures = [submit(pool, self.research_technology, tech, [q for q in query_plan["queries"] if q["technology"] == tech])
                            for tech in self.config["technologies"]]
                 for future in as_completed(futures):
                     tech, result, queries, hits = future.result()
@@ -430,6 +432,10 @@ class Pipeline:
                   "gap_records": [{"id": f"gap-{name}-{i}", "perspective": name, "text": gap}
                                   for name, result in assessments.items()
                                   for i, gap in enumerate(result["gaps"], 1)]}
+        joined["conflict_records"] = build_conflict_records(assessments, claims)
+        errors = conflict_record_errors(joined["conflict_records"], claims, assessments)
+        if errors:
+            raise ValueError("Conflict provenance validation failed: " + "; ".join(errors))
         self.save_node("join", joined)
         return {"joined": joined, "run_status": "incomplete" if any(r["status"] == "failed" for r in assessments.values()) else "joined"}
 
@@ -485,8 +491,8 @@ class Pipeline:
 
             gaps = joined.get("gap_records", [])
             with ThreadPoolExecutor(max_workers=min(3, self.settings.integer("RAG_MAX_CONCURRENCY", 1))) as pool:
-                report_future = pool.submit(build_report)
-                gap_futures = [pool.submit(review_gaps, i // 5, gaps[i:i + 5]) for i in range(0, len(gaps), 5)]
+                report_future = submit(pool, build_report)
+                gap_futures = [submit(pool, review_gaps, i // 5, gaps[i:i + 5]) for i in range(0, len(gaps), 5)]
                 report = report_future.result()
                 report["gap_decisions"] = [d for future in gap_futures for d in future.result()]
             report = Report.model_validate(report).model_dump()
@@ -517,12 +523,12 @@ class Pipeline:
 
     def compile(self):
         graph = StateGraph(State)
-        graph.add_node("research", self.research)
+        graph.add_node("research", traced_node("research", self.research))
         for name in ("market", "stakeholder", "domain"):
-            graph.add_node(name, lambda state, n=name: self.perspective(n, state))
-        graph.add_node("join", self.join)
-        graph.add_node("synthesize", self.synthesize)
-        graph.add_node("render", self.render)
+            graph.add_node(name, traced_node(name, lambda state, n=name: self.perspective(n, state)))
+        graph.add_node("join", traced_node("join", self.join))
+        graph.add_node("synthesize", traced_node("synthesize", self.synthesize))
+        graph.add_node("render", traced_node("render", self.render))
         graph.add_edge(START, "research")
         graph.add_conditional_edges("research", lambda s: ["market", "stakeholder", "domain"] if s["run_status"] == "research_ok" else END, ["market", "stakeholder", "domain", END])
         graph.add_edge(["market", "stakeholder", "domain"], "join")

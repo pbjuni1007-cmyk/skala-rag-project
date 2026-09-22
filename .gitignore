@@ -171,3 +171,23 @@
 !/tests/test_source_discovery.py
 !/tests/test_synthesis_payload.py
 !/uv.lock
+
+!/rag/tracing.py
+!/tests/test_tracing.py
+
+# Reviewed feedback implementation and reproducible evidence
+!/experiments/retrieval-regression-20260922/
+!/experiments/rewrite-20260922/
+!/rag/conflicts.py
+!/scripts/revalidate_retrieval.py
+!/scripts/evaluate_rewrite.py
+!/tests/test_conflicts.py
+!/tests/test_revalidate_retrieval.py
+!/tests/test_rewrite_evaluation.py
+!/eval/retrieval-baseline.json
+!/eval/rewrite-pairs.json
+!/docs/domain-validation-plan.md
+!/docs/retrieval-regression.md
+!/experiments/retrieval-regression-20260922/candidate.json
+!/experiments/retrieval-regression-20260922/checked.json
+!/experiments/rewrite-20260922/results.json

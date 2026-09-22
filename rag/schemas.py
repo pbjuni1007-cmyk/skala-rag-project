@@ -50,6 +50,22 @@ class Assessment(Strict):
     gaps: list[str]
 
 
+class ConflictRecord(Strict):
+    """Local review artifact; never added to an LLM response schema."""
+    id: str
+    perspective: str
+    text: str
+    candidate_claim_ids: list[str]
+    explicit_claim_ids: list[str]
+    verified_claim_ids: list[str]
+    conditions: dict[str, str]
+    evidence_ids: dict[str, list[str]]
+    type: Literal["unclassified", "condition_difference", "contradiction", "tradeoff"]
+    status: Literal["unresolved", "resolved"]
+    rationale: str
+    reviewed_by: str
+
+
 class PerspectiveQuery(Strict):
     facet: str
     query: str = Field(min_length=1, max_length=400)

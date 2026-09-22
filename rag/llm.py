@@ -1,3 +1,4 @@
+from rag.tracing import span
 from pathlib import Path
 from datetime import datetime, timezone
 from threading import BoundedSemaphore, Event, Lock, Thread
@@ -123,6 +124,8 @@ class Gateway:
                        "cache_hit_at": datetime.now(timezone.utc).isoformat(),
                        "cache_hit_elapsed_seconds": time.monotonic() - call_started}
             write_json(self.output_dir / "calls" / f"{purpose}-reused.json", receipt)
+            with span("cache_reuse", purpose=purpose, cache_hit=True):
+                pass
             return receipt["text"]
         self.preflight(purpose, instructions, content, schema, max_output)
         retries = int(self.settings.get("OPENAI_MAX_RETRIES", "2"))
@@ -150,7 +153,18 @@ class Gateway:
                 failure_status = None
                 failed = False
                 try:
-                    response = self.request("responses", payload)
+                    with span("generation", "llm", purpose=purpose, model=payload["model"],
+                              effort=payload["reasoning"]["effort"], attempt=attempt + 1,
+                              queue_wait_seconds=queue_wait) as trace:
+                        try:
+                            response = self.request("responses", payload)
+                            trace["usage"] = response.get("usage")
+                            trace["status"] = response.get("status")
+                        except urllib.error.HTTPError as error:
+                            trace["http_status"] = error.code
+                            raise
+                        finally:
+                            trace["generation_elapsed_seconds"] = time.monotonic() - started
                 except Exception as exc:
                     failed = True
                     failure_status = exc.code if isinstance(exc, urllib.error.HTTPError) else None

@@ -1,3 +1,4 @@
+from rag.tracing import submit
 """Bounded facet reassessment when the complete request exceeds input budget."""
 from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -69,7 +70,7 @@ def reassess_facets(pipeline, purpose, instructions, content, check, base_instru
 
         failures = {}
         with ThreadPoolExecutor(max_workers=min(len(planned), pipeline.settings.integer('RAG_MAX_CONCURRENCY', 3))) as pool:
-            futures = {pool.submit(run_unit, *unit): unit[0] for unit in planned}
+            futures = {submit(pool, run_unit, *unit): unit[0] for unit in planned}
             for future in as_completed(futures):
                 facet = futures[future]
                 try:

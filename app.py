@@ -9,6 +9,7 @@ import yaml
 
 from rag.budget import write_json, Budget
 from rag.settings import Settings
+from rag.tracing import trace_run
 
 
 def report_contract_hash(path=Path("config/report-contract.yaml")):
@@ -63,6 +64,10 @@ def main():
     corpus = Corpus(settings, config)
     pages = corpus.prepare_sources(args.refresh_web)
     index = corpus.build()
+    from scripts.revalidate_retrieval import ensure_retrieval_regression
+    retrieval_check = ensure_retrieval_regression(
+        corpus, config, baseline_path=Path("eval/retrieval-baseline.json"),
+        result_path=Path(settings.get("RAG_OUTPUT_DIR", "outputs")) / "retrieval-regression.json")
     if args.prepare:
         print(json.dumps(index, ensure_ascii=False))
         return 0
@@ -90,6 +95,7 @@ def main():
                 "report_contract_sha256": identity["report_contract_sha256"],
                 "requirements_path": "config/report-contract.yaml",
                 "code_sha256": code_hash, "lock_sha256": hashlib.sha256(Path("uv.lock").read_bytes()).hexdigest(),
+                "retrieval_validation": {"status": retrieval_check["status"], "fingerprint": retrieval_check["fingerprint"]},
                 "api": gateway.lookup(), "budget_before": gateway.budget.summary()}
     write_json(out / "manifest.json", manifest)
     write_json(out / "sources.json", corpus.sources)
@@ -97,8 +103,10 @@ def main():
     graph = pipeline.compile()
     (out / "graph.mmd").write_text(graph.get_graph().draw_mermaid())
     print(f"run={out}", flush=True)
-    state = graph.invoke({"run_config": manifest, "source_registry": corpus.sources},
-                         {"max_concurrency": settings.integer("RAG_MAX_CONCURRENCY", 1), "recursion_limit": 30})
+    with trace_run(settings, run_id) as trace:
+        state = graph.invoke({"run_config": manifest, "source_registry": corpus.sources},
+                             {"max_concurrency": settings.integer("RAG_MAX_CONCURRENCY", 1), "recursion_limit": 30})
+        trace["status"] = state["run_status"]
     state["budget_after"] = gateway.budget.summary()
     write_json(out / "state.json", state)
     print(json.dumps({"run": str(out), "status": state["run_status"], "outputs": state.get("output_paths"),

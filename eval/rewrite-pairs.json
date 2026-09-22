@@ -1,0 +1,305 @@
+{
+  "scope": "All available saved two-attempt technical research receipts at collection time; queries only. Replayed under current settings, not original-run accuracy.",
+  "cases": [
+    {
+      "id": "20260921T100118-6dfbc0-infinigen",
+      "technology": "InfiniGen",
+      "source_receipt_sha256": "070081d22e8d79ed424672da15738843f46bcc900175e63fe560794bc6df1c50",
+      "observed_after_status": "insufficient_or_invalid",
+      "before": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "How does InfiniGen's hardware- and memory-hierarchy management decide which KV-cache data to retain, move, or selectively fetch, and what policy or signals drive those decisions?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "What accuracy or output-quality trade-offs and configuration limitations does InfiniGen report for selective KV-cache fetching, including dependence on memory-hierarchy capacity, transfer behavior, model or workload, and concurrency, without assuming that fetching is lossless?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "In Section 5.1, Experimental Setup, of the InfiniGen paper, what exact hardware models are used for the A6000 GPU, CPU, and PCIe link, and what are the model, precision, sequence lengths, batch size, dataset, baselines, metrics, paper version, and measured-versus-simulated status?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "What implementation and empirical-validation evidence does the InfiniGen paper provide, including system-integration or code details, supported memory tiers and hardware, evaluated models and workloads, datasets, baselines, and reproducibility limits?"
+        }
+      ],
+      "after": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "InfiniGen 논문의 Sections 4.1~4.4와 Figure 6에 근거해, Layer i−1의 attention 입력, 오프라인 수정 Q/K weight, partial key cache로 Layer i의 중요 KV token을 추정하는 절차를 단계별로 설명하라. attention score의 max−alpha 기준, head별 선택량 평균화, 각 controller의 역할, CPU KV pool·GPU partial cache 사이의 보관·전송·계산·삭제를 구분하고, user-defined memory limit에서 counter·FIFO·LRU 및 counter 포화 처리의 victim 선택 신호를 명시하라. 전용 하드웨어 기능과 소프트웨어 관리 기능을 구별하며, 출처에 없는 정책이나 무손실 동작은 unknown으로 표시하라."
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "InfiniGen의 Section 5.2와 Section 6.3, Table 2, Figures 12·15·19 및 관련 본문에서 선택적 KV fetch의 품질·성능 trade-off를 찾아 정리하라. full-cache와 비교한 accuracy·perplexity·출력 품질의 실제 차이, 상대 KV cache 크기와 메모리 한도별 결과(10% 미만 포함), alpha·pool 크기·eviction 정책별 영향, CPU-GPU 전송량과 latency, 모델·데이터셋·작업·sequence length·batch size·동시 요청별 편차를 확인하라. Figure 15의 모든 batch 조건과 동시성 보고 여부도 명시하고, 각 수치에 모델·정밀도·길이·장비·baseline·지표·측정/시뮬레이션 조건을 붙여라. 선택적 fetch를 무손실이라고 가정하지 말고, 보고되지 않은 조건은 unknown으로 표시하라."
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "InfiniGen 논문의 Section 5.1 Experimental Setup과 각 결과의 표·그림 캡션 및 본문을 대조해 실험조건 표를 복원하라. NVIDIA RTX A6000의 정확한 모델·메모리, Intel Xeon Gold 6136·DRAM, PCIe 링크를 확인하고, OPT·Llama-2 각 모델의 weight·KV cache·partial weight 정밀도, 입력·출력·전체 sequence length, decoding chunk, 모든 batch size와 동시 요청 조건, 사용 데이터셋·few-shot task를 실험별로 제시하라. Full Cache, H2O, FlexGen, UVM, INT4, quantization 등 baseline의 전체 목록과 설정, latency·perplexity·accuracy·전송량 등 metric 정의 및 측정 절차, 워밍업·반복 측정 여부, 실제 측정과 시뮬레이션의 구분, arXiv 식별자·문서 버전·개정일을 명시하라. 본문에 없는 항목은 미확인으로 남겨라."
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "InfiniGen 논문의 설계 설명과 실제 구현·실증을 구분해 성숙도 근거를 수집하라. 공개 저장소·코드·commit·artifact·실행 지침·라이선스가 명시되어 있는지 확인하고, runtime/framework·CUDA kernel·driver·메모리 할당·CPU-GPU offloading·offline Q/K weight 변환과 각 controller의 구현 근거를 찾아라. 지원이 확인된 메모리 계층과 하드웨어를 CPU DRAM·GPU·PCIe 및 그 밖의 tier별로 구분하고, OPT·Llama-2 모델, few-shot task·WikiText-2·PTB, sequence/batch/precision·baseline·metric, ablation과 결과의 실측/시뮬레이션 범위를 정리하라. preprocessing·seed·실행 스크립트·alpha·pool limit·환경 버전 등 재현성 정보의 유무도 표시하고, 기업 IT 문서 검토 Agentic AI의 장문·반복·동시 요청에 대한 직접 검증이 없으면 scenario 또는 team_inference가 아닌 unknown으로 구분하라."
+        }
+      ]
+    },
+    {
+      "id": "20260921T100118-6dfbc0-kivi",
+      "technology": "KIVI",
+      "source_receipt_sha256": "730857214f11dbf71209459a805d3681c7a7a72dbddf9d2094fd66542bd8da97",
+      "observed_after_status": "insufficient_or_invalid",
+      "before": [
+        {
+          "technology": "KIVI",
+          "facet": "mechanism",
+          "query": "How does KIVI implement software KV-cache quantization at its core, including the treatment of keys, values, quantization granularity, and the retained high-precision residual cache?"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "limitation",
+          "query": "What accuracy and configuration limitations does KIVI report for software KV-cache quantization, including sensitivity to model or workload settings, quantization precision, and the retained high-precision residual cache?"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "conditions",
+          "query": "In KIVI's efficiency Figure 5, what are the complete experimental conditions for the NVIDIA A100 and ShareGPT results, including paper version, model, quantization precision, input and output lengths, batch size, comparison baseline, metric, dataset split, and whether results are measured or simulated?"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "maturity",
+          "query": "What implementation and empirical-validation evidence does the KIVI paper provide, including code or integration details, supported model families and frameworks, evaluated workloads and datasets, hardware platforms, baselines, and reproducibility limits?"
+        }
+      ],
+      "after": [
+        {
+          "technology": "KIVI",
+          "facet": "mechanism",
+          "query": "KIVI 논문의 Section 3.1–3.3과 Appendix A Algorithm 1을 근거로 알고리즘의 전체 흐름을 설명하라. 키 캐시의 per-channel·group-wise 양자화와 값 캐시의 per-token 양자화, group size G, zero-point·scaling factor, grouped/residual 분할(XKg·XKr·XVg·XVr), residual length R과 R의 divisibility 조건, 새 토큰의 처리·큐 동작·재양자화 시점, prefill과 decoding의 차이, tiled matrix multiplication, CUDA dequantization-fused matmul 및 Triton kernel을 각각 구분하라. 고정밀 residual cache와 sliding window를 누락하거나 무손실로 표현하지 말고, 본문에 없는 세부는 unknown으로 표시하라."
+        },
+        {
+          "technology": "KIVI",
+          "facet": "limitation",
+          "query": "KIVI 논문의 정확도·설정 한계를 Section 3.2, Table 3, Table 4, Table 5 및 Appendix C에서 찾아 정리하라. 16bit·4bit·2bit 비교와 key/value 양자화 조합별 결과, Llama/Llama-2·Falcon·Mistral 모델 및 각 task/dataset, GSM8K와 LongBench의 조건을 분리하고, group size G=32·64·128 및 residual length R=32·64·96·128 변화가 정확도와 압축에 미친 관찰을 수치와 함께 제시하라. 큰 group size의 저하, residual length의 비단조성, 어려운 task에서 고정밀 residual cache가 필요한 이유, 지원·검증되지 않은 구성과 prefill/decode overhead를 저자 관찰·실험 사실·unknown으로 구분하며 각 수치의 모델·정밀도·길이·배치·하드웨어·baseline·지표 조건을 보존하라."
+        },
+        {
+          "technology": "KIVI",
+          "facet": "conditions",
+          "query": "KIVI 논문의 Section 4.1과 Section 4.2.4, Figure 5의 전체 캡션·본문에서 efficiency 실험 조건을 복원하라. 문서 식별자와 버전/출판 정보, Llama-2-7B, 2bit KIVI의 G와 residual length 32·128, FP16 baseline, 단일 NVIDIA A100 80GB, 입력 토큰 길이와 출력 토큰 길이, 각 batch size와 탐색 범위·OOM 중단 기준, peak memory에 포함된 범위, throughput의 단위·측정 프로토콜·반복/워밍업 조건, Figure 5의 수치와 측정 시점을 항목별로 제시하라. 또한 ShareGPT 기반 합성 workload에 대해 샘플링·전처리·분할·샘플 수·길이 분포를 확인하고, 결과가 실측인지 시뮬레이션인지 명시하라. 본문·그림에 없는 항목은 추정하지 말고 unknown으로 남겨라."
+        },
+        {
+          "technology": "KIVI",
+          "facet": "maturity",
+          "query": "KIVI 논문의 Section 4.1–4.2, 관련 표·부록과 공개 저장소 안내를 근거로 구현 및 실증 성숙도를 점검하라. 공개 code URL과 확인 가능한 release/commit, Hugging Face Transformers 통합 방식, CUDA dequantization·matrix-multiplication fusion과 Triton kernel, 의존성·빌드·실행 절차를 구분해 정리하라. Llama/Llama-2·Falcon·Mistral의 정확한 모델 변형, LongBench·GSM8K·ShareGPT 등 task/dataset·split·workload 생성 방식, 실험별 하드웨어와 소프트웨어 버전, FP16·다른 양자화 구성 등의 baseline, 표·그림별 지표와 수치 조건을 목록화하라. A100 이외 플랫폼 검증, 독립 재현, 공개 코드의 현재 실행 가능성, 실제 서비스·기업 workload 검증은 논문이 직접 입증한 범위와 unknown을 분리해 평가하라."
+        }
+      ]
+    },
+    {
+      "id": "20260921T100525-27ea3e-infinigen",
+      "technology": "InfiniGen",
+      "source_receipt_sha256": "f1cfce21a08ea5c41ec1410914a0eb6122c19fd4e3a267db00c263612714299f",
+      "observed_after_status": "accepted",
+      "before": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "How does InfiniGen use attention-aware selective KV cache fetching and memory hierarchy management to reduce latency?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "What accuracy, prediction, and configuration limitations affect InfiniGen's selective KV cache fetching under changing workloads and model settings?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "What experimental conditions are reported in InfiniGen Section 5.1 for A6000, CPU, PCIe, and tested models?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "What implementation and empirical evidence does InfiniGen provide across hardware platforms, models, workloads, and end-to-end deployments?"
+        }
+      ],
+      "after": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "InfiniGen Section 4.3 minimal rehearsal current layer partial query weight partial key cache subsequent layer attention pattern selective KV prefetch CPU memory"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "InfiniGen Section 6.1 alpha threshold partial weight ratio speculation accuracy latency tradeoff Section 4.4 limited CPU user-defined pool infrequently selected entries counter LRU"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "InfiniGen Section 5.1 RTX A6000 48GB Xeon Gold 6136 96GB DDR4-2666 PCIe 3.0x16 OPT Llama-2 precision input output lengths batch datasets baselines metrics measured latency"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "InfiniGen implementation modern offloading-based inference system FlexGen UVM OPT Llama-2 models workloads batch sizes sequence lengths baselines latency accuracy"
+        }
+      ]
+    },
+    {
+      "id": "20260921T103300-917c01-infinigen",
+      "technology": "InfiniGen",
+      "source_receipt_sha256": "f1cfce21a08ea5c41ec1410914a0eb6122c19fd4e3a267db00c263612714299f",
+      "observed_after_status": "accepted",
+      "before": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "How does InfiniGen use attention-aware selective KV cache fetching and memory hierarchy management to reduce latency?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "What accuracy, prediction, and configuration limitations affect InfiniGen's selective KV cache fetching under changing workloads and model settings?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "What experimental conditions are reported in InfiniGen Section 5.1 for A6000, CPU, PCIe, and tested models?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "What implementation and empirical evidence does InfiniGen provide across hardware platforms, models, workloads, and end-to-end deployments?"
+        }
+      ],
+      "after": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "InfiniGen Section 4.3 minimal rehearsal current layer partial query weight partial key cache subsequent layer attention pattern selective KV prefetch CPU memory"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "InfiniGen Section 6.1 alpha threshold partial weight ratio speculation accuracy latency tradeoff Section 4.4 limited CPU user-defined pool infrequently selected entries counter LRU"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "InfiniGen Section 5.1 RTX A6000 48GB Xeon Gold 6136 96GB DDR4-2666 PCIe 3.0x16 OPT Llama-2 precision input output lengths batch datasets baselines metrics measured latency"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "InfiniGen implementation modern offloading-based inference system FlexGen UVM OPT Llama-2 models workloads batch sizes sequence lengths baselines latency accuracy"
+        }
+      ]
+    },
+    {
+      "id": "20260921T103742-b26f39-infinigen",
+      "technology": "InfiniGen",
+      "source_receipt_sha256": "f1cfce21a08ea5c41ec1410914a0eb6122c19fd4e3a267db00c263612714299f",
+      "observed_after_status": "accepted",
+      "before": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "How does InfiniGen use attention-aware selective KV cache fetching and memory hierarchy management to reduce latency?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "What accuracy, prediction, and configuration limitations affect InfiniGen's selective KV cache fetching under changing workloads and model settings?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "What experimental conditions are reported in InfiniGen Section 5.1 for A6000, CPU, PCIe, and tested models?"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "What implementation and empirical evidence does InfiniGen provide across hardware platforms, models, workloads, and end-to-end deployments?"
+        }
+      ],
+      "after": [
+        {
+          "technology": "InfiniGen",
+          "facet": "mechanism",
+          "query": "InfiniGen Section 4.3 minimal rehearsal current layer partial query weight partial key cache subsequent layer attention pattern selective KV prefetch CPU memory"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "limitation",
+          "query": "InfiniGen Section 6.1 alpha threshold partial weight ratio speculation accuracy latency tradeoff Section 4.4 limited CPU user-defined pool infrequently selected entries counter LRU"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "conditions",
+          "query": "InfiniGen Section 5.1 RTX A6000 48GB Xeon Gold 6136 96GB DDR4-2666 PCIe 3.0x16 OPT Llama-2 precision input output lengths batch datasets baselines metrics measured latency"
+        },
+        {
+          "technology": "InfiniGen",
+          "facet": "maturity",
+          "query": "InfiniGen implementation modern offloading-based inference system FlexGen UVM OPT Llama-2 models workloads batch sizes sequence lengths baselines latency accuracy"
+        }
+      ]
+    },
+    {
+      "id": "20260922T024141-f6e6db-kivi",
+      "technology": "KIVI",
+      "source_receipt_sha256": "7621f223726d1fc660d2a46a991fc451d396936fff90a659c93b9f6dfcf36b1c",
+      "observed_after_status": "insufficient_or_invalid",
+      "before": [
+        {
+          "technology": "KIVI",
+          "facet": "mechanism",
+          "query": "KIVI paper asymmetric 2-bit key value cache quantization per-channel keys per-token values mechanism"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "limitation",
+          "query": "KIVI accuracy degradation sensitivity to quantization settings context length and attention key value cache precision"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "conditions",
+          "query": "KIVI efficiency Figure 5 NVIDIA A100 ShareGPT throughput memory evaluation"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "maturity",
+          "query": "KIVI implementation availability reproducibility supported models and empirical evaluation scope"
+        }
+      ],
+      "after": [
+        {
+          "technology": "KIVI",
+          "facet": "mechanism",
+          "query": "KIVI original paper grouped residual key cache value cache full precision sliding window Algorithm 1"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "limitation",
+          "query": "KIVI paper Falcon multi-query attention 2-bit accuracy drop group size residual length ablation"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "conditions",
+          "query": "KIVI Figure 5 ShareGPT workload average prompt output length Llama-2-7B FP16 A100 80GB throughput"
+        },
+        {
+          "technology": "KIVI",
+          "facet": "maturity",
+          "query": "KIVI paper GitHub source code license CUDA Triton Hugging Face supported models evaluation datasets"
+        }
+      ]
+    }
+  ]
+}

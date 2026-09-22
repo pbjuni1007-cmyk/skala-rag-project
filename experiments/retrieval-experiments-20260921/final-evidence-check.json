@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "holdout_results": [
+    {
+      "result": "outputs/retrieval-experiments-20260921/results/e5-300-50-holdout.json",
+      "sha256": "032fe0d9f549c72bb191ad8b1be06f490e8115236f83123c19a87a209291792f",
+      "rows": 16,
+      "metrics_recomputed": 48
+    },
+    {
+      "result": "outputs/retrieval-experiments-20260921/results/e5-380-50-holdout.json",
+      "sha256": "ac3d73359c7d6bf4b6d869274298b28f28b988ed4c4d26b9ac962a79c06cd779",
+      "rows": 16,
+      "metrics_recomputed": 48
+    }
+  ],
+  "frozen_inputs_unchanged": true,
+  "report_links": "PASS",
+  "report_sha256": "7a756f8b55ff82af77a3696b8e9ab537c9a411b144499debc6cb8ce146430f93"
+}

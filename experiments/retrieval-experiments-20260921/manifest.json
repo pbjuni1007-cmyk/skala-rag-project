@@ -1,0 +1,149 @@
+{
+  "protocol_sha256": "20c5b97000989993f6f8087ae217e73b7c155efb9d6853150c3f7000a868474e",
+  "configs": [
+    {
+      "id": "e5-common",
+      "model": "e5",
+      "family": "common",
+      "limit": 512,
+      "chunk_count": 95,
+      "chunks_sha256": "2ed515d42678b2f5f2780a1d9895b52f02446b00f8794df87cff62b9e0dd22b7"
+    },
+    {
+      "id": "e5-200-0",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 200,
+      "overlap": 0,
+      "chunk_count": 219,
+      "chunks_sha256": "42a141f6af07f5952a715e52b2918222ef3b215e4ad2edf12b0265e63c19a529"
+    },
+    {
+      "id": "e5-200-25",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 200,
+      "overlap": 25,
+      "chunk_count": 245,
+      "chunks_sha256": "0f6eed0d48fd92e644faa4607bf7a1b720af037fb99f90583241de082bb9227d"
+    },
+    {
+      "id": "e5-200-50",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 200,
+      "overlap": 50,
+      "chunk_count": 286,
+      "chunks_sha256": "64373c9ac92275af76c1d4ced612cf4fbb45045a82a2698bb51b3d56d31a893d"
+    },
+    {
+      "id": "e5-300-0",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 300,
+      "overlap": 0,
+      "chunk_count": 152,
+      "chunks_sha256": "3650046b00db99fc68921aa8621dca37757231a88c63e40e2e2e7f27f916e278"
+    },
+    {
+      "id": "e5-300-25",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 300,
+      "overlap": 25,
+      "chunk_count": 160,
+      "chunks_sha256": "80b22118f61be536e77fed97c04ed2606751126b3d921f8dad6d2da668d9343f"
+    },
+    {
+      "id": "e5-300-50",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 300,
+      "overlap": 50,
+      "chunk_count": 175,
+      "chunks_sha256": "e63c1e60b41aa576a3ad39e89287e3e5529068c189d824b431e95ebd38e3bea4"
+    },
+    {
+      "id": "e5-380-0",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 380,
+      "overlap": 0,
+      "chunk_count": 123,
+      "chunks_sha256": "189ffcbec23bcfcf8fc223a0e4c45d9a062f11ca06a761e73f6cfc5bdf801b66"
+    },
+    {
+      "id": "e5-380-25",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 380,
+      "overlap": 25,
+      "chunk_count": 126,
+      "chunks_sha256": "6101e642920a524995b5b51c667eab9f811b18ab283ab8b4782dbcd6cf697feb"
+    },
+    {
+      "id": "e5-380-50",
+      "model": "e5",
+      "family": "operational",
+      "limit": 512,
+      "size": 380,
+      "overlap": 50,
+      "chunk_count": 136,
+      "chunks_sha256": "b24c7fe7ec332b7a74902b0359649670af3575ad49c26b24f7cd441b91eabd3f"
+    },
+    {
+      "id": "bge-small-common",
+      "model": "bge-small",
+      "family": "common",
+      "limit": 512,
+      "chunk_count": 95,
+      "chunks_sha256": "2ed515d42678b2f5f2780a1d9895b52f02446b00f8794df87cff62b9e0dd22b7"
+    },
+    {
+      "id": "bge-small-380-50",
+      "model": "bge-small",
+      "family": "operational",
+      "limit": 512,
+      "size": 380,
+      "overlap": 50,
+      "chunk_count": 132,
+      "chunks_sha256": "e0205cea126e7ad2b28d6de28c55311082457fc2f0cc479ad1e0fb47017a5d48"
+    },
+    {
+      "id": "bge-m3-common",
+      "model": "bge-m3",
+      "family": "common",
+      "limit": 512,
+      "chunk_count": 95,
+      "chunks_sha256": "2ed515d42678b2f5f2780a1d9895b52f02446b00f8794df87cff62b9e0dd22b7"
+    },
+    {
+      "id": "bge-m3-380-50",
+      "model": "bge-m3",
+      "family": "operational",
+      "limit": 512,
+      "size": 380,
+      "overlap": 50,
+      "chunk_count": 136,
+      "chunks_sha256": "b24c7fe7ec332b7a74902b0359649670af3575ad49c26b24f7cd441b91eabd3f"
+    },
+    {
+      "id": "bge-m3-1024-50",
+      "model": "bge-m3",
+      "family": "exploratory",
+      "limit": 1024,
+      "size": 1024,
+      "overlap": 50,
+      "chunk_count": 61,
+      "chunks_sha256": "87b17df8448f1e0f45e8f8d760d74a9033bb76902fe062222122995f60922e5e"
+    }
+  ]
+}

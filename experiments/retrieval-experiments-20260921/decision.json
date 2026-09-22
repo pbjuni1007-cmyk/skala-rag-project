@@ -1,0 +1,19 @@
+{
+  "selected_before_validation": "e5-300-50",
+  "holdout_passed": true,
+  "retained": "e5-300-50",
+  "baseline_holdout_score": [
+    0.375,
+    0.71875,
+    -0.006293875048868358
+  ],
+  "candidate_holdout_score": [
+    0.875,
+    0.9375,
+    -0.006387353932950646
+  ],
+  "operational_change_authorized": true,
+  "review_status": "human_review_pending",
+  "corpus": "technical",
+  "note": "Human semantic review remains pending; enterprise evidence alone cannot change production."
+}

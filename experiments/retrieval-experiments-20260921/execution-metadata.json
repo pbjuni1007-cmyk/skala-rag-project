@@ -1,0 +1,52 @@
+{
+  "frozen_at": "2026-09-21T14:41:01.095923+00:00",
+  "commands": [
+    [
+      ".venv/bin/python",
+      "scripts/retrieval_experiments.py",
+      "freeze",
+      "--cache",
+      ".cache/huggingface/hub",
+      "--output",
+      "outputs/retrieval-experiments-20260921"
+    ],
+    [
+      ".venv/bin/python",
+      "scripts/retrieval_experiments.py",
+      "prepare",
+      "--cache",
+      ".cache/huggingface/hub",
+      "--output",
+      "outputs/retrieval-experiments-20260921"
+    ],
+    [
+      ".venv/bin/python",
+      "scripts/retrieval_experiments.py",
+      "run-all",
+      "--cache",
+      ".cache/huggingface/hub",
+      "--output",
+      "outputs/retrieval-experiments-20260921"
+    ],
+    [
+      ".venv/bin/python",
+      "scripts/retrieval_experiments.py",
+      "select",
+      "--cache",
+      ".cache/huggingface/hub",
+      "--output",
+      "outputs/retrieval-experiments-20260921"
+    ],
+    [
+      ".venv/bin/python",
+      "scripts/retrieval_experiments.py",
+      "validate",
+      "--cache",
+      ".cache/huggingface/hub",
+      "--output",
+      "outputs/retrieval-experiments-20260921"
+    ]
+  ],
+  "protocol_sha256": "20c5b97000989993f6f8087ae217e73b7c155efb9d6853150c3f7000a868474e",
+  "notes": "No result examined before freeze. CPU performance measured sequentially."
+}

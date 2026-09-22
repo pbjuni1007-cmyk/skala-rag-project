@@ -1,0 +1,1318 @@
+{
+  "diagnostic_only": true,
+  "human_review_pending": true,
+  "policy": {
+    "policy": "full-chunk-caption-setup-neighbors-v1",
+    "evidence_token_budget": 6500,
+    "adjacent_token_budget": 2800,
+    "assessment_evidence_token_budget": 6500
+  },
+  "dataset_sha256": "ee8599e4f171e7489c71e9e1789c141708e2e98dfaf801c11e5f606c41f234ca",
+  "pages_sha256": "dffa79e8eed1793f16c217c624af55d6d2f93c629f41d815643082657275fca3",
+  "index_sha256": "78c7035148e49932be942dcbcbd5e1bc8fd0c11fb580868b66047cd3d2d69e58",
+  "ranking": {
+    "KIVI": [
+      {
+        "facet": "mechanism",
+        "hits": [
+          {
+            "id": "kivi:p2:t500",
+            "score": 0.9080130457878113
+          },
+          {
+            "id": "kivi:p2:t250",
+            "score": 0.9054791331291199
+          },
+          {
+            "id": "kivi:p2:t0",
+            "score": 0.9048029780387878
+          },
+          {
+            "id": "kivi:p4:t0",
+            "score": 0.8983429670333862
+          },
+          {
+            "id": "kivi:p14:t0",
+            "score": 0.8976684808731079
+          }
+        ]
+      },
+      {
+        "facet": "limitation",
+        "hits": [
+          {
+            "id": "kivi:p9:t500",
+            "score": 0.8880556225776672
+          },
+          {
+            "id": "kivi:p14:t0",
+            "score": 0.881483793258667
+          },
+          {
+            "id": "kivi:p6:t0",
+            "score": 0.881278932094574
+          },
+          {
+            "id": "kivi:p6:t1250",
+            "score": 0.8769196271896362
+          },
+          {
+            "id": "kivi:p1:t0",
+            "score": 0.8768245577812195
+          }
+        ]
+      },
+      {
+        "facet": "conditions",
+        "hits": [
+          {
+            "id": "kivi:p8:t500",
+            "score": 0.8956628441810608
+          },
+          {
+            "id": "kivi:p3:t0",
+            "score": 0.8785613775253296
+          },
+          {
+            "id": "kivi:p1:t250",
+            "score": 0.8756570219993591
+          },
+          {
+            "id": "kivi:p7:t750",
+            "score": 0.873577356338501
+          },
+          {
+            "id": "kivi:p2:t750",
+            "score": 0.8718241453170776
+          }
+        ]
+      },
+      {
+        "facet": "maturity",
+        "hits": [
+          {
+            "id": "kivi:p1:t250",
+            "score": 0.8433175086975098
+          },
+          {
+            "id": "kivi:p6:t1250",
+            "score": 0.8404683470726013
+          },
+          {
+            "id": "kivi:p2:t750",
+            "score": 0.8400972485542297
+          },
+          {
+            "id": "kivi:p1:t0",
+            "score": 0.8392050266265869
+          },
+          {
+            "id": "kivi:p6:t0",
+            "score": 0.8388949632644653
+          }
+        ]
+      }
+    ],
+    "InfiniGen": [
+      {
+        "facet": "mechanism",
+        "hits": [
+          {
+            "id": "infinigen:p2:t250",
+            "score": 0.9234210252761841
+          },
+          {
+            "id": "infinigen:p1:t750",
+            "score": 0.9189966917037964
+          },
+          {
+            "id": "infinigen:p9:t0",
+            "score": 0.9070156812667847
+          },
+          {
+            "id": "infinigen:p2:t0",
+            "score": 0.9057016372680664
+          },
+          {
+            "id": "infinigen:p6:t250",
+            "score": 0.9048184156417847
+          }
+        ]
+      },
+      {
+        "facet": "limitation",
+        "hits": [
+          {
+            "id": "infinigen:p2:t250",
+            "score": 0.8665364384651184
+          },
+          {
+            "id": "infinigen:p14:t1000",
+            "score": 0.8611162900924683
+          },
+          {
+            "id": "infinigen:p12:t750",
+            "score": 0.8592549562454224
+          },
+          {
+            "id": "infinigen:p1:t0",
+            "score": 0.85899418592453
+          },
+          {
+            "id": "infinigen:p14:t250",
+            "score": 0.8576178550720215
+          }
+        ]
+      },
+      {
+        "facet": "conditions",
+        "hits": [
+          {
+            "id": "infinigen:p9:t750",
+            "score": 0.9160076379776001
+          },
+          {
+            "id": "infinigen:p2:t250",
+            "score": 0.8782461285591125
+          },
+          {
+            "id": "infinigen:p1:t750",
+            "score": 0.874107837677002
+          },
+          {
+            "id": "infinigen:p9:t0",
+            "score": 0.8737452030181885
+          },
+          {
+            "id": "infinigen:p6:t250",
+            "score": 0.871907114982605
+          }
+        ]
+      },
+      {
+        "facet": "maturity",
+        "hits": [
+          {
+            "id": "infinigen:p9:t750",
+            "score": 0.8773245215415955
+          },
+          {
+            "id": "infinigen:p1:t0",
+            "score": 0.8681447505950928
+          },
+          {
+            "id": "infinigen:p14:t500",
+            "score": 0.861554741859436
+          },
+          {
+            "id": "infinigen:p1:t750",
+            "score": 0.861470103263855
+          },
+          {
+            "id": "infinigen:p2:t250",
+            "score": 0.8588628768920898
+          }
+        ]
+      }
+    ]
+  },
+  "contexts": {
+    "research_before": {
+      "KIVI": {
+        "chunk_ids": [
+          "kivi:p3:t0",
+          "kivi:p1:t0",
+          "kivi:p8:t0",
+          "kivi:p10:t0",
+          "kivi:p7:t0",
+          "kivi:p9:t0",
+          "kivi:p2:t0",
+          "kivi:p13:t0",
+          "kivi:p15:t0",
+          "kivi:p15:t250",
+          "kivi:p7:t1000",
+          "kivi:p2:t500",
+          "kivi:p9:t500",
+          "kivi:p8:t500",
+          "kivi:p1:t250",
+          "kivi:p2:t250",
+          "kivi:p14:t0",
+          "kivi:p6:t1250",
+          "kivi:p6:t0",
+          "kivi:p2:t750",
+          "kivi:p4:t0",
+          "kivi:p7:t750"
+        ],
+        "e5_tokens": 5992
+      },
+      "InfiniGen": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p2:t0",
+          "infinigen:p13:t0",
+          "infinigen:p15:t0",
+          "infinigen:p11:t0",
+          "infinigen:p5:t0",
+          "infinigen:p1:t1000",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p1:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p9:t0",
+          "infinigen:p12:t750",
+          "infinigen:p14:t500",
+          "infinigen:p6:t250",
+          "infinigen:p14:t250"
+        ],
+        "e5_tokens": 5492
+      }
+    },
+    "research_after": {
+      "KIVI": {
+        "chunk_ids": [
+          "kivi:p3:t0",
+          "kivi:p1:t0",
+          "kivi:p8:t0",
+          "kivi:p10:t0",
+          "kivi:p7:t0",
+          "kivi:p9:t0",
+          "kivi:p2:t0",
+          "kivi:p13:t0",
+          "kivi:p15:t0",
+          "kivi:p15:t250",
+          "kivi:p7:t1000",
+          "kivi:p2:t500",
+          "kivi:p9:t500",
+          "kivi:p8:t500",
+          "kivi:p1:t250",
+          "kivi:p2:t250",
+          "kivi:p14:t0",
+          "kivi:p6:t1250",
+          "kivi:p6:t0",
+          "kivi:p2:t750",
+          "kivi:p4:t0",
+          "kivi:p7:t750",
+          "kivi:p8:t750",
+          "kivi:p13:t500"
+        ],
+        "e5_tokens": 6468
+      },
+      "InfiniGen": {
+        "chunk_ids": [
+          "infinigen:p3:t0",
+          "infinigen:p1:t0",
+          "infinigen:p8:t0",
+          "infinigen:p10:t0",
+          "infinigen:p2:t0",
+          "infinigen:p13:t0",
+          "infinigen:p15:t0",
+          "infinigen:p11:t0",
+          "infinigen:p5:t0",
+          "infinigen:p1:t1000",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p1:t750",
+          "infinigen:p14:t1000",
+          "infinigen:p9:t0",
+          "infinigen:p12:t750",
+          "infinigen:p14:t500",
+          "infinigen:p6:t250",
+          "infinigen:p14:t250",
+          "infinigen:p6:t500",
+          "infinigen:p14:t0",
+          "infinigen:p12:t1000",
+          "infinigen:p8:t1250"
+        ],
+        "e5_tokens": 6466
+      }
+    },
+    "assessment_before": {
+      "KIVI": {
+        "chunk_ids": [
+          "kivi:p1:t250",
+          "kivi:p2:t0",
+          "kivi:p2:t250",
+          "kivi:p2:t500",
+          "kivi:p6:t0",
+          "kivi:p6:t1250",
+          "kivi:p7:t750",
+          "kivi:p7:t1000",
+          "kivi:p8:t500",
+          "kivi:p9:t0"
+        ],
+        "e5_tokens": 2668
+      },
+      "InfiniGen": {
+        "chunk_ids": [
+          "infinigen:p1:t750",
+          "infinigen:p2:t0",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p11:t0",
+          "infinigen:p12:t750",
+          "infinigen:p13:t0"
+        ],
+        "e5_tokens": 2115
+      }
+    },
+    "assessment_after": {
+      "KIVI": {
+        "chunk_ids": [
+          "kivi:p1:t250",
+          "kivi:p2:t0",
+          "kivi:p2:t250",
+          "kivi:p2:t500",
+          "kivi:p6:t0",
+          "kivi:p6:t1250",
+          "kivi:p7:t750",
+          "kivi:p7:t1000",
+          "kivi:p8:t500",
+          "kivi:p9:t0",
+          "kivi:p8:t750",
+          "kivi:p8:t0",
+          "kivi:p2:t750"
+        ],
+        "e5_tokens": 3574
+      },
+      "InfiniGen": {
+        "chunk_ids": [
+          "infinigen:p1:t750",
+          "infinigen:p2:t0",
+          "infinigen:p2:t250",
+          "infinigen:p9:t750",
+          "infinigen:p11:t0",
+          "infinigen:p12:t750",
+          "infinigen:p13:t0",
+          "infinigen:p11:t250",
+          "infinigen:p12:t1000",
+          "infinigen:p10:t750"
+        ],
+        "e5_tokens": 2910
+      }
+    }
+  },
+  "results": {
+    "research_before": [
+      {
+        "id": "K1",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K2",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true,
+          true
+        ]
+      },
+      {
+        "id": "K4",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I1",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I2",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false,
+          false
+        ]
+      },
+      {
+        "id": "I3",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "I4",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K5",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K6",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K7",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K8",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I5",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I6",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "I7",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I8",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.75,
+        "spans": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "id": "I1-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I-Fig17-setup",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K-Fig5-precision",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      }
+    ],
+    "research_after": [
+      {
+        "id": "K1",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K2",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true,
+          true
+        ]
+      },
+      {
+        "id": "K4",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I1",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I2",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          true,
+          false
+        ]
+      },
+      {
+        "id": "I3",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "I4",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K5",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K6",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K7",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K8",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I5",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I6",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "I7",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I8",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K3-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "id": "I1-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I-Fig17-setup",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K-Fig5-precision",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      }
+    ],
+    "assessment_before": [
+      {
+        "id": "K1",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K2",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true,
+          true
+        ]
+      },
+      {
+        "id": "K4",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I1",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I2",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false,
+          false
+        ]
+      },
+      {
+        "id": "I3",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "I4",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K5",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K6",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K7",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K8",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I5",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I6",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I7",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I8",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.75,
+        "spans": [
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      {
+        "id": "I1-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I-Fig17-setup",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K-Fig5-precision",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      }
+    ],
+    "assessment_after": [
+      {
+        "id": "K1",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K2",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true,
+          true
+        ]
+      },
+      {
+        "id": "K4",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I1",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I2",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          true,
+          false
+        ]
+      },
+      {
+        "id": "I3",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "I4",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K5",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K6",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K7",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K8",
+        "group": "legacy_registered_spans",
+        "technology": "KIVI",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I5",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I6",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I7",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "I8",
+        "group": "legacy_registered_spans",
+        "technology": "InfiniGen",
+        "required": false,
+        "complete": 0,
+        "condition_recovery": 0,
+        "spans": [
+          false
+        ]
+      },
+      {
+        "id": "K3-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      {
+        "id": "I1-expanded",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 0,
+        "condition_recovery": 0.5,
+        "spans": [
+          false,
+          true
+        ]
+      },
+      {
+        "id": "I-Fig17-setup",
+        "group": "known_condition_diagnostic",
+        "technology": "InfiniGen",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      },
+      {
+        "id": "K-Fig5-precision",
+        "group": "known_condition_diagnostic",
+        "technology": "KIVI",
+        "required": true,
+        "complete": 1,
+        "condition_recovery": 1,
+        "spans": [
+          true
+        ]
+      }
+    ]
+  },
+  "required_regressions": [],
+  "assessment_required_regressions": [],
+  "assessment_total_e5_tokens": 6484
+}

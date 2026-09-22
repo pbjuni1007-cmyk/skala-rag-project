@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "runner_sha256": "d2e2c49317d9c300f9a8133029fec0e62dcae3d8c2b52227e00bea1a6d1070e1",
+  "pages_sha256": "dffa79e8eed1793f16c217c624af55d6d2f93c629f41d815643082657275fca3",
+  "dataset_sha256": "ccc50193422eb087fcbc0474ea107c2086df8ab63054b02c4c590216a6d364e8",
+  "models_sha256": "ceb3bc71ae5c849ec7c1a1921af0ed70c04ffc6a124517cf2c1a765b94b454e3",
+  "source_pages_sha256": {
+    "kivi:1": "66dc52665af92b5b9767dfb8ec6d9db386b6e05f7f62017a8a7efcd9be5203ee",
+    "kivi:2": "ea0cd42a2c5269b7dedff35f0911377cf0eb6d5db11ce70e9b782bff75e474a9",
+    "kivi:3": "3ab51fdd7fa9bad1a052fc1f0f53658feef19898e22776d618382cfc476a06d4",
+    "kivi:4": "266db9fc4542bfd0566e115b3b361ea53d37bfb47396c1bf65c07978cca9b2c7",
+    "kivi:5": "9b865eab030d583e2a11854f9273177efa58b0be737fc7093d257712b04293d8",
+    "kivi:6": "33bb1ce5cf34327b598e7ec1536fcf89402618168c53b560bf5716c7e1836f14",
+    "kivi:7": "4a9d23150420362f78e6e86a13cabc318e54d8159c3e9de21fee2043c3b84c75",
+    "kivi:8": "80268f125b8070c9223a8334660b681e8ea4951b61e3ede3bfafdb0aea3b8ac9",
+    "kivi:9": "ee724080e9b00422d839e560ed62223b6b78ed0080373458dd76d4e8a398b503",
+    "kivi:10": "9a43ea9175e9ac63e15e4ac2772bcd70f1354ec04dc8010a5a04f7efbee77fdb",
+    "kivi:11": "90f9ce9638aba8c65a95849f97af16e549e7488c3b8393d42e7cb788802137f2",
+    "kivi:12": "95c4cd5ec2857ca095d481937ad8a463e81f0c00c21acfe524855a413f54a9ca",
+    "kivi:13": "12c59caa23dcc1427f553317b122abbce58b6f6dae5ed564f283fb17d54f810d",
+    "kivi:14": "799d57ffb6ae4c41b9c9df20ce73f76d7a86d36e2ec8dbd3e86736070789baec",
+    "kivi:15": "daf4c3e740ee10df6ed6adb702719f4091d6af4ba9678da82356f60f239a0490",
+    "infinigen:1": "1336fecbed7f02c27bbd7bb3e38282d1d1d06411ae5fc006603c8bbe1a2ab4ff",
+    "infinigen:2": "8cf6f6a5955137ad686efb7e17c17bfcb084a086b18895cbe387c5683f12a857",
+    "infinigen:3": "9ceb06b5166519bdb7a38b05a149685c7d1b2e128cece509cb5ea898da73fecf",
+    "infinigen:4": "d5e093e587624587ce063b80ed53a2775f4bf43755c57b5e229e7cc628cd5c76",
+    "infinigen:5": "8ed67907609ecdb35a7f000b5c7f5bd565afdb51da40bbf3fcae2e3a34aedf69",
+    "infinigen:6": "a71b02a75bce9c42814a41776bd4b823a352dbbe0707dc54f85b178d1a71d868",
+    "infinigen:7": "cc74af8693e8601ab80dc10e26f96a020a7c39453724518c661b72723436131d",
+    "infinigen:8": "b875ec3d90efa59ce73195d0b9806a93d913880125cf4fff59ff4d7c481876d3",
+    "infinigen:9": "6dff27404aa3e0f856e9b6b0e32f00eb8ef136b730d512654bf818474d77b959",
+    "infinigen:10": "3531ce6ee1643b08ef607f240e5ffba9c51e45fe85f2e26b0cd1d7fabee286b8",
+    "infinigen:11": "d0671ce8cdad5be80cddba8da3eafb0e27a0184684ad1e2b15e97fa3123d6cc6",
+    "infinigen:12": "ce11056568fedc8250abc387a89bd2a0aa6f6f830a37077fdf5229cd62a49ef8",
+    "infinigen:13": "f4781463f5a06b0069955041bc575fa9f89ac12e6dc79f2c4b0a5582b026e1e5",
+    "infinigen:14": "c5f991b89463bdbd2ce27187ff004fbfe82567578d2fbeba95f5e44164f41b97",
+    "infinigen:15": "817098fd375ce5c1eab4ad1fb0e92d300e9961c46527eeacc9451fd5a14fc8fa",
+    "infinigen:16": "a78a8d356d03593952ab2b2bede10ea99b5492c7fb06294f7720007eb452883c",
+    "infinigen:17": "b88f7399553f8c36e285f848d2d6b0835565a2581bfae1d44741d12e952b01f0",
+    "infinigen:18": "46cfe8570162295cc76ca8c4bc88e0a1e147016d88f47d00f9856a6b9bdc1ccc"
+  },
+  "baseline": "e5-380-50",
+  "selection_rule": "required-query complete non-regression; complete, conditions, latency; holdout fallback",
+  "selection_metric_view": "budget2000",
+  "primary_language": "en",
+  "secondary_language": "ko",
+  "corpus": "technical",
+  "review_status": "human_review_pending",
+  "threads": 2,
+  "query_repeats": 3,
+  "context_tokenizer": "e5",
+  "context_budget": 2000,
+  "top_k": 5,
+  "common_gate": "each required selection query non-regression against common E5",
+  "holdout_gate": "candidate complete and condition means and each required query must not regress",
+  "adjacent_policy": "top hit then ranked adjacent-page chunks; diagnostic only",
+  "enterprise_policy": "separate corpus, never authorizes operational model change",
+  "grid": [
+    [
+      200,
+      0
+    ],
+    [
+      200,
+      25
+    ],
+    [
+      200,
+      50
+    ],
+    [
+      300,
+      0
+    ],
+    [
+      300,
+      25
+    ],
+    [
+      300,
+      50
+    ],
+    [
+      380,
+      0
+    ],
+    [
+      380,
+      25
+    ],
+    [
+      380,
+      50
+    ]
+  ],
+  "operational_chunking": "Corpus.build offset/stride algorithm including trailing chunks; each model uses its own tokenizer",
+  "m3_1024": "separate exploratory run; endpoint trimmed for special tokens within total limit 1024; never selection eligible"
+}

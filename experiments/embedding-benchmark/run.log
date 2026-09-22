@@ -1,0 +1,130 @@
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (627 > 512). Running this sequence through the model will result in indexing errors
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (572 > 512). Running this sequence through the model will result in indexing errors
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11032.83it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 17869.51it/s]
+{
+  "e5": {
+    "en_all": {
+      "n": 16,
+      "hit_at_5": 0.5625,
+      "mrr_at_5": 0.4166666666666667,
+      "span_coverage_at_5": 0.7379351265822784,
+      "complete_evidence_at_5": 0.6875,
+      "required_condition_coverage_at_5": 0.6875,
+      "page_keyword_proxy_at_5": 0.8125,
+      "warm_query_median_seconds": 0.004950895963702351
+    },
+    "en_existing": {
+      "n": 8,
+      "hit_at_5": 0.875,
+      "mrr_at_5": 0.6458333333333334,
+      "span_coverage_at_5": 1.0,
+      "complete_evidence_at_5": 1,
+      "required_condition_coverage_at_5": 1.0,
+      "page_keyword_proxy_at_5": 1,
+      "warm_query_median_seconds": 0.004959708487149328
+    },
+    "en_new": {
+      "n": 8,
+      "hit_at_5": 0.25,
+      "mrr_at_5": 0.1875,
+      "span_coverage_at_5": 0.47587025316455694,
+      "complete_evidence_at_5": 0.375,
+      "required_condition_coverage_at_5": 0.375,
+      "page_keyword_proxy_at_5": 0.625,
+      "warm_query_median_seconds": 0.004906729038339108
+    },
+    "ko_all": {
+      "n": 16,
+      "hit_at_5": 0.375,
+      "mrr_at_5": 0.29375,
+      "span_coverage_at_5": 0.5,
+      "complete_evidence_at_5": 0.5,
+      "required_condition_coverage_at_5": 0.5,
+      "page_keyword_proxy_at_5": 0.625,
+      "warm_query_median_seconds": 0.005075729452073574
+    },
+    "ko_existing": {
+      "n": 8,
+      "hit_at_5": 0.5,
+      "mrr_at_5": 0.3375,
+      "span_coverage_at_5": 0.625,
+      "complete_evidence_at_5": 0.625,
+      "required_condition_coverage_at_5": 0.625,
+      "page_keyword_proxy_at_5": 0.75,
+      "warm_query_median_seconds": 0.005082729505375028
+    },
+    "ko_new": {
+      "n": 8,
+      "hit_at_5": 0.25,
+      "mrr_at_5": 0.25,
+      "span_coverage_at_5": 0.375,
+      "complete_evidence_at_5": 0.375,
+      "required_condition_coverage_at_5": 0.375,
+      "page_keyword_proxy_at_5": 0.5,
+      "warm_query_median_seconds": 0.005075729452073574
+    }
+  },
+  "minilm": {
+    "en_all": {
+      "n": 16,
+      "hit_at_5": 0.75,
+      "mrr_at_5": 0.609375,
+      "span_coverage_at_5": 0.9254351265822784,
+      "complete_evidence_at_5": 0.875,
+      "required_condition_coverage_at_5": 0.875,
+      "page_keyword_proxy_at_5": 0.9375,
+      "warm_query_median_seconds": 0.002493249950930476
+    },
+    "en_existing": {
+      "n": 8,
+      "hit_at_5": 0.875,
+      "mrr_at_5": 0.6875,
+      "span_coverage_at_5": 1.0,
+      "complete_evidence_at_5": 1,
+      "required_condition_coverage_at_5": 1.0,
+      "page_keyword_proxy_at_5": 1,
+      "warm_query_median_seconds": 0.002548479475080967
+    },
+    "en_new": {
+      "n": 8,
+      "hit_at_5": 0.625,
+      "mrr_at_5": 0.53125,
+      "span_coverage_at_5": 0.850870253164557,
+      "complete_evidence_at_5": 0.75,
+      "required_condition_coverage_at_5": 0.75,
+      "page_keyword_proxy_at_5": 0.875,
+      "warm_query_median_seconds": 0.002449271036311984
+    },
+    "ko_all": {
+      "n": 16,
+      "hit_at_5": 0.125,
+      "mrr_at_5": 0.03333333333333333,
+      "span_coverage_at_5": 0.1824748743718593,
+      "complete_evidence_at_5": 0.125,
+      "required_condition_coverage_at_5": 0.125,
+      "page_keyword_proxy_at_5": 0.4375,
+      "warm_query_median_seconds": 0.003338958020322025
+    },
+    "ko_existing": {
+      "n": 8,
+      "hit_at_5": 0.25,
+      "mrr_at_5": 0.06666666666666667,
+      "span_coverage_at_5": 0.3649497487437186,
+      "complete_evidence_at_5": 0.25,
+      "required_condition_coverage_at_5": 0.25,
+      "page_keyword_proxy_at_5": 0.625,
+      "warm_query_median_seconds": 0.0033206455409526825
+    },
+    "ko_new": {
+      "n": 8,
+      "hit_at_5": 0,
+      "mrr_at_5": 0,
+      "span_coverage_at_5": 0.0,
+      "complete_evidence_at_5": 0,
+      "required_condition_coverage_at_5": 0.0,
+      "page_keyword_proxy_at_5": 0.25,
+      "warm_query_median_seconds": 0.003634958469774574
+    }
+  }
+}

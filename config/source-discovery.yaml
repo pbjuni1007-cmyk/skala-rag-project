@@ -1,0 +1,27 @@
+depth: 1
+per_source: 3
+total: 6
+file_bytes: 5000000
+aggregate_bytes: 20000000
+timeout: 30
+sources:
+  kivi_repo:
+    allow:
+      - host: raw.githubusercontent.com
+        paths: [/jy-yuan/KIVI/main/]
+      - host: github.com
+        paths: [/jy-yuan/KIVI/]
+  infinigen_repo:
+    allow:
+      - host: raw.githubusercontent.com
+        paths: [/snu-comparch/InfiniGen/main/]
+      - host: github.com
+        paths: [/snu-comparch/InfiniGen/]
+  hf_kv:
+    allow:
+      - host: huggingface.co
+        paths: [/docs/transformers/]
+  aipmo:
+    allow:
+      - host: www.skax.co.kr
+        paths: [/ax-services/, /insights/]

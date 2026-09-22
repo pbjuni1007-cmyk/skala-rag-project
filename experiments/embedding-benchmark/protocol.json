@@ -1,0 +1,30 @@
+{
+  "dataset_sha256": "ada083754f7d2cfc5749db37c606a3ea83d1a603b4c105db8bc58d2e40dfc667",
+  "pages_sha256": "dffa79e8eed1793f16c217c624af55d6d2f93c629f41d815643082657275fca3",
+  "chunks_sha256": "c03c1bac9935e669a8dcf418a5780cb80cdae408a87dd0fd68755dd1638490ac",
+  "page_count": 33,
+  "chunk_count": 190,
+  "models": {
+    "e5": {
+      "repo": "intfloat/multilingual-e5-small",
+      "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+      "limit": 512,
+      "document_prefix": "passage: ",
+      "query_prefix": "query: ",
+      "license": "mit"
+    },
+    "minilm": {
+      "repo": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "limit": 256,
+      "document_prefix": "",
+      "query_prefix": "",
+      "license": "apache-2.0"
+    }
+  },
+  "overlap_words": 24,
+  "threads": 2,
+  "query_repeats": 3,
+  "independent_questions": 16,
+  "language_queries": 32
+}

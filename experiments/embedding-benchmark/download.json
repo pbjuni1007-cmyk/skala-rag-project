@@ -1,0 +1,12 @@
+{
+  "e5": {
+    "seconds": 6.5461173329968005,
+    "snapshot_bytes": 493308085,
+    "cache_reuse_possible": true
+  },
+  "minilm": {
+    "seconds": 3.391139040933922,
+    "snapshot_bytes": 91617680,
+    "cache_reuse_possible": true
+  }
+}

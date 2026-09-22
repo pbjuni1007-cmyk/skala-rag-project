@@ -1,0 +1,11 @@
+test_common_chunks_keep_source_offsets_and_fit_both (test_embedding_benchmark.BenchmarkTests.test_common_chunks_keep_source_offsets_and_fit_both) ... ok
+test_filter_precedes_top_k (test_embedding_benchmark.BenchmarkTests.test_filter_precedes_top_k) ... ok
+test_ground_truth_matches_current_pages (test_embedding_benchmark.BenchmarkTests.test_ground_truth_matches_current_pages) ... ok
+test_mrr_requires_entire_span_but_union_can_complete (test_embedding_benchmark.BenchmarkTests.test_mrr_requires_entire_span_but_union_can_complete) ... ok
+test_truncation_is_failure (test_embedding_benchmark.BenchmarkTests.test_truncation_is_failure) ... ok
+test_union_coverage_does_not_count_overlap_twice_or_other_pages (test_embedding_benchmark.BenchmarkTests.test_union_coverage_does_not_count_overlap_twice_or_other_pages) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

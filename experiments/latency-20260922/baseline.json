@@ -1,0 +1,215 @@
+{
+  "measurement": "Approximate client wall time: ledger reservation timestamp to original call receipt filesystem mtime. Not provider queue or time-to-first-token. Excludes reused calls; original files unchanged.",
+  "calls": [
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "research_queries",
+      "duration_seconds_approx": 6.686,
+      "input_tokens": 997,
+      "output_tokens": 806,
+      "reasoning_tokens": 512,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "retrieval_review_infinigen_0",
+      "duration_seconds_approx": 99.249,
+      "input_tokens": 12820,
+      "output_tokens": 7382,
+      "reasoning_tokens": 6732,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "retrieval_review_kivi_0",
+      "duration_seconds_approx": 137.364,
+      "input_tokens": 13136,
+      "output_tokens": 17223,
+      "reasoning_tokens": 16056,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "research_infinigen_0",
+      "duration_seconds_approx": 191.777,
+      "input_tokens": 13423,
+      "output_tokens": 25582,
+      "reasoning_tokens": 23115,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "research_kivi_0",
+      "duration_seconds_approx": 211.609,
+      "input_tokens": 14268,
+      "output_tokens": 29390,
+      "reasoning_tokens": 27016,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "research_kivi_0_repair_0",
+      "duration_seconds_approx": 3.766,
+      "input_tokens": 2073,
+      "output_tokens": 434,
+      "reasoning_tokens": 333,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "domain",
+      "duration_seconds_approx": 311.578,
+      "input_tokens": 21751,
+      "output_tokens": 39658,
+      "reasoning_tokens": 34704,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "market",
+      "duration_seconds_approx": 157.518,
+      "input_tokens": 21525,
+      "output_tokens": 26288,
+      "reasoning_tokens": 22790,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "stakeholder",
+      "duration_seconds_approx": 203.979,
+      "input_tokens": 21480,
+      "output_tokens": 24851,
+      "reasoning_tokens": 20697,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "market_repair_0",
+      "duration_seconds_approx": 4.423,
+      "input_tokens": 2040,
+      "output_tokens": 448,
+      "reasoning_tokens": 383,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "market_repair_1",
+      "duration_seconds_approx": 3.943,
+      "input_tokens": 1966,
+      "output_tokens": 489,
+      "reasoning_tokens": 428,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "market_rewrite",
+      "duration_seconds_approx": 4.182,
+      "input_tokens": 1094,
+      "output_tokens": 320,
+      "reasoning_tokens": 281,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "market_reassessment",
+      "duration_seconds_approx": 168.545,
+      "input_tokens": 22492,
+      "output_tokens": 22093,
+      "reasoning_tokens": 18373,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "stakeholder_repair_0",
+      "duration_seconds_approx": 5.131,
+      "input_tokens": 2041,
+      "output_tokens": 603,
+      "reasoning_tokens": 541,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "stakeholder_rewrite",
+      "duration_seconds_approx": 5.623,
+      "input_tokens": 1095,
+      "output_tokens": 574,
+      "reasoning_tokens": 516,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "stakeholder_reassessment_facet_governance",
+      "duration_seconds_approx": 141.122,
+      "input_tokens": 20096,
+      "output_tokens": 17192,
+      "reasoning_tokens": 14452,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T020623-6cd64e",
+      "purpose": "stakeholder_reassessment_facet_governance_repair_0",
+      "duration_seconds_approx": 4.026,
+      "input_tokens": 2512,
+      "output_tokens": 430,
+      "reasoning_tokens": 361,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T022555-18b788",
+      "purpose": "domain_rewrite",
+      "duration_seconds_approx": 9.167,
+      "input_tokens": 1119,
+      "output_tokens": 630,
+      "reasoning_tokens": 516,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T022555-18b788",
+      "purpose": "domain_reassessment_facet_evaluation",
+      "duration_seconds_approx": 225.456,
+      "input_tokens": 22115,
+      "output_tokens": 32143,
+      "reasoning_tokens": 28433,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T022555-18b788",
+      "purpose": "domain_reassessment_facet_evaluation_repair_0",
+      "duration_seconds_approx": 6.787,
+      "input_tokens": 3154,
+      "output_tokens": 583,
+      "reasoning_tokens": 516,
+      "effort": "max",
+      "status": "settled"
+    },
+    {
+      "run": "20260922T022555-18b788",
+      "purpose": "domain_reassessment_facet_fit",
+      "duration_seconds_approx": 177.994,
+      "input_tokens": 21982,
+      "output_tokens": 24204,
+      "reasoning_tokens": 21526,
+      "effort": "max",
+      "status": "settled"
+    }
+  ]
+}

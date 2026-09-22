@@ -1,0 +1,96 @@
+{
+  "status": "PASS",
+  "configs": [
+    {
+      "config": "e5-common",
+      "result_sha256": "5af91c1df85c3e8d9389ac61b8c00392529476b12e4fd2cae0dd90bec94961a1",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-200-0",
+      "result_sha256": "da4a9089385a9515f8ddfaded3f45cb0324f8e211f5bf1284745a9037d3f5d9f",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-200-25",
+      "result_sha256": "1f3333fb24dfa677c5a248b641bad535d5c46528e62cac0b5c140da2c20a07d2",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-200-50",
+      "result_sha256": "416996a1878b27cc3c76e990428e766613deef40a3247b3112f9b632b0697221",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-300-0",
+      "result_sha256": "13cfa22a0935b8dee929ece2c8d527798e9edafb8ea818599b9d1226a441019a",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-300-25",
+      "result_sha256": "d5e01ae9a3f6c09a39196b56ccb2994eed0aac3b071a0ead5a6704b4f26dccb5",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-300-50",
+      "result_sha256": "b1d72521a3e247156a86024f56507088cd1e489b67215469f4de1a1b20502cac",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-380-0",
+      "result_sha256": "2a714235c276b4ecd52e570ec4da6d3b7552ec31f268c31d9f9150269a815933",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-380-25",
+      "result_sha256": "5466d5faee9f75105bdbd6f13930ce12e26014385c3c97f2aa8a120487687f53",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "e5-380-50",
+      "result_sha256": "022548351147811d374a3c6eec006d7e35ce5eec68f641b20c1ce37e7db61323",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "bge-small-common",
+      "result_sha256": "531b8ff9bc84d5bb8df2536e53b1cf32bb9b6e5d461b96d30304e41bd17cb660",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "bge-small-380-50",
+      "result_sha256": "9c8eabe8e40d985ed46ba83e5551cf16257b85b7166896bfd7368774c7afe65c",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "bge-m3-common",
+      "result_sha256": "f63801940eb0f7d8ac42700d22c2a6d7fd63498f4e540946d80e73a963a474b8",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "bge-m3-380-50",
+      "result_sha256": "7fa9d7a418aa7821c532ce24951c39b8b4e65c0dc92807f8afcadc9b65fcfcf7",
+      "rows": 32,
+      "metrics_recomputed": 96
+    },
+    {
+      "config": "bge-m3-1024-50",
+      "result_sha256": "9b621da327ff5dead329130ed6a50a6fb9ea083bd13eab702f9a3602a42bef78",
+      "rows": 32,
+      "metrics_recomputed": 96
+    }
+  ],
+  "note": "Raw contexts rescored from frozen source spans; no model execution."
+}

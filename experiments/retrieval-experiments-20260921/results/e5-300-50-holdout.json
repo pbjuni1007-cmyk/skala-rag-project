@@ -1,0 +1,7310 @@
+{
+  "config": {
+    "id": "e5-300-50",
+    "model": "e5",
+    "family": "operational",
+    "limit": 512,
+    "size": 300,
+    "overlap": 50,
+    "chunk_count": 175,
+    "chunks_sha256": "e63c1e60b41aa576a3ad39e89287e3e5529068c189d824b431e95ebd38e3bea4"
+  },
+  "split": "holdout",
+  "protocol_sha256": "20c5b97000989993f6f8087ae217e73b7c155efb9d6853150c3f7000a868474e",
+  "manifest_sha256": "3f654e9d151b50bf37e9acdb225270dcd2f166ae5058b59944c4c59e1c306f99",
+  "selection_sha256": "3db63ce28ec6261068b8c010231bb973cf2f5cff2a59c51aac17ff0ed14182d5",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "packages": {
+      "torch": "2.14.0",
+      "transformers": "5.17.0",
+      "sentence-transformers": "5.7.0",
+      "numpy": "2.5.3"
+    }
+  },
+  "process_peak_rss_bytes": 1434025984,
+  "summary": {
+    "en": {
+      "top5": {
+        "complete": 0.875,
+        "condition_recovery": 0.9375,
+        "duplicate_ratio": 0.031181740366055283
+      },
+      "budget2000": {
+        "complete": 0.875,
+        "condition_recovery": 0.9375,
+        "duplicate_ratio": 0.04454495356777603
+      },
+      "adjacent2000": {
+        "complete": 0.25,
+        "condition_recovery": 0.6666666666666666,
+        "duplicate_ratio": 0.0723550490874555
+      }
+    },
+    "ko": {
+      "top5": {
+        "complete": 0.5,
+        "condition_recovery": 0.6875,
+        "duplicate_ratio": 0.03210712157305978
+      },
+      "budget2000": {
+        "complete": 0.5,
+        "condition_recovery": 0.6875,
+        "duplicate_ratio": 0.03735149742694027
+      },
+      "adjacent2000": {
+        "complete": 0.25,
+        "condition_recovery": 0.4583333333333333,
+        "duplicate_ratio": 0.08111516431634914
+      }
+    }
+  },
+  "model": {
+    "repo": "intfloat/multilingual-e5-small",
+    "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    "limit": 512,
+    "document_prefix": "passage: ",
+    "query_prefix": "query: ",
+    "dimension": 384,
+    "mode": "dense",
+    "trust_remote_code": false
+  },
+  "batch_size": 16,
+  "threads": 2,
+  "device": "cpu",
+  "model_load_seconds": 0.725193457910791,
+  "index_build_seconds": 3.181838750024326,
+  "vector_bytes": 268800,
+  "index_total_bytes": 467872,
+  "query_timing_scope": "warm query encode + dense dot product + ranking; excludes context packing",
+  "index_file_bytes": 268928,
+  "vectors_sha256": "f8918bfb0c159248c81149df9a6b8c50cbf07d39b2508983df5ea45e840c555d",
+  "max_document_tokens": 305,
+  "rows": [
+    {
+      "id": "H1",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.009551166091114283,
+        0.005984000046737492,
+        0.006130457972176373
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.02645502645502651,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.75,
+          "duplicate_ratio": 0.08212087297146053,
+          "span_recovered": [
+            true,
+            true,
+            false,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p11-1762-2979",
+            "infinigen-p13-2906-4089",
+            "infinigen-p9-4983-5846",
+            "infinigen-p4-2928-4194"
+          ],
+          "e5_tokens": 1419
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p11-1762-2979",
+            "infinigen-p13-2906-4089",
+            "infinigen-p9-4983-5846",
+            "infinigen-p4-2928-4194",
+            "infinigen-p10-2498-3183",
+            "infinigen-p13-3884-5125",
+            "infinigen-p3-4352-4618",
+            "infinigen-p4-5094-5153"
+          ],
+          "e5_tokens": 1989
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p10-2498-3183",
+            "infinigen-p10-691-1668",
+            "infinigen-p12-1706-2810",
+            "infinigen-p10-1446-2694",
+            "infinigen-p12-849-1875",
+            "infinigen-p12-3480-4619"
+          ],
+          "e5_tokens": 1989
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.9177875518798828
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8857346177101135
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8854272365570068
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8850772380828857
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8850023150444031
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8849341869354248
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8784157633781433
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8745520114898682
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8741765022277832
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8740096092224121
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8736822605133057
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8730905055999756
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8727996349334717
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8712840676307678
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.869033694267273
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8655264377593994
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8642401099205017
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8636579513549805
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8626360893249512
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8615112900733948
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8608072996139526
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.858593761920929
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8583433032035828
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8576298952102661
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8575584888458252
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8574236035346985
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8568583130836487
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8567554950714111
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8561581969261169
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8558444976806641
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8548982739448547
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8548275232315063
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8539025783538818
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8527324795722961
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8526483774185181
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8520991206169128
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.851513147354126
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8511440753936768
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8505071997642517
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8501015901565552
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8497132658958435
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8496082425117493
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.8475173711776733
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8468783497810364
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.84617680311203
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8452751636505127
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8446273803710938
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8444260954856873
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8436474800109863
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8435910940170288
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8435230851173401
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.8433595895767212
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8427023887634277
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.840980052947998
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8407615423202515
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8401405811309814
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.8398045897483826
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.8391240835189819
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8385671973228455
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8361856341362
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.833823025226593
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8322440385818481
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.8321881294250488
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8307793736457825
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.8305249214172363
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8297102451324463
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8288880586624146
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8279538154602051
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8274677395820618
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.827224850654602
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8270465135574341
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8257631659507751
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8254128694534302
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.8245524168014526
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8240572810173035
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8238765001296997
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.8231008052825928
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.8221232891082764
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8213250041007996
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8208574056625366
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8204487562179565
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8201524019241333
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.8184189200401306
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.8172564506530762
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8168561458587646
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.816343367099762
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8155720233917236
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8155335783958435
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8136056065559387
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.8134714365005493
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.813265323638916
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8123881816864014
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.8112518787384033
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.8105071783065796
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.80916428565979
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.8085440397262573
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.8084958791732788
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.8080763220787048
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.8074467182159424
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.8074319362640381
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.8044698238372803
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.8044577836990356
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8001978993415833
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.7947837710380554
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.7893534898757935
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.756655752658844
+        }
+      ]
+    },
+    {
+      "id": "H1",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.010615666978992522,
+        0.006106624961830676,
+        0.006088458001613617
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.75,
+          "duplicate_ratio": 0.10658167803142604,
+          "span_recovered": [
+            true,
+            true,
+            false,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p11-1762-2979",
+            "infinigen-p9-4983-5846",
+            "infinigen-p13-1993-3067",
+            "infinigen-p4-2928-4194"
+          ],
+          "e5_tokens": 1420
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p11-1762-2979",
+            "infinigen-p9-4983-5846",
+            "infinigen-p13-1993-3067",
+            "infinigen-p4-2928-4194",
+            "infinigen-p10-691-1668",
+            "infinigen-p10-2498-3183",
+            "infinigen-p4-5094-5153",
+            "infinigen-p5-5989-6112",
+            "infinigen-p17-4191-4353"
+          ],
+          "e5_tokens": 1998
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p10-691-1668",
+            "infinigen-p10-2498-3183",
+            "infinigen-p10-1446-2694",
+            "infinigen-p10-0-821",
+            "infinigen-p12-0-1020",
+            "infinigen-p12-849-1875"
+          ],
+          "e5_tokens": 1989
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8842990398406982
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8697360754013062
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8643447756767273
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8611231446266174
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8571310043334961
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8547553420066833
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8537652492523193
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.852774977684021
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8523705005645752
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.845311164855957
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8441261053085327
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8439908027648926
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.843399167060852
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.84251469373703
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8423959612846375
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8406388759613037
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8405238389968872
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8400724530220032
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8396596908569336
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8390091061592102
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.83844393491745
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8381345272064209
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.837722659111023
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.83573317527771
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8353113532066345
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8348703980445862
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8334321975708008
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8333545327186584
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8326694965362549
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8322677612304688
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8322186470031738
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8320685029029846
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8317649960517883
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8307945728302002
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8301894664764404
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8299327492713928
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8299074172973633
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8294616937637329
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8294291496276855
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.8290874361991882
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.828874945640564
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8282935619354248
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8269481658935547
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.826943039894104
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8260974884033203
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8258761167526245
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8238013982772827
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8224653601646423
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8218076229095459
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8217428922653198
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.8217363953590393
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8213815093040466
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8206583857536316
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.820173978805542
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8200260400772095
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.819031298160553
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8183579444885254
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.817992091178894
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8176583647727966
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8163222670555115
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8144352436065674
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8139668703079224
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8133464455604553
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8127414584159851
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8125238418579102
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8115956783294678
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.8110218048095703
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8103059530258179
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8099315762519836
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8093796968460083
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8089276552200317
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.8084490299224854
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8080739974975586
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8069803714752197
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8068715333938599
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.8062753677368164
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8053799867630005
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.805334746837616
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8053256273269653
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.8050358295440674
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8049278259277344
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8038468956947327
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.80377197265625
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.8031910061836243
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.8030261397361755
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8020105361938477
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8018385171890259
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8015488982200623
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8001530170440674
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.7999444007873535
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.7983403205871582
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.7980760931968689
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7963976263999939
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.7954776883125305
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.7952800989151001
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.794947624206543
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.7947299480438232
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7940211296081543
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.7934477925300598
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.7934411764144897
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.7933335304260254
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.790769636631012
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.7895652055740356
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.7828445434570312
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7737119197845459
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7444203495979309
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.010602292022667825,
+        0.006153124966658652,
+        0.0060842500533908606
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.02199153121158315,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.75,
+          "duplicate_ratio": 0.07863395035155685,
+          "span_recovered": [
+            true,
+            true,
+            false,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p9-2099-3315",
+            "infinigen-p13-2906-4089",
+            "infinigen-p11-1762-2979",
+            "infinigen-p10-691-1668"
+          ],
+          "e5_tokens": 1500
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p9-2099-3315",
+            "infinigen-p13-2906-4089",
+            "infinigen-p11-1762-2979",
+            "infinigen-p10-691-1668",
+            "infinigen-p13-1993-3067",
+            "infinigen-p10-2498-3183"
+          ],
+          "e5_tokens": 1989
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p11-0-969",
+            "infinigen-p10-691-1668",
+            "infinigen-p10-0-821",
+            "infinigen-p10-2498-3183",
+            "infinigen-p12-1706-2810",
+            "infinigen-p10-1446-2694",
+            "infinigen-p12-4414-5397",
+            "infinigen-p4-5094-5153",
+            "infinigen-p5-5989-6112"
+          ],
+          "e5_tokens": 1974
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8659254312515259
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8561533689498901
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8532204627990723
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8507874011993408
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8496096134185791
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8495872020721436
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8461644053459167
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.841241180896759
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8384923934936523
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8348643779754639
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8346866369247437
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8331610560417175
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.828544020652771
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.828173816204071
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.827983021736145
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8277767300605774
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8263850212097168
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8257670402526855
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8250055909156799
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8243905305862427
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8234391212463379
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8230085372924805
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8220298290252686
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8218777775764465
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8207563757896423
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8203397393226624
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8200432062149048
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8198455572128296
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8198326230049133
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8189207315444946
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8188424110412598
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8184378147125244
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8181833028793335
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8180267214775085
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8175422549247742
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8170431852340698
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8168058395385742
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8160684704780579
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8160184025764465
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8147487640380859
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.8147301077842712
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8141011595726013
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8139981031417847
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8134099245071411
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8118909597396851
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8117392659187317
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8115946054458618
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8114497065544128
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8113228678703308
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8112164735794067
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8108606338500977
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8104594945907593
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8103542923927307
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8100377917289734
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.809657096862793
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8094609975814819
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8092375993728638
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8088887929916382
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.808531641960144
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8085262179374695
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8083494901657104
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8069965243339539
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.806717038154602
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8062530755996704
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8058127164840698
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8057808876037598
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8048373460769653
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.8038454651832581
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8033013343811035
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8027130961418152
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8024042844772339
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.801576554775238
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8014976382255554
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.8010480403900146
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8006460666656494
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.8006091713905334
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.8005996942520142
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8003997206687927
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.8002995252609253
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.7998091578483582
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.7995177507400513
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.7994728088378906
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.7989073395729065
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.7983095645904541
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.7979336977005005
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.79764723777771
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.7972855567932129
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.7969409227371216
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.7962422370910645
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.7952635884284973
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.7946243286132812
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7937639951705933
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.7936232089996338
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.793007493019104
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.7927322387695312
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.7904092073440552
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.7896146178245544
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.7893112897872925
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7881555557250977
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.788102388381958
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.7878323793411255
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.7877359390258789
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.7849947214126587
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.7812909483909607
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7756797075271606
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7546603083610535
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.011569708934985101,
+        0.006170584005303681,
+        0.006166749983094633
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.03034300791556732,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.022075963252433883,
+          "span_recovered": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.25,
+          "duplicate_ratio": 0.10284075389237912,
+          "span_recovered": [
+            false,
+            false,
+            true,
+            false
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p11-1762-2979",
+            "infinigen-p11-0-969",
+            "infinigen-p13-1993-3067",
+            "infinigen-p9-4983-5846",
+            "infinigen-p13-2906-4089"
+          ],
+          "e5_tokens": 1420
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p11-1762-2979",
+            "infinigen-p11-0-969",
+            "infinigen-p13-1993-3067",
+            "infinigen-p9-4983-5846",
+            "infinigen-p13-2906-4089",
+            "infinigen-p10-691-1668",
+            "infinigen-p10-2498-3183",
+            "infinigen-p4-5094-5153",
+            "infinigen-p3-4352-4618"
+          ],
+          "e5_tokens": 1990
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p11-1762-2979",
+            "infinigen-p10-691-1668",
+            "infinigen-p10-2498-3183",
+            "infinigen-p10-0-821",
+            "infinigen-p12-4414-5397",
+            "infinigen-p10-1446-2694",
+            "infinigen-p12-3480-4619",
+            "infinigen-p4-5094-5153",
+            "infinigen-p1-4227-4420"
+          ],
+          "e5_tokens": 1996
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8656316995620728
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.862450897693634
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8593378067016602
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8591524362564087
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8581536412239075
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8519575595855713
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8505387306213379
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8410236835479736
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8364740610122681
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8351156711578369
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8339367508888245
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8336478471755981
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8334156274795532
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8329935669898987
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8328292965888977
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8317141532897949
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8296233415603638
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.829093337059021
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.828109860420227
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8275799751281738
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8269959092140198
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8257502913475037
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8255180716514587
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8248076438903809
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8246176242828369
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8242074847221375
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8230518698692322
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8225545287132263
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8219344019889832
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8218027353286743
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8214319348335266
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.820482611656189
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8203315734863281
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8202099204063416
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8199962377548218
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8198303580284119
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8197436928749084
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.819341778755188
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8191202282905579
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.8182035684585571
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8179997205734253
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8172861337661743
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8170223832130432
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.816826581954956
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8165127038955688
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8164781332015991
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.81584632396698
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8156764507293701
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.815593957901001
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8155503273010254
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8152662515640259
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8150210380554199
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8142029643058777
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8140158653259277
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8125782012939453
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8124110102653503
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8118098974227905
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8107447624206543
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8089966177940369
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8088501691818237
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8084326386451721
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8082461357116699
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.8077585697174072
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8071122765541077
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.807070791721344
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8068971633911133
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8057659864425659
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8051207065582275
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.8050991892814636
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8049122095108032
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8047224879264832
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8047013282775879
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.804158091545105
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8041166067123413
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8038332462310791
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.8036366105079651
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.8032509088516235
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8028071522712708
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8021579384803772
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.8016058802604675
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8012581467628479
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.80100417137146
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.80080246925354
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.800471305847168
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.7995713949203491
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.7994546890258789
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.7994522452354431
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.7987609505653381
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.7946336269378662
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7940710186958313
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.793579638004303
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.7930223345756531
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.792119562625885
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.7919801473617554
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.7907311320304871
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.7891621589660645
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.7889571189880371
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.788317084312439
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.7852041125297546
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.7848114967346191
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7800066471099854
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.7796374559402466
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7795424461364746
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.7786178588867188
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.770135223865509
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7414093017578125
+        }
+      ]
+    },
+    {
+      "id": "H3",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.013473500031977892,
+        0.007157874992117286,
+        0.006564375013113022
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.029431260771576317,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.049902280130293186,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p12-4414-5397",
+            "infinigen-p13-2906-4089",
+            "infinigen-p11-747-1968",
+            "infinigen-p13-0-1212",
+            "infinigen-p12-2625-3678"
+          ],
+          "e5_tokens": 1445
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p12-4414-5397",
+            "infinigen-p13-2906-4089",
+            "infinigen-p11-747-1968",
+            "infinigen-p13-0-1212",
+            "infinigen-p12-2625-3678",
+            "infinigen-p11-0-969",
+            "infinigen-p9-4983-5846",
+            "infinigen-p4-5094-5153"
+          ],
+          "e5_tokens": 1977
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p12-4414-5397",
+            "infinigen-p13-2906-4089",
+            "infinigen-p11-747-1968",
+            "infinigen-p13-0-1212",
+            "infinigen-p11-0-969",
+            "infinigen-p13-1993-3067",
+            "infinigen-p13-4921-5386",
+            "infinigen-p11-4634-5020",
+            "infinigen-p4-5094-5153",
+            "infinigen-p5-5989-6112"
+          ],
+          "e5_tokens": 1993
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.864244282245636
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8537761569023132
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8494478464126587
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8475635051727295
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8459256887435913
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.842390239238739
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8396084308624268
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8387206792831421
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8381952047348022
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8372994065284729
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8349170088768005
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8339189291000366
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.833812952041626
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8336530923843384
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8326163291931152
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8325963020324707
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8313875794410706
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8302186727523804
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.829775869846344
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8292849063873291
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8290417790412903
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8287619352340698
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8286633491516113
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8286332488059998
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8286120891571045
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8285732269287109
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8280360102653503
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8279863595962524
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8279767036437988
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.827845573425293
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.8278104066848755
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8276299238204956
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.8271477222442627
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8267942070960999
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8264361619949341
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.8256237506866455
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8250394463539124
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8250309228897095
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8248896598815918
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8243062496185303
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8239191770553589
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8235415816307068
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.823203980922699
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8231174945831299
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8223724365234375
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.821749210357666
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8217406272888184
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8205846548080444
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8204889297485352
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.8203021287918091
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8200126886367798
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.819310188293457
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8190494775772095
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8187040686607361
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.817126989364624
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8167761564254761
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8165768980979919
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8158912658691406
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.8152738809585571
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.815096914768219
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.8150086402893066
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8148764371871948
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8148448467254639
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8143465518951416
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.814117968082428
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.813850462436676
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8132861256599426
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8129019737243652
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8126358985900879
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8120081424713135
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8118418455123901
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.8116605281829834
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8113558292388916
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8108532428741455
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8105140924453735
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8100665807723999
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8095880150794983
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.8089745044708252
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8081580400466919
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8077760934829712
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8070740103721619
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8068535923957825
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.806634783744812
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8062405586242676
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8056787252426147
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8055719137191772
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.804985523223877
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.8040433526039124
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8037427067756653
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8036125898361206
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.8021725416183472
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.8020716309547424
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8017169237136841
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.8012945652008057
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.8009202480316162
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.7992587089538574
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.7989564538002014
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7980059385299683
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.7950721979141235
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.794220507144928
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.7938287258148193
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.7917355298995972
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7906554341316223
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.785461962223053
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.784691572189331
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7800188064575195
+        }
+      ]
+    },
+    {
+      "id": "H3",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.011421957984566689,
+        0.006429333006963134,
+        0.006300291977822781
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 0,
+          "condition_recovery": 0.6666666666666666,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            false
+          ]
+        },
+        "budget2000": {
+          "complete": 0,
+          "condition_recovery": 0.6666666666666666,
+          "duplicate_ratio": 0.0,
+          "span_recovered": [
+            true,
+            true,
+            false
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0,
+          "duplicate_ratio": 0.12987345008308837,
+          "span_recovered": [
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p4-5094-5153",
+            "infinigen-p12-4414-5397",
+            "infinigen-p10-0-821",
+            "infinigen-p11-0-969",
+            "infinigen-p9-3093-4156"
+          ],
+          "e5_tokens": 1156
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p4-5094-5153",
+            "infinigen-p12-4414-5397",
+            "infinigen-p10-0-821",
+            "infinigen-p11-0-969",
+            "infinigen-p9-3093-4156",
+            "infinigen-p14-0-1077",
+            "infinigen-p1-4227-4420",
+            "infinigen-p7-4180-5129",
+            "infinigen-p5-5989-6112",
+            "infinigen-p14-4915-5418",
+            "infinigen-p17-4191-4353"
+          ],
+          "e5_tokens": 1988
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p4-5094-5153",
+            "infinigen-p5-5989-6112",
+            "infinigen-p5-3032-4211",
+            "infinigen-p5-2056-3242",
+            "infinigen-p3-3404-4533",
+            "infinigen-p5-1065-2250",
+            "infinigen-p5-0-1273",
+            "infinigen-p5-3988-5218",
+            "infinigen-p3-4352-4618",
+            "infinigen-p1-4227-4420"
+          ],
+          "e5_tokens": 1964
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8503139019012451
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8376739621162415
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8358587026596069
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8313668966293335
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8297196626663208
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8278012871742249
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.827767014503479
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8272590637207031
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8272539377212524
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.826872706413269
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8260033130645752
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8243601322174072
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8235068321228027
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8228846192359924
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8228558301925659
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8227328062057495
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8208330869674683
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8205782175064087
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.8205305933952332
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8202087879180908
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.819158673286438
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8190600872039795
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8187108039855957
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8182660937309265
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8181679248809814
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8167611360549927
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.816604495048523
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.8165578842163086
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8157402276992798
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8157182931900024
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8148168325424194
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8144264221191406
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.81407630443573
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8136091232299805
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.8133260011672974
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8133155107498169
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8131922483444214
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8130626678466797
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8129522204399109
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8129165172576904
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8127627372741699
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8127503991127014
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.8126118779182434
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.811691164970398
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8115079402923584
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8112587928771973
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8110527992248535
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8106402158737183
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8103572130203247
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8099424839019775
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8098074197769165
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.8097319006919861
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8097129464149475
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8096529245376587
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.8095719218254089
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8094624876976013
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8094319701194763
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8094192743301392
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8092997670173645
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8090929985046387
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8089670538902283
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8086676001548767
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8084872961044312
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.808468222618103
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8077609539031982
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8075646162033081
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.807193398475647
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.8070414066314697
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.8068894147872925
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8067682981491089
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8064565658569336
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.806393027305603
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.8058179616928101
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8057023286819458
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.8052600026130676
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.8051309585571289
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8049485683441162
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8047579526901245
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8037385940551758
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8036726713180542
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.8021010160446167
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.801724374294281
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8016745448112488
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8004633188247681
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.8001173138618469
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.7999628186225891
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.7995745539665222
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.799545168876648
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.7995074391365051
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.7993370294570923
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.7986022233963013
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.797744631767273
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.7966373562812805
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.7958269715309143
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.7952070236206055
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.7951927781105042
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.7950013875961304
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.7948538661003113
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.7920819520950317
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.7916637063026428
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7912360429763794
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.7900339365005493
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.7834922075271606
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.782278299331665
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.7798290848731995
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7773007154464722
+        }
+      ]
+    },
+    {
+      "id": "H4",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.011060957913286984,
+        0.006273459061048925,
+        0.006192749948240817
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.029680365296803624,
+          "span_recovered": [
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.04688105385509489,
+          "span_recovered": [
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.5,
+          "duplicate_ratio": 0.07777777777777772,
+          "span_recovered": [
+            false,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p12-1706-2810",
+            "infinigen-p12-849-1875",
+            "infinigen-p4-2928-4194",
+            "infinigen-p5-1065-2250",
+            "infinigen-p5-4999-6112"
+          ],
+          "e5_tokens": 1481
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p12-1706-2810",
+            "infinigen-p12-849-1875",
+            "infinigen-p4-2928-4194",
+            "infinigen-p5-1065-2250",
+            "infinigen-p5-4999-6112",
+            "infinigen-p5-2056-3242",
+            "infinigen-p9-4983-5846"
+          ],
+          "e5_tokens": 2000
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p12-1706-2810",
+            "infinigen-p11-2834-3862",
+            "infinigen-p13-2906-4089",
+            "infinigen-p11-0-969",
+            "infinigen-p11-1762-2979",
+            "infinigen-p11-3621-4829",
+            "infinigen-p11-4634-5020",
+            "infinigen-p5-5989-6112",
+            "infinigen-p4-5094-5153",
+            "infinigen-p1-4227-4420"
+          ],
+          "e5_tokens": 1990
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8453777432441711
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8414727449417114
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8412089943885803
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8370456695556641
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.835135817527771
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8318955302238464
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8310033082962036
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8293208479881287
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8289182186126709
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8284868597984314
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8262230753898621
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8260800838470459
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8253344893455505
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8251327276229858
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8250402212142944
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.82492995262146
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8246943950653076
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8245275616645813
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8238495588302612
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.822216272354126
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.821193516254425
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8205649852752686
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8196696639060974
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8184585571289062
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8183768391609192
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8179537653923035
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.817092776298523
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.816710889339447
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.816338300704956
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8160176277160645
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8158997297286987
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8158814907073975
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8153623342514038
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8153318166732788
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8152887225151062
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8149065971374512
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8146897554397583
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8144502639770508
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8144140243530273
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8139548897743225
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8137555122375488
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8127668499946594
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.8126335740089417
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8114987015724182
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.8108221888542175
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8106351494789124
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8102138638496399
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.8101090788841248
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8100107312202454
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8093578815460205
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.809241771697998
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8089841604232788
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8086255788803101
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.8085027933120728
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8084208965301514
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.808030366897583
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8079189658164978
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.807219386100769
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8062196373939514
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8045215606689453
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.8042184114456177
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8035578727722168
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.8030236959457397
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.8021161556243896
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8004859089851379
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.7998639345169067
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.7994133234024048
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.7989040613174438
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.7985104322433472
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.7984933257102966
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.7975260615348816
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.7972633242607117
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.7970737218856812
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7965226173400879
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.7963919639587402
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7961645126342773
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.7951912879943848
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.7949330806732178
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.7948068380355835
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.7942508459091187
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.7928520441055298
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.7927343249320984
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.7904586791992188
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.790271520614624
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.7901997566223145
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.7898980379104614
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.7880308628082275
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.7872933149337769
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.7866851091384888
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.7857084274291992
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.7851531505584717
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.7847490310668945
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.7845295667648315
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.7842952609062195
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.7839714288711548
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.7822105884552002
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.7814977169036865
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.7811576128005981
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.7804014682769775
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.7798687219619751
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.7744095325469971
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7723474502563477
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.7700158357620239
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.7690346837043762
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.766306459903717
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7451632022857666
+        }
+      ]
+    },
+    {
+      "id": "H4",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.011443666997365654,
+        0.00640333304181695,
+        0.00631141709163785
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 0,
+          "condition_recovery": 0,
+          "duplicate_ratio": 0.03341370995521875,
+          "span_recovered": [
+            false,
+            false
+          ]
+        },
+        "budget2000": {
+          "complete": 0,
+          "condition_recovery": 0,
+          "duplicate_ratio": 0.024448645242596045,
+          "span_recovered": [
+            false,
+            false
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0,
+          "duplicate_ratio": 0.05678891205691161,
+          "span_recovered": [
+            false,
+            false
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p5-1065-2250",
+            "infinigen-p5-2056-3242",
+            "infinigen-p13-2906-4089",
+            "infinigen-p5-4999-6112",
+            "infinigen-p12-3480-4619"
+          ],
+          "e5_tokens": 1480
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p5-1065-2250",
+            "infinigen-p5-2056-3242",
+            "infinigen-p13-2906-4089",
+            "infinigen-p5-4999-6112",
+            "infinigen-p12-3480-4619",
+            "infinigen-p4-2928-4194",
+            "infinigen-p9-4983-5846"
+          ],
+          "e5_tokens": 1999
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p5-1065-2250",
+            "infinigen-p4-2928-4194",
+            "infinigen-p4-2024-3102",
+            "infinigen-p6-0-1207",
+            "infinigen-p4-5094-5153",
+            "infinigen-p4-3964-5153",
+            "infinigen-p4-0-1194",
+            "infinigen-p6-4168-5143"
+          ],
+          "e5_tokens": 2000
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8435143232345581
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8391433954238892
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8391069173812866
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8387973308563232
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8382039070129395
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.837719202041626
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8365318775177002
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8362995982170105
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8341638445854187
+        },
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8341171741485596
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8338868021965027
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8323580026626587
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8320255279541016
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8317087888717651
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8313260078430176
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8306276202201843
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8301385641098022
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8298470377922058
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8295379877090454
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8288015127182007
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8285583257675171
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8285554051399231
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8280766010284424
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8270006775856018
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.826246976852417
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8258452415466309
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8250566124916077
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8250449299812317
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8233346939086914
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8229160308837891
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8228464722633362
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8224704265594482
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8213831186294556
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8206616640090942
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8202857971191406
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8201940059661865
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8199912309646606
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8195284605026245
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8191627860069275
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8180520534515381
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8176611065864563
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8171937465667725
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8167085647583008
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8157709836959839
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8156524896621704
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8154923915863037
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8148399591445923
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8148249983787537
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.813762366771698
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.8136672377586365
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.8136292695999146
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8132246136665344
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.8126547932624817
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8124611973762512
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8122856616973877
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8116463422775269
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8115350604057312
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8115023374557495
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8105202913284302
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.81002277135849
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8098747730255127
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.8097729682922363
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8097352981567383
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8093657493591309
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8091062903404236
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.8089916706085205
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.8082275390625
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.8080457448959351
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8079926371574402
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.807759165763855
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.8076545000076294
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8076353669166565
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.807161808013916
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.8071383833885193
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8069976568222046
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8069442510604858
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8065904378890991
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8064677119255066
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.8057653307914734
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8056992888450623
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8050655722618103
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.804305911064148
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.8038821816444397
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.8037928342819214
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.80355304479599
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8034812808036804
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.8034439086914062
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8030791282653809
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8022923469543457
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.8018162250518799
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8009555339813232
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.7997085452079773
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.7996189594268799
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.7969185709953308
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.7968350648880005
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.7966499924659729
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.796622633934021
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7963858246803284
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.794931173324585
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.7947065234184265
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.7932754158973694
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7900233864784241
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.7895973920822144
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.7878775596618652
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.7824019193649292
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7634188532829285
+        }
+      ]
+    },
+    {
+      "id": "H5",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.01366258307825774,
+        0.006426207954064012,
+        0.006278582965023816
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 0,
+          "condition_recovery": 0.5,
+          "duplicate_ratio": 0.03907013088493849,
+          "span_recovered": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 0,
+          "condition_recovery": 0.5,
+          "duplicate_ratio": 0.05688579306341601,
+          "span_recovered": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0,
+          "duplicate_ratio": 0.07016532103037298,
+          "span_recovered": [
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "kivi-p13-981-1904",
+            "kivi-p8-0-886",
+            "kivi-p9-1328-2360",
+            "kivi-p6-3687-4807",
+            "kivi-p6-2729-3887"
+          ],
+          "e5_tokens": 1501
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "kivi-p13-981-1904",
+            "kivi-p8-0-886",
+            "kivi-p9-1328-2360",
+            "kivi-p6-3687-4807",
+            "kivi-p6-2729-3887",
+            "kivi-p6-0-1122",
+            "kivi-p6-4615-5208",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1994
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "kivi-p13-981-1904",
+            "kivi-p14-1281-2116",
+            "kivi-p14-0-797",
+            "kivi-p14-2005-2829",
+            "kivi-p14-679-1417",
+            "kivi-p12-0-774",
+            "kivi-p12-1126-1380",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1969
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "kivi-p13-981-1904",
+          "cosine": 0.9135856628417969
+        },
+        {
+          "id": "kivi-p8-0-886",
+          "cosine": 0.9128864407539368
+        },
+        {
+          "id": "kivi-p9-1328-2360",
+          "cosine": 0.9121575951576233
+        },
+        {
+          "id": "kivi-p6-3687-4807",
+          "cosine": 0.9045337438583374
+        },
+        {
+          "id": "kivi-p6-2729-3887",
+          "cosine": 0.9038441777229309
+        },
+        {
+          "id": "kivi-p6-0-1122",
+          "cosine": 0.9019886255264282
+        },
+        {
+          "id": "kivi-p6-4615-5208",
+          "cosine": 0.8976387977600098
+        },
+        {
+          "id": "kivi-p9-0-834",
+          "cosine": 0.8968551158905029
+        },
+        {
+          "id": "kivi-p14-1281-2116",
+          "cosine": 0.8960611820220947
+        },
+        {
+          "id": "kivi-p14-0-797",
+          "cosine": 0.8949027061462402
+        },
+        {
+          "id": "kivi-p15-0-756",
+          "cosine": 0.8916102647781372
+        },
+        {
+          "id": "kivi-p3-2795-3923",
+          "cosine": 0.8893518447875977
+        },
+        {
+          "id": "kivi-p8-1316-2265",
+          "cosine": 0.8879680633544922
+        },
+        {
+          "id": "kivi-p8-772-1430",
+          "cosine": 0.8845720291137695
+        },
+        {
+          "id": "kivi-p4-0-1009",
+          "cosine": 0.8815609216690063
+        },
+        {
+          "id": "kivi-p7-1149-2330",
+          "cosine": 0.881419837474823
+        },
+        {
+          "id": "kivi-p2-2041-3339",
+          "cosine": 0.8793796300888062
+        },
+        {
+          "id": "kivi-p7-0-660",
+          "cosine": 0.8785820007324219
+        },
+        {
+          "id": "kivi-p14-2005-2829",
+          "cosine": 0.8781981468200684
+        },
+        {
+          "id": "kivi-p5-0-1146",
+          "cosine": 0.8757458925247192
+        },
+        {
+          "id": "kivi-p13-1744-2333",
+          "cosine": 0.8741684556007385
+        },
+        {
+          "id": "kivi-p1-979-2126",
+          "cosine": 0.871018648147583
+        },
+        {
+          "id": "kivi-p14-679-1417",
+          "cosine": 0.868911623954773
+        },
+        {
+          "id": "kivi-p6-949-2013",
+          "cosine": 0.8673222064971924
+        },
+        {
+          "id": "kivi-p13-0-1186",
+          "cosine": 0.8659336566925049
+        },
+        {
+          "id": "kivi-p9-724-1443",
+          "cosine": 0.8642696142196655
+        },
+        {
+          "id": "kivi-p2-971-2261",
+          "cosine": 0.8619277477264404
+        },
+        {
+          "id": "kivi-p1-0-1181",
+          "cosine": 0.8609690070152283
+        },
+        {
+          "id": "kivi-p3-1975-2893",
+          "cosine": 0.8583139777183533
+        },
+        {
+          "id": "kivi-p10-0-1081",
+          "cosine": 0.858247697353363
+        },
+        {
+          "id": "kivi-p5-3706-4258",
+          "cosine": 0.8569481372833252
+        },
+        {
+          "id": "kivi-p7-2074-3295",
+          "cosine": 0.8563867211341858
+        },
+        {
+          "id": "kivi-p3-3706-4652",
+          "cosine": 0.8546732664108276
+        },
+        {
+          "id": "kivi-p3-0-1079",
+          "cosine": 0.8513790965080261
+        },
+        {
+          "id": "kivi-p5-940-2151",
+          "cosine": 0.8513718843460083
+        },
+        {
+          "id": "kivi-p12-0-774",
+          "cosine": 0.8502848744392395
+        },
+        {
+          "id": "kivi-p14-2676-3187",
+          "cosine": 0.8502369523048401
+        },
+        {
+          "id": "kivi-p9-3196-4037",
+          "cosine": 0.8493386507034302
+        },
+        {
+          "id": "kivi-p3-896-2163",
+          "cosine": 0.8475616574287415
+        },
+        {
+          "id": "kivi-p2-3131-4209",
+          "cosine": 0.8463669419288635
+        },
+        {
+          "id": "kivi-p2-0-1201",
+          "cosine": 0.8453279733657837
+        },
+        {
+          "id": "kivi-p11-0-951",
+          "cosine": 0.8435633182525635
+        },
+        {
+          "id": "kivi-p4-838-2061",
+          "cosine": 0.8426578044891357
+        },
+        {
+          "id": "kivi-p1-3908-4597",
+          "cosine": 0.8420290350914001
+        },
+        {
+          "id": "kivi-p10-2501-3399",
+          "cosine": 0.8410829305648804
+        },
+        {
+          "id": "kivi-p9-2206-3407",
+          "cosine": 0.839383602142334
+        },
+        {
+          "id": "kivi-p5-2799-3879",
+          "cosine": 0.8389866352081299
+        },
+        {
+          "id": "kivi-p1-2925-4102",
+          "cosine": 0.8388957977294922
+        },
+        {
+          "id": "kivi-p5-1960-2961",
+          "cosine": 0.8354787826538086
+        },
+        {
+          "id": "kivi-p6-1858-2891",
+          "cosine": 0.8342996835708618
+        },
+        {
+          "id": "kivi-p8-2975-3830",
+          "cosine": 0.834201455116272
+        },
+        {
+          "id": "kivi-p7-542-1350",
+          "cosine": 0.8339787721633911
+        },
+        {
+          "id": "kivi-p4-1843-2816",
+          "cosine": 0.833737850189209
+        },
+        {
+          "id": "kivi-p8-2037-3167",
+          "cosine": 0.8317891359329224
+        },
+        {
+          "id": "kivi-p4-2677-3436",
+          "cosine": 0.8264299035072327
+        },
+        {
+          "id": "kivi-p12-691-1205",
+          "cosine": 0.8255850076675415
+        },
+        {
+          "id": "kivi-p10-1694-2670",
+          "cosine": 0.8235024213790894
+        },
+        {
+          "id": "kivi-p2-4065-4559",
+          "cosine": 0.8220624327659607
+        },
+        {
+          "id": "kivi-p12-1126-1380",
+          "cosine": 0.8203873634338379
+        },
+        {
+          "id": "kivi-p15-699-756",
+          "cosine": 0.8200445771217346
+        },
+        {
+          "id": "kivi-p1-1965-3101",
+          "cosine": 0.8167266845703125
+        },
+        {
+          "id": "kivi-p10-3277-4242",
+          "cosine": 0.8089068531990051
+        },
+        {
+          "id": "kivi-p11-1629-2603",
+          "cosine": 0.805709958076477
+        },
+        {
+          "id": "kivi-p10-4077-4558",
+          "cosine": 0.8051812648773193
+        },
+        {
+          "id": "kivi-p11-2443-3386",
+          "cosine": 0.8031657338142395
+        },
+        {
+          "id": "kivi-p11-3241-3755",
+          "cosine": 0.8016976714134216
+        },
+        {
+          "id": "kivi-p11-774-1806",
+          "cosine": 0.7950679063796997
+        },
+        {
+          "id": "kivi-p10-949-1873",
+          "cosine": 0.7901132106781006
+        },
+        {
+          "id": "kivi-p7-3108-3381",
+          "cosine": 0.7770602703094482
+        }
+      ]
+    },
+    {
+      "id": "H5",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.011857790988869965,
+        0.006313125020824373,
+        0.006307292031124234
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 0,
+          "condition_recovery": 0.5,
+          "duplicate_ratio": 0.028224808120821954,
+          "span_recovered": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 0,
+          "condition_recovery": 0.5,
+          "duplicate_ratio": 0.041420118343195256,
+          "span_recovered": [
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0,
+          "duplicate_ratio": 0.041558921315108965,
+          "span_recovered": [
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "kivi-p8-772-1430",
+            "kivi-p13-981-1904",
+            "kivi-p8-0-886",
+            "kivi-p14-679-1417",
+            "kivi-p9-0-834"
+          ],
+          "e5_tokens": 1502
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "kivi-p8-772-1430",
+            "kivi-p13-981-1904",
+            "kivi-p8-0-886",
+            "kivi-p14-679-1417",
+            "kivi-p9-0-834",
+            "kivi-p9-724-1443",
+            "kivi-p6-4615-5208",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1995
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "kivi-p8-772-1430",
+            "kivi-p9-0-834",
+            "kivi-p9-724-1443",
+            "kivi-p9-1328-2360",
+            "kivi-p7-0-660",
+            "kivi-p7-1149-2330",
+            "kivi-p7-3108-3381",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1902
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "kivi-p8-772-1430",
+          "cosine": 0.8921109437942505
+        },
+        {
+          "id": "kivi-p13-981-1904",
+          "cosine": 0.8902867436408997
+        },
+        {
+          "id": "kivi-p8-0-886",
+          "cosine": 0.8896725177764893
+        },
+        {
+          "id": "kivi-p14-679-1417",
+          "cosine": 0.881081759929657
+        },
+        {
+          "id": "kivi-p9-0-834",
+          "cosine": 0.8776131868362427
+        },
+        {
+          "id": "kivi-p9-724-1443",
+          "cosine": 0.8771412968635559
+        },
+        {
+          "id": "kivi-p9-1328-2360",
+          "cosine": 0.8770560622215271
+        },
+        {
+          "id": "kivi-p7-0-660",
+          "cosine": 0.8770227432250977
+        },
+        {
+          "id": "kivi-p14-0-797",
+          "cosine": 0.8736883401870728
+        },
+        {
+          "id": "kivi-p14-1281-2116",
+          "cosine": 0.873238742351532
+        },
+        {
+          "id": "kivi-p4-0-1009",
+          "cosine": 0.8700841665267944
+        },
+        {
+          "id": "kivi-p8-1316-2265",
+          "cosine": 0.8683646321296692
+        },
+        {
+          "id": "kivi-p6-3687-4807",
+          "cosine": 0.8673831820487976
+        },
+        {
+          "id": "kivi-p6-2729-3887",
+          "cosine": 0.8671562075614929
+        },
+        {
+          "id": "kivi-p6-0-1122",
+          "cosine": 0.8641406893730164
+        },
+        {
+          "id": "kivi-p15-0-756",
+          "cosine": 0.8612700700759888
+        },
+        {
+          "id": "kivi-p14-2005-2829",
+          "cosine": 0.8571497797966003
+        },
+        {
+          "id": "kivi-p6-4615-5208",
+          "cosine": 0.8563607335090637
+        },
+        {
+          "id": "kivi-p15-699-756",
+          "cosine": 0.8561630845069885
+        },
+        {
+          "id": "kivi-p2-2041-3339",
+          "cosine": 0.852245569229126
+        },
+        {
+          "id": "kivi-p7-1149-2330",
+          "cosine": 0.8497453927993774
+        },
+        {
+          "id": "kivi-p3-2795-3923",
+          "cosine": 0.8496422171592712
+        },
+        {
+          "id": "kivi-p1-979-2126",
+          "cosine": 0.8480252623558044
+        },
+        {
+          "id": "kivi-p13-1744-2333",
+          "cosine": 0.8447937369346619
+        },
+        {
+          "id": "kivi-p5-0-1146",
+          "cosine": 0.8412860035896301
+        },
+        {
+          "id": "kivi-p13-0-1186",
+          "cosine": 0.8392503261566162
+        },
+        {
+          "id": "kivi-p1-0-1181",
+          "cosine": 0.8380945324897766
+        },
+        {
+          "id": "kivi-p7-2074-3295",
+          "cosine": 0.8369146585464478
+        },
+        {
+          "id": "kivi-p14-2676-3187",
+          "cosine": 0.8362874388694763
+        },
+        {
+          "id": "kivi-p12-691-1205",
+          "cosine": 0.8356034755706787
+        },
+        {
+          "id": "kivi-p6-949-2013",
+          "cosine": 0.8337951898574829
+        },
+        {
+          "id": "kivi-p3-1975-2893",
+          "cosine": 0.83331298828125
+        },
+        {
+          "id": "kivi-p3-0-1079",
+          "cosine": 0.8331471681594849
+        },
+        {
+          "id": "kivi-p10-0-1081",
+          "cosine": 0.8311319351196289
+        },
+        {
+          "id": "kivi-p12-0-774",
+          "cosine": 0.8297067880630493
+        },
+        {
+          "id": "kivi-p7-542-1350",
+          "cosine": 0.8296767473220825
+        },
+        {
+          "id": "kivi-p2-3131-4209",
+          "cosine": 0.8293051719665527
+        },
+        {
+          "id": "kivi-p2-971-2261",
+          "cosine": 0.8272649645805359
+        },
+        {
+          "id": "kivi-p9-3196-4037",
+          "cosine": 0.8253309726715088
+        },
+        {
+          "id": "kivi-p11-0-951",
+          "cosine": 0.8224427700042725
+        },
+        {
+          "id": "kivi-p3-896-2163",
+          "cosine": 0.8224300146102905
+        },
+        {
+          "id": "kivi-p1-3908-4597",
+          "cosine": 0.8198973536491394
+        },
+        {
+          "id": "kivi-p2-0-1201",
+          "cosine": 0.8198529481887817
+        },
+        {
+          "id": "kivi-p12-1126-1380",
+          "cosine": 0.819520115852356
+        },
+        {
+          "id": "kivi-p10-2501-3399",
+          "cosine": 0.8187646865844727
+        },
+        {
+          "id": "kivi-p5-3706-4258",
+          "cosine": 0.8186584115028381
+        },
+        {
+          "id": "kivi-p4-838-2061",
+          "cosine": 0.8180184960365295
+        },
+        {
+          "id": "kivi-p5-940-2151",
+          "cosine": 0.8151770830154419
+        },
+        {
+          "id": "kivi-p4-2677-3436",
+          "cosine": 0.8128259181976318
+        },
+        {
+          "id": "kivi-p9-2206-3407",
+          "cosine": 0.8116497993469238
+        },
+        {
+          "id": "kivi-p3-3706-4652",
+          "cosine": 0.8106076121330261
+        },
+        {
+          "id": "kivi-p5-1960-2961",
+          "cosine": 0.810545027256012
+        },
+        {
+          "id": "kivi-p6-1858-2891",
+          "cosine": 0.8091516494750977
+        },
+        {
+          "id": "kivi-p4-1843-2816",
+          "cosine": 0.8082810044288635
+        },
+        {
+          "id": "kivi-p5-2799-3879",
+          "cosine": 0.8080735206604004
+        },
+        {
+          "id": "kivi-p8-2037-3167",
+          "cosine": 0.8056639432907104
+        },
+        {
+          "id": "kivi-p2-4065-4559",
+          "cosine": 0.8045445680618286
+        },
+        {
+          "id": "kivi-p1-2925-4102",
+          "cosine": 0.8042583465576172
+        },
+        {
+          "id": "kivi-p10-1694-2670",
+          "cosine": 0.8035455942153931
+        },
+        {
+          "id": "kivi-p11-3241-3755",
+          "cosine": 0.800116777420044
+        },
+        {
+          "id": "kivi-p1-1965-3101",
+          "cosine": 0.7998522520065308
+        },
+        {
+          "id": "kivi-p11-2443-3386",
+          "cosine": 0.7982352375984192
+        },
+        {
+          "id": "kivi-p8-2975-3830",
+          "cosine": 0.7963883280754089
+        },
+        {
+          "id": "kivi-p10-3277-4242",
+          "cosine": 0.7940428256988525
+        },
+        {
+          "id": "kivi-p11-1629-2603",
+          "cosine": 0.793785810470581
+        },
+        {
+          "id": "kivi-p10-949-1873",
+          "cosine": 0.7812939882278442
+        },
+        {
+          "id": "kivi-p10-4077-4558",
+          "cosine": 0.7797840237617493
+        },
+        {
+          "id": "kivi-p7-3108-3381",
+          "cosine": 0.7778559923171997
+        },
+        {
+          "id": "kivi-p11-774-1806",
+          "cosine": 0.7770475149154663
+        }
+      ]
+    },
+    {
+      "id": "H6",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.010393750038929284,
+        0.006117750075645745,
+        0.0060770000563934445
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.09981429897864436,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.07079354626275935,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.6666666666666666,
+          "duplicate_ratio": 0.05531141081982116,
+          "span_recovered": [
+            false,
+            true,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "kivi-p7-542-1350",
+            "kivi-p7-0-660",
+            "kivi-p14-1281-2116",
+            "kivi-p14-2005-2829",
+            "kivi-p7-1149-2330"
+          ],
+          "e5_tokens": 1500
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "kivi-p7-542-1350",
+            "kivi-p7-0-660",
+            "kivi-p14-1281-2116",
+            "kivi-p14-2005-2829",
+            "kivi-p7-1149-2330",
+            "kivi-p6-3687-4807",
+            "kivi-p13-1744-2333",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1997
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "kivi-p7-542-1350",
+            "kivi-p6-3687-4807",
+            "kivi-p6-949-2013",
+            "kivi-p8-1316-2265",
+            "kivi-p8-0-886",
+            "kivi-p6-0-1122",
+            "kivi-p6-4615-5208",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1994
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "kivi-p7-542-1350",
+          "cosine": 0.9137568473815918
+        },
+        {
+          "id": "kivi-p7-0-660",
+          "cosine": 0.8824962377548218
+        },
+        {
+          "id": "kivi-p14-1281-2116",
+          "cosine": 0.8611711263656616
+        },
+        {
+          "id": "kivi-p14-2005-2829",
+          "cosine": 0.8546302914619446
+        },
+        {
+          "id": "kivi-p7-1149-2330",
+          "cosine": 0.8480924367904663
+        },
+        {
+          "id": "kivi-p6-3687-4807",
+          "cosine": 0.8477944731712341
+        },
+        {
+          "id": "kivi-p13-1744-2333",
+          "cosine": 0.8464690446853638
+        },
+        {
+          "id": "kivi-p5-1960-2961",
+          "cosine": 0.8441660404205322
+        },
+        {
+          "id": "kivi-p2-2041-3339",
+          "cosine": 0.8436323404312134
+        },
+        {
+          "id": "kivi-p3-2795-3923",
+          "cosine": 0.843386173248291
+        },
+        {
+          "id": "kivi-p4-0-1009",
+          "cosine": 0.8433645367622375
+        },
+        {
+          "id": "kivi-p13-981-1904",
+          "cosine": 0.8422049283981323
+        },
+        {
+          "id": "kivi-p4-838-2061",
+          "cosine": 0.8412619829177856
+        },
+        {
+          "id": "kivi-p6-949-2013",
+          "cosine": 0.840592622756958
+        },
+        {
+          "id": "kivi-p1-2925-4102",
+          "cosine": 0.8404510021209717
+        },
+        {
+          "id": "kivi-p9-1328-2360",
+          "cosine": 0.8383306264877319
+        },
+        {
+          "id": "kivi-p8-1316-2265",
+          "cosine": 0.8383181095123291
+        },
+        {
+          "id": "kivi-p8-0-886",
+          "cosine": 0.8377087712287903
+        },
+        {
+          "id": "kivi-p1-979-2126",
+          "cosine": 0.8360803127288818
+        },
+        {
+          "id": "kivi-p3-0-1079",
+          "cosine": 0.835751473903656
+        },
+        {
+          "id": "kivi-p15-0-756",
+          "cosine": 0.8335788249969482
+        },
+        {
+          "id": "kivi-p1-0-1181",
+          "cosine": 0.8320842385292053
+        },
+        {
+          "id": "kivi-p2-3131-4209",
+          "cosine": 0.8317378759384155
+        },
+        {
+          "id": "kivi-p1-1965-3101",
+          "cosine": 0.831295907497406
+        },
+        {
+          "id": "kivi-p6-0-1122",
+          "cosine": 0.8309705853462219
+        },
+        {
+          "id": "kivi-p2-0-1201",
+          "cosine": 0.8306573629379272
+        },
+        {
+          "id": "kivi-p3-3706-4652",
+          "cosine": 0.8305046558380127
+        },
+        {
+          "id": "kivi-p4-1843-2816",
+          "cosine": 0.8304874897003174
+        },
+        {
+          "id": "kivi-p10-4077-4558",
+          "cosine": 0.8303818702697754
+        },
+        {
+          "id": "kivi-p14-0-797",
+          "cosine": 0.8302063941955566
+        },
+        {
+          "id": "kivi-p10-2501-3399",
+          "cosine": 0.8297677040100098
+        },
+        {
+          "id": "kivi-p2-4065-4559",
+          "cosine": 0.8295580744743347
+        },
+        {
+          "id": "kivi-p9-2206-3407",
+          "cosine": 0.8293982744216919
+        },
+        {
+          "id": "kivi-p7-2074-3295",
+          "cosine": 0.8292462825775146
+        },
+        {
+          "id": "kivi-p2-971-2261",
+          "cosine": 0.8288707733154297
+        },
+        {
+          "id": "kivi-p10-3277-4242",
+          "cosine": 0.8285154104232788
+        },
+        {
+          "id": "kivi-p5-3706-4258",
+          "cosine": 0.8279941082000732
+        },
+        {
+          "id": "kivi-p7-3108-3381",
+          "cosine": 0.8275691270828247
+        },
+        {
+          "id": "kivi-p12-691-1205",
+          "cosine": 0.8273392915725708
+        },
+        {
+          "id": "kivi-p8-772-1430",
+          "cosine": 0.8268792033195496
+        },
+        {
+          "id": "kivi-p6-2729-3887",
+          "cosine": 0.8268002271652222
+        },
+        {
+          "id": "kivi-p9-0-834",
+          "cosine": 0.8267897367477417
+        },
+        {
+          "id": "kivi-p6-1858-2891",
+          "cosine": 0.826547384262085
+        },
+        {
+          "id": "kivi-p11-3241-3755",
+          "cosine": 0.8244091272354126
+        },
+        {
+          "id": "kivi-p14-2676-3187",
+          "cosine": 0.8241866827011108
+        },
+        {
+          "id": "kivi-p6-4615-5208",
+          "cosine": 0.8232576251029968
+        },
+        {
+          "id": "kivi-p5-940-2151",
+          "cosine": 0.8224183320999146
+        },
+        {
+          "id": "kivi-p11-774-1806",
+          "cosine": 0.8221793174743652
+        },
+        {
+          "id": "kivi-p9-3196-4037",
+          "cosine": 0.8214614391326904
+        },
+        {
+          "id": "kivi-p9-724-1443",
+          "cosine": 0.8212621808052063
+        },
+        {
+          "id": "kivi-p14-679-1417",
+          "cosine": 0.820828914642334
+        },
+        {
+          "id": "kivi-p8-2037-3167",
+          "cosine": 0.8198927044868469
+        },
+        {
+          "id": "kivi-p3-1975-2893",
+          "cosine": 0.8196803331375122
+        },
+        {
+          "id": "kivi-p5-0-1146",
+          "cosine": 0.8169665336608887
+        },
+        {
+          "id": "kivi-p11-1629-2603",
+          "cosine": 0.8152961134910583
+        },
+        {
+          "id": "kivi-p11-2443-3386",
+          "cosine": 0.8149616718292236
+        },
+        {
+          "id": "kivi-p11-0-951",
+          "cosine": 0.8149466514587402
+        },
+        {
+          "id": "kivi-p4-2677-3436",
+          "cosine": 0.8149183988571167
+        },
+        {
+          "id": "kivi-p1-3908-4597",
+          "cosine": 0.8132811784744263
+        },
+        {
+          "id": "kivi-p10-1694-2670",
+          "cosine": 0.810507595539093
+        },
+        {
+          "id": "kivi-p12-1126-1380",
+          "cosine": 0.8098344802856445
+        },
+        {
+          "id": "kivi-p5-2799-3879",
+          "cosine": 0.808249831199646
+        },
+        {
+          "id": "kivi-p12-0-774",
+          "cosine": 0.8052419424057007
+        },
+        {
+          "id": "kivi-p10-949-1873",
+          "cosine": 0.8050395250320435
+        },
+        {
+          "id": "kivi-p10-0-1081",
+          "cosine": 0.8038586974143982
+        },
+        {
+          "id": "kivi-p13-0-1186",
+          "cosine": 0.8019199371337891
+        },
+        {
+          "id": "kivi-p15-699-756",
+          "cosine": 0.7991664409637451
+        },
+        {
+          "id": "kivi-p3-896-2163",
+          "cosine": 0.7977574467658997
+        },
+        {
+          "id": "kivi-p8-2975-3830",
+          "cosine": 0.7973701357841492
+        }
+      ]
+    },
+    {
+      "id": "H6",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.011831749929115176,
+        0.0059215419460088015,
+        0.005877249990589917
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.02972292191435766,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.058403515195898925,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.6666666666666666,
+          "duplicate_ratio": 0.0694789081885856,
+          "span_recovered": [
+            true,
+            true,
+            false
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "kivi-p7-0-660",
+            "kivi-p7-542-1350",
+            "kivi-p8-772-1430",
+            "kivi-p14-1281-2116",
+            "kivi-p4-0-1009"
+          ],
+          "e5_tokens": 1500
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "kivi-p7-0-660",
+            "kivi-p7-542-1350",
+            "kivi-p8-772-1430",
+            "kivi-p14-1281-2116",
+            "kivi-p4-0-1009",
+            "kivi-p7-1149-2330",
+            "kivi-p12-1126-1380",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1967
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "kivi-p7-0-660",
+            "kivi-p8-772-1430",
+            "kivi-p8-1316-2265",
+            "kivi-p8-0-886",
+            "kivi-p6-0-1122",
+            "kivi-p6-3687-4807",
+            "kivi-p6-4615-5208",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1994
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "kivi-p7-0-660",
+          "cosine": 0.8684786558151245
+        },
+        {
+          "id": "kivi-p7-542-1350",
+          "cosine": 0.867599606513977
+        },
+        {
+          "id": "kivi-p8-772-1430",
+          "cosine": 0.8449572920799255
+        },
+        {
+          "id": "kivi-p14-1281-2116",
+          "cosine": 0.843312680721283
+        },
+        {
+          "id": "kivi-p4-0-1009",
+          "cosine": 0.8399513959884644
+        },
+        {
+          "id": "kivi-p7-1149-2330",
+          "cosine": 0.8399134278297424
+        },
+        {
+          "id": "kivi-p1-979-2126",
+          "cosine": 0.8396079540252686
+        },
+        {
+          "id": "kivi-p14-679-1417",
+          "cosine": 0.8384779095649719
+        },
+        {
+          "id": "kivi-p9-724-1443",
+          "cosine": 0.8368223905563354
+        },
+        {
+          "id": "kivi-p8-1316-2265",
+          "cosine": 0.8351067304611206
+        },
+        {
+          "id": "kivi-p14-2005-2829",
+          "cosine": 0.8349417448043823
+        },
+        {
+          "id": "kivi-p13-981-1904",
+          "cosine": 0.8340442180633545
+        },
+        {
+          "id": "kivi-p2-2041-3339",
+          "cosine": 0.8328851461410522
+        },
+        {
+          "id": "kivi-p12-691-1205",
+          "cosine": 0.8314935564994812
+        },
+        {
+          "id": "kivi-p3-2795-3923",
+          "cosine": 0.8309277296066284
+        },
+        {
+          "id": "kivi-p2-3131-4209",
+          "cosine": 0.8296483159065247
+        },
+        {
+          "id": "kivi-p1-2925-4102",
+          "cosine": 0.8293537497520447
+        },
+        {
+          "id": "kivi-p8-0-886",
+          "cosine": 0.8289762735366821
+        },
+        {
+          "id": "kivi-p1-0-1181",
+          "cosine": 0.8274398446083069
+        },
+        {
+          "id": "kivi-p14-0-797",
+          "cosine": 0.8272862434387207
+        },
+        {
+          "id": "kivi-p4-838-2061",
+          "cosine": 0.8268657922744751
+        },
+        {
+          "id": "kivi-p6-0-1122",
+          "cosine": 0.8265657424926758
+        },
+        {
+          "id": "kivi-p9-1328-2360",
+          "cosine": 0.8262994289398193
+        },
+        {
+          "id": "kivi-p3-0-1079",
+          "cosine": 0.8262443542480469
+        },
+        {
+          "id": "kivi-p6-3687-4807",
+          "cosine": 0.8250542879104614
+        },
+        {
+          "id": "kivi-p1-1965-3101",
+          "cosine": 0.8243483901023865
+        },
+        {
+          "id": "kivi-p6-949-2013",
+          "cosine": 0.8237144351005554
+        },
+        {
+          "id": "kivi-p10-2501-3399",
+          "cosine": 0.8224198222160339
+        },
+        {
+          "id": "kivi-p10-3277-4242",
+          "cosine": 0.8215509057044983
+        },
+        {
+          "id": "kivi-p9-2206-3407",
+          "cosine": 0.8213200569152832
+        },
+        {
+          "id": "kivi-p1-3908-4597",
+          "cosine": 0.8212575912475586
+        },
+        {
+          "id": "kivi-p7-2074-3295",
+          "cosine": 0.8210350275039673
+        },
+        {
+          "id": "kivi-p5-1960-2961",
+          "cosine": 0.8206082582473755
+        },
+        {
+          "id": "kivi-p12-1126-1380",
+          "cosine": 0.8202669620513916
+        },
+        {
+          "id": "kivi-p9-0-834",
+          "cosine": 0.8193764686584473
+        },
+        {
+          "id": "kivi-p2-0-1201",
+          "cosine": 0.8189154863357544
+        },
+        {
+          "id": "kivi-p8-2037-3167",
+          "cosine": 0.81812584400177
+        },
+        {
+          "id": "kivi-p4-1843-2816",
+          "cosine": 0.8166407942771912
+        },
+        {
+          "id": "kivi-p10-1694-2670",
+          "cosine": 0.8166199326515198
+        },
+        {
+          "id": "kivi-p11-2443-3386",
+          "cosine": 0.8163024187088013
+        },
+        {
+          "id": "kivi-p10-4077-4558",
+          "cosine": 0.8162598609924316
+        },
+        {
+          "id": "kivi-p3-1975-2893",
+          "cosine": 0.8162524700164795
+        },
+        {
+          "id": "kivi-p4-2677-3436",
+          "cosine": 0.8161953091621399
+        },
+        {
+          "id": "kivi-p6-4615-5208",
+          "cosine": 0.8155978322029114
+        },
+        {
+          "id": "kivi-p11-3241-3755",
+          "cosine": 0.8153679370880127
+        },
+        {
+          "id": "kivi-p2-4065-4559",
+          "cosine": 0.8151453733444214
+        },
+        {
+          "id": "kivi-p7-3108-3381",
+          "cosine": 0.8148869276046753
+        },
+        {
+          "id": "kivi-p9-3196-4037",
+          "cosine": 0.8142945766448975
+        },
+        {
+          "id": "kivi-p15-0-756",
+          "cosine": 0.8135727047920227
+        },
+        {
+          "id": "kivi-p11-1629-2603",
+          "cosine": 0.8132318258285522
+        },
+        {
+          "id": "kivi-p15-699-756",
+          "cosine": 0.8121195435523987
+        },
+        {
+          "id": "kivi-p3-3706-4652",
+          "cosine": 0.8113289475440979
+        },
+        {
+          "id": "kivi-p6-1858-2891",
+          "cosine": 0.8094968199729919
+        },
+        {
+          "id": "kivi-p5-940-2151",
+          "cosine": 0.8094884753227234
+        },
+        {
+          "id": "kivi-p3-896-2163",
+          "cosine": 0.8088200688362122
+        },
+        {
+          "id": "kivi-p2-971-2261",
+          "cosine": 0.8074477910995483
+        },
+        {
+          "id": "kivi-p13-0-1186",
+          "cosine": 0.8071736693382263
+        },
+        {
+          "id": "kivi-p5-0-1146",
+          "cosine": 0.8068414926528931
+        },
+        {
+          "id": "kivi-p10-0-1081",
+          "cosine": 0.8053098320960999
+        },
+        {
+          "id": "kivi-p13-1744-2333",
+          "cosine": 0.8053008317947388
+        },
+        {
+          "id": "kivi-p14-2676-3187",
+          "cosine": 0.8039079904556274
+        },
+        {
+          "id": "kivi-p5-3706-4258",
+          "cosine": 0.8036549091339111
+        },
+        {
+          "id": "kivi-p6-2729-3887",
+          "cosine": 0.8030787706375122
+        },
+        {
+          "id": "kivi-p11-774-1806",
+          "cosine": 0.8010686039924622
+        },
+        {
+          "id": "kivi-p10-949-1873",
+          "cosine": 0.8010329604148865
+        },
+        {
+          "id": "kivi-p11-0-951",
+          "cosine": 0.7964162230491638
+        },
+        {
+          "id": "kivi-p12-0-774",
+          "cosine": 0.7934074997901917
+        },
+        {
+          "id": "kivi-p5-2799-3879",
+          "cosine": 0.7912347316741943
+        },
+        {
+          "id": "kivi-p8-2975-3830",
+          "cosine": 0.7858929634094238
+        }
+      ]
+    },
+    {
+      "id": "H7",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.011097250040620565,
+        0.006275875028222799,
+        0.0062335829716175795
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.04480114997604212,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.029296569011436624,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 0,
+          "condition_recovery": 0.6666666666666666,
+          "duplicate_ratio": 0.1076986640958546,
+          "span_recovered": [
+            false,
+            true,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "kivi-p7-2074-3295",
+            "kivi-p7-3108-3381",
+            "kivi-p7-542-1350",
+            "kivi-p8-1316-2265",
+            "kivi-p13-981-1904"
+          ],
+          "e5_tokens": 1280
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "kivi-p7-2074-3295",
+            "kivi-p7-3108-3381",
+            "kivi-p7-542-1350",
+            "kivi-p8-1316-2265",
+            "kivi-p13-981-1904",
+            "kivi-p14-0-797",
+            "kivi-p9-3196-4037",
+            "kivi-p11-3241-3755",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1977
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "kivi-p7-2074-3295",
+            "kivi-p8-1316-2265",
+            "kivi-p8-2037-3167",
+            "kivi-p6-1858-2891",
+            "kivi-p6-2729-3887",
+            "kivi-p6-3687-4807",
+            "kivi-p6-4615-5208",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1994
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "kivi-p7-2074-3295",
+          "cosine": 0.8533363938331604
+        },
+        {
+          "id": "kivi-p7-3108-3381",
+          "cosine": 0.8497191667556763
+        },
+        {
+          "id": "kivi-p7-542-1350",
+          "cosine": 0.8380938768386841
+        },
+        {
+          "id": "kivi-p8-1316-2265",
+          "cosine": 0.8345414996147156
+        },
+        {
+          "id": "kivi-p13-981-1904",
+          "cosine": 0.8326461315155029
+        },
+        {
+          "id": "kivi-p14-0-797",
+          "cosine": 0.8322077393531799
+        },
+        {
+          "id": "kivi-p9-3196-4037",
+          "cosine": 0.8315801620483398
+        },
+        {
+          "id": "kivi-p14-1281-2116",
+          "cosine": 0.8304054737091064
+        },
+        {
+          "id": "kivi-p9-1328-2360",
+          "cosine": 0.8302702307701111
+        },
+        {
+          "id": "kivi-p9-2206-3407",
+          "cosine": 0.8281100988388062
+        },
+        {
+          "id": "kivi-p10-2501-3399",
+          "cosine": 0.8272978663444519
+        },
+        {
+          "id": "kivi-p9-0-834",
+          "cosine": 0.8257583379745483
+        },
+        {
+          "id": "kivi-p8-2037-3167",
+          "cosine": 0.825641930103302
+        },
+        {
+          "id": "kivi-p7-0-660",
+          "cosine": 0.8238438367843628
+        },
+        {
+          "id": "kivi-p14-2005-2829",
+          "cosine": 0.8232426643371582
+        },
+        {
+          "id": "kivi-p7-1149-2330",
+          "cosine": 0.8227373957633972
+        },
+        {
+          "id": "kivi-p15-0-756",
+          "cosine": 0.8224812746047974
+        },
+        {
+          "id": "kivi-p6-1858-2891",
+          "cosine": 0.8210145235061646
+        },
+        {
+          "id": "kivi-p3-0-1079",
+          "cosine": 0.8208365440368652
+        },
+        {
+          "id": "kivi-p11-3241-3755",
+          "cosine": 0.8207976818084717
+        },
+        {
+          "id": "kivi-p10-3277-4242",
+          "cosine": 0.8206814527511597
+        },
+        {
+          "id": "kivi-p1-0-1181",
+          "cosine": 0.820643424987793
+        },
+        {
+          "id": "kivi-p11-1629-2603",
+          "cosine": 0.8205450773239136
+        },
+        {
+          "id": "kivi-p6-2729-3887",
+          "cosine": 0.8199055790901184
+        },
+        {
+          "id": "kivi-p13-1744-2333",
+          "cosine": 0.8198156952857971
+        },
+        {
+          "id": "kivi-p1-1965-3101",
+          "cosine": 0.8195216655731201
+        },
+        {
+          "id": "kivi-p1-2925-4102",
+          "cosine": 0.8190160989761353
+        },
+        {
+          "id": "kivi-p3-2795-3923",
+          "cosine": 0.8179669380187988
+        },
+        {
+          "id": "kivi-p2-3131-4209",
+          "cosine": 0.8178412914276123
+        },
+        {
+          "id": "kivi-p1-3908-4597",
+          "cosine": 0.8176149725914001
+        },
+        {
+          "id": "kivi-p6-3687-4807",
+          "cosine": 0.8170295357704163
+        },
+        {
+          "id": "kivi-p11-2443-3386",
+          "cosine": 0.8167535662651062
+        },
+        {
+          "id": "kivi-p3-1975-2893",
+          "cosine": 0.8156527280807495
+        },
+        {
+          "id": "kivi-p6-4615-5208",
+          "cosine": 0.8155186772346497
+        },
+        {
+          "id": "kivi-p10-1694-2670",
+          "cosine": 0.8154693841934204
+        },
+        {
+          "id": "kivi-p14-2676-3187",
+          "cosine": 0.8153347373008728
+        },
+        {
+          "id": "kivi-p2-2041-3339",
+          "cosine": 0.8131582736968994
+        },
+        {
+          "id": "kivi-p10-0-1081",
+          "cosine": 0.8130446076393127
+        },
+        {
+          "id": "kivi-p8-772-1430",
+          "cosine": 0.8122177124023438
+        },
+        {
+          "id": "kivi-p6-949-2013",
+          "cosine": 0.8120936751365662
+        },
+        {
+          "id": "kivi-p4-0-1009",
+          "cosine": 0.8111191987991333
+        },
+        {
+          "id": "kivi-p8-0-886",
+          "cosine": 0.8106776475906372
+        },
+        {
+          "id": "kivi-p10-4077-4558",
+          "cosine": 0.8105206489562988
+        },
+        {
+          "id": "kivi-p13-0-1186",
+          "cosine": 0.8096392154693604
+        },
+        {
+          "id": "kivi-p11-0-951",
+          "cosine": 0.8081551790237427
+        },
+        {
+          "id": "kivi-p3-896-2163",
+          "cosine": 0.807417631149292
+        },
+        {
+          "id": "kivi-p1-979-2126",
+          "cosine": 0.8065357208251953
+        },
+        {
+          "id": "kivi-p5-3706-4258",
+          "cosine": 0.8049904704093933
+        },
+        {
+          "id": "kivi-p4-838-2061",
+          "cosine": 0.8043830394744873
+        },
+        {
+          "id": "kivi-p11-774-1806",
+          "cosine": 0.8037605881690979
+        },
+        {
+          "id": "kivi-p6-0-1122",
+          "cosine": 0.8035207986831665
+        },
+        {
+          "id": "kivi-p12-691-1205",
+          "cosine": 0.8033992648124695
+        },
+        {
+          "id": "kivi-p14-679-1417",
+          "cosine": 0.8030012845993042
+        },
+        {
+          "id": "kivi-p9-724-1443",
+          "cosine": 0.8013321161270142
+        },
+        {
+          "id": "kivi-p10-949-1873",
+          "cosine": 0.7996060848236084
+        },
+        {
+          "id": "kivi-p4-1843-2816",
+          "cosine": 0.7983834743499756
+        },
+        {
+          "id": "kivi-p12-1126-1380",
+          "cosine": 0.7980965971946716
+        },
+        {
+          "id": "kivi-p2-4065-4559",
+          "cosine": 0.7979881763458252
+        },
+        {
+          "id": "kivi-p5-0-1146",
+          "cosine": 0.7978652715682983
+        },
+        {
+          "id": "kivi-p2-971-2261",
+          "cosine": 0.7977012991905212
+        },
+        {
+          "id": "kivi-p2-0-1201",
+          "cosine": 0.7976561784744263
+        },
+        {
+          "id": "kivi-p3-3706-4652",
+          "cosine": 0.7961410880088806
+        },
+        {
+          "id": "kivi-p5-940-2151",
+          "cosine": 0.7956845760345459
+        },
+        {
+          "id": "kivi-p4-2677-3436",
+          "cosine": 0.7952111959457397
+        },
+        {
+          "id": "kivi-p5-1960-2961",
+          "cosine": 0.7951300144195557
+        },
+        {
+          "id": "kivi-p15-699-756",
+          "cosine": 0.79405677318573
+        },
+        {
+          "id": "kivi-p5-2799-3879",
+          "cosine": 0.7924824953079224
+        },
+        {
+          "id": "kivi-p8-2975-3830",
+          "cosine": 0.7916973829269409
+        },
+        {
+          "id": "kivi-p12-0-774",
+          "cosine": 0.7814077734947205
+        }
+      ]
+    },
+    {
+      "id": "H7",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.009032999980263412,
+        0.006632791948504746,
+        0.006535416003316641
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 0,
+          "condition_recovery": 0.3333333333333333,
+          "duplicate_ratio": 0.07120669056152928,
+          "span_recovered": [
+            true,
+            false,
+            false
+          ]
+        },
+        "budget2000": {
+          "complete": 0,
+          "condition_recovery": 0.3333333333333333,
+          "duplicate_ratio": 0.04998322710499836,
+          "span_recovered": [
+            true,
+            false,
+            false
+          ]
+        },
+        "adjacent2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.08456857544078644,
+          "span_recovered": [
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "kivi-p7-3108-3381",
+            "kivi-p7-2074-3295",
+            "kivi-p9-1328-2360",
+            "kivi-p14-2005-2829",
+            "kivi-p14-1281-2116"
+          ],
+          "e5_tokens": 1278
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "kivi-p7-3108-3381",
+            "kivi-p7-2074-3295",
+            "kivi-p9-1328-2360",
+            "kivi-p14-2005-2829",
+            "kivi-p14-1281-2116",
+            "kivi-p13-981-1904",
+            "kivi-p14-0-797",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1904
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "kivi-p7-3108-3381",
+            "kivi-p8-1316-2265",
+            "kivi-p8-772-1430",
+            "kivi-p6-949-2013",
+            "kivi-p6-3687-4807",
+            "kivi-p6-2729-3887",
+            "kivi-p8-2037-3167",
+            "kivi-p15-699-756"
+          ],
+          "e5_tokens": 1903
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "kivi-p7-3108-3381",
+          "cosine": 0.8382065296173096
+        },
+        {
+          "id": "kivi-p7-2074-3295",
+          "cosine": 0.8371061682701111
+        },
+        {
+          "id": "kivi-p9-1328-2360",
+          "cosine": 0.8287560939788818
+        },
+        {
+          "id": "kivi-p14-2005-2829",
+          "cosine": 0.826951801776886
+        },
+        {
+          "id": "kivi-p14-1281-2116",
+          "cosine": 0.8239550590515137
+        },
+        {
+          "id": "kivi-p13-981-1904",
+          "cosine": 0.8226056098937988
+        },
+        {
+          "id": "kivi-p14-0-797",
+          "cosine": 0.8220144510269165
+        },
+        {
+          "id": "kivi-p8-1316-2265",
+          "cosine": 0.8210818767547607
+        },
+        {
+          "id": "kivi-p7-542-1350",
+          "cosine": 0.819923460483551
+        },
+        {
+          "id": "kivi-p14-679-1417",
+          "cosine": 0.8198604583740234
+        },
+        {
+          "id": "kivi-p7-0-660",
+          "cosine": 0.8197404146194458
+        },
+        {
+          "id": "kivi-p2-2041-3339",
+          "cosine": 0.8189276456832886
+        },
+        {
+          "id": "kivi-p8-772-1430",
+          "cosine": 0.8185274600982666
+        },
+        {
+          "id": "kivi-p7-1149-2330",
+          "cosine": 0.8181663751602173
+        },
+        {
+          "id": "kivi-p9-3196-4037",
+          "cosine": 0.8179501295089722
+        },
+        {
+          "id": "kivi-p9-2206-3407",
+          "cosine": 0.8163047432899475
+        },
+        {
+          "id": "kivi-p9-724-1443",
+          "cosine": 0.8157237768173218
+        },
+        {
+          "id": "kivi-p12-1126-1380",
+          "cosine": 0.8156275749206543
+        },
+        {
+          "id": "kivi-p10-2501-3399",
+          "cosine": 0.8151366710662842
+        },
+        {
+          "id": "kivi-p12-691-1205",
+          "cosine": 0.8150098323822021
+        },
+        {
+          "id": "kivi-p15-0-756",
+          "cosine": 0.8139740228652954
+        },
+        {
+          "id": "kivi-p14-2676-3187",
+          "cosine": 0.8138154745101929
+        },
+        {
+          "id": "kivi-p6-949-2013",
+          "cosine": 0.813716471195221
+        },
+        {
+          "id": "kivi-p11-2443-3386",
+          "cosine": 0.8136845231056213
+        },
+        {
+          "id": "kivi-p13-0-1186",
+          "cosine": 0.813214123249054
+        },
+        {
+          "id": "kivi-p11-3241-3755",
+          "cosine": 0.812900960445404
+        },
+        {
+          "id": "kivi-p1-3908-4597",
+          "cosine": 0.8125163316726685
+        },
+        {
+          "id": "kivi-p10-3277-4242",
+          "cosine": 0.8123733997344971
+        },
+        {
+          "id": "kivi-p1-0-1181",
+          "cosine": 0.8117749691009521
+        },
+        {
+          "id": "kivi-p1-979-2126",
+          "cosine": 0.8117600679397583
+        },
+        {
+          "id": "kivi-p9-0-834",
+          "cosine": 0.8113535046577454
+        },
+        {
+          "id": "kivi-p3-1975-2893",
+          "cosine": 0.8113500475883484
+        },
+        {
+          "id": "kivi-p13-1744-2333",
+          "cosine": 0.8097310662269592
+        },
+        {
+          "id": "kivi-p3-0-1079",
+          "cosine": 0.8094911575317383
+        },
+        {
+          "id": "kivi-p3-2795-3923",
+          "cosine": 0.8093000650405884
+        },
+        {
+          "id": "kivi-p6-3687-4807",
+          "cosine": 0.8090604543685913
+        },
+        {
+          "id": "kivi-p4-0-1009",
+          "cosine": 0.8085640668869019
+        },
+        {
+          "id": "kivi-p4-838-2061",
+          "cosine": 0.8075617551803589
+        },
+        {
+          "id": "kivi-p2-3131-4209",
+          "cosine": 0.8075253367424011
+        },
+        {
+          "id": "kivi-p10-4077-4558",
+          "cosine": 0.8069853782653809
+        },
+        {
+          "id": "kivi-p1-2925-4102",
+          "cosine": 0.8069424033164978
+        },
+        {
+          "id": "kivi-p15-699-756",
+          "cosine": 0.806830108165741
+        },
+        {
+          "id": "kivi-p6-2729-3887",
+          "cosine": 0.806549608707428
+        },
+        {
+          "id": "kivi-p3-896-2163",
+          "cosine": 0.8063424825668335
+        },
+        {
+          "id": "kivi-p8-2037-3167",
+          "cosine": 0.8061858415603638
+        },
+        {
+          "id": "kivi-p6-1858-2891",
+          "cosine": 0.8056507110595703
+        },
+        {
+          "id": "kivi-p5-940-2151",
+          "cosine": 0.804823637008667
+        },
+        {
+          "id": "kivi-p2-971-2261",
+          "cosine": 0.8045703172683716
+        },
+        {
+          "id": "kivi-p11-0-951",
+          "cosine": 0.8045008182525635
+        },
+        {
+          "id": "kivi-p10-1694-2670",
+          "cosine": 0.8039522171020508
+        },
+        {
+          "id": "kivi-p5-1960-2961",
+          "cosine": 0.8029736280441284
+        },
+        {
+          "id": "kivi-p6-0-1122",
+          "cosine": 0.8026431798934937
+        },
+        {
+          "id": "kivi-p10-0-1081",
+          "cosine": 0.8023121356964111
+        },
+        {
+          "id": "kivi-p6-4615-5208",
+          "cosine": 0.801967978477478
+        },
+        {
+          "id": "kivi-p4-1843-2816",
+          "cosine": 0.8005731701850891
+        },
+        {
+          "id": "kivi-p1-1965-3101",
+          "cosine": 0.800362229347229
+        },
+        {
+          "id": "kivi-p5-0-1146",
+          "cosine": 0.7998571395874023
+        },
+        {
+          "id": "kivi-p4-2677-3436",
+          "cosine": 0.798769474029541
+        },
+        {
+          "id": "kivi-p10-949-1873",
+          "cosine": 0.7973236441612244
+        },
+        {
+          "id": "kivi-p3-3706-4652",
+          "cosine": 0.7958086729049683
+        },
+        {
+          "id": "kivi-p2-0-1201",
+          "cosine": 0.7936372756958008
+        },
+        {
+          "id": "kivi-p8-0-886",
+          "cosine": 0.7930777072906494
+        },
+        {
+          "id": "kivi-p11-1629-2603",
+          "cosine": 0.79196697473526
+        },
+        {
+          "id": "kivi-p5-2799-3879",
+          "cosine": 0.7917124032974243
+        },
+        {
+          "id": "kivi-p11-774-1806",
+          "cosine": 0.789555013179779
+        },
+        {
+          "id": "kivi-p8-2975-3830",
+          "cosine": 0.7892585396766663
+        },
+        {
+          "id": "kivi-p2-4065-4559",
+          "cosine": 0.7884723544120789
+        },
+        {
+          "id": "kivi-p5-3706-4258",
+          "cosine": 0.7859941720962524
+        },
+        {
+          "id": "kivi-p12-0-774",
+          "cosine": 0.7854442596435547
+        }
+      ]
+    },
+    {
+      "id": "H8",
+      "language": "en",
+      "required": true,
+      "query_seconds": [
+        0.012552250060252845,
+        0.006489417050033808,
+        0.00634849991183728
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.03608797779201367,
+          "span_recovered": [
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.0746248479113154,
+          "span_recovered": [
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.05723011552250701,
+          "span_recovered": [
+            true,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p12-849-1875",
+            "infinigen-p11-2834-3862",
+            "infinigen-p12-1706-2810",
+            "infinigen-p12-3480-4619",
+            "infinigen-p11-4634-5020"
+          ],
+          "e5_tokens": 1296
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p12-849-1875",
+            "infinigen-p11-2834-3862",
+            "infinigen-p12-1706-2810",
+            "infinigen-p12-3480-4619",
+            "infinigen-p11-4634-5020",
+            "infinigen-p12-2625-3678",
+            "infinigen-p7-3220-4378",
+            "infinigen-p14-4915-5418"
+          ],
+          "e5_tokens": 2000
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p12-849-1875",
+            "infinigen-p11-2834-3862",
+            "infinigen-p11-4634-5020",
+            "infinigen-p13-1003-2189",
+            "infinigen-p11-747-1968",
+            "infinigen-p11-0-969",
+            "infinigen-p13-0-1212",
+            "infinigen-p14-4915-5418"
+          ],
+          "e5_tokens": 2000
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.9096968770027161
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8908898234367371
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.8817921280860901
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8732980489730835
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.8707219362258911
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.868359386920929
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.867657482624054
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.86580491065979
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8639759421348572
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8629364371299744
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8599073886871338
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8567129373550415
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8535658121109009
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8529725670814514
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.852140486240387
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8516063690185547
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8498779535293579
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8495994210243225
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8494148254394531
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.848034679889679
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8480024933815002
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8472836017608643
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8450671434402466
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8447673320770264
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.8445162773132324
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8430504202842712
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8428550958633423
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8428142666816711
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8422067761421204
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8413422703742981
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8409383893013
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8406031131744385
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.839756429195404
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8394601345062256
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.839405357837677
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.839203953742981
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8390146493911743
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.8383533954620361
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8370583057403564
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8355370163917542
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8342002034187317
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8336270451545715
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8335103988647461
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.833186149597168
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8323657512664795
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8319199085235596
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8319153189659119
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8317918181419373
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.831472635269165
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8309142589569092
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8300194144248962
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8292592763900757
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8277148008346558
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.826654314994812
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8261289000511169
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.826029896736145
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.8251050710678101
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.8244705200195312
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8241798877716064
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8241608142852783
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.824004054069519
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.823742151260376
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8234437704086304
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.8232589960098267
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8230873346328735
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.8217679262161255
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8216269016265869
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.821112871170044
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.820645272731781
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8197723031044006
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.8194289207458496
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.8188135623931885
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.8180733919143677
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.81747967004776
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.8174145221710205
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.8174143433570862
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8157524466514587
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8156117796897888
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8142426013946533
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.8133236169815063
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.8118914365768433
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.811879575252533
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.8115074634552002
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.8113903403282166
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8109652996063232
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8096442222595215
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8094923496246338
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.8094921112060547
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.8072925806045532
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.8071326017379761
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8066524267196655
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8063960671424866
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.8055621385574341
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8044475317001343
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8033734560012817
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.8026623725891113
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.8021388053894043
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8020554780960083
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.8013608455657959
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7999322414398193
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.7975102663040161
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.7973425388336182
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.7933011651039124
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.7918241024017334
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7767300605773926
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7573326826095581
+        }
+      ]
+    },
+    {
+      "id": "H8",
+      "language": "ko",
+      "required": true,
+      "query_seconds": [
+        0.010013999999500811,
+        0.006286832969635725,
+        0.006142292055301368
+      ],
+      "metrics": {
+        "top5": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.06394583411698329,
+          "span_recovered": [
+            true,
+            true
+          ]
+        },
+        "budget2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.1024805102763997,
+          "span_recovered": [
+            true,
+            true
+          ]
+        },
+        "adjacent2000": {
+          "complete": 1,
+          "condition_recovery": 1,
+          "duplicate_ratio": 0.05723011552250701,
+          "span_recovered": [
+            true,
+            true
+          ]
+        }
+      },
+      "contexts": {
+        "top5": {
+          "chunk_ids": [
+            "infinigen-p12-849-1875",
+            "infinigen-p11-2834-3862",
+            "infinigen-p12-0-1020",
+            "infinigen-p12-3480-4619",
+            "infinigen-p12-1706-2810"
+          ],
+          "e5_tokens": 1501
+        },
+        "budget2000": {
+          "chunk_ids": [
+            "infinigen-p12-849-1875",
+            "infinigen-p11-2834-3862",
+            "infinigen-p12-0-1020",
+            "infinigen-p12-3480-4619",
+            "infinigen-p12-1706-2810",
+            "infinigen-p12-2625-3678",
+            "infinigen-p10-2498-3183"
+          ],
+          "e5_tokens": 1990
+        },
+        "adjacent2000": {
+          "chunk_ids": [
+            "infinigen-p12-849-1875",
+            "infinigen-p11-2834-3862",
+            "infinigen-p11-0-969",
+            "infinigen-p13-1003-2189",
+            "infinigen-p13-0-1212",
+            "infinigen-p11-4634-5020",
+            "infinigen-p11-747-1968",
+            "infinigen-p14-4915-5418"
+          ],
+          "e5_tokens": 2000
+        }
+      },
+      "raw_ranking": [
+        {
+          "id": "infinigen-p12-849-1875",
+          "cosine": 0.8778787851333618
+        },
+        {
+          "id": "infinigen-p11-2834-3862",
+          "cosine": 0.8707660436630249
+        },
+        {
+          "id": "infinigen-p12-0-1020",
+          "cosine": 0.8570499420166016
+        },
+        {
+          "id": "infinigen-p12-3480-4619",
+          "cosine": 0.8555232286453247
+        },
+        {
+          "id": "infinigen-p12-1706-2810",
+          "cosine": 0.852899432182312
+        },
+        {
+          "id": "infinigen-p12-2625-3678",
+          "cosine": 0.8526625633239746
+        },
+        {
+          "id": "infinigen-p11-0-969",
+          "cosine": 0.8494939804077148
+        },
+        {
+          "id": "infinigen-p13-1003-2189",
+          "cosine": 0.8456991910934448
+        },
+        {
+          "id": "infinigen-p13-0-1212",
+          "cosine": 0.8449029922485352
+        },
+        {
+          "id": "infinigen-p10-2498-3183",
+          "cosine": 0.8437660336494446
+        },
+        {
+          "id": "infinigen-p11-4634-5020",
+          "cosine": 0.8405805230140686
+        },
+        {
+          "id": "infinigen-p7-2455-3368",
+          "cosine": 0.8404132723808289
+        },
+        {
+          "id": "infinigen-p10-0-821",
+          "cosine": 0.8404044508934021
+        },
+        {
+          "id": "infinigen-p11-747-1968",
+          "cosine": 0.8395811915397644
+        },
+        {
+          "id": "infinigen-p10-1446-2694",
+          "cosine": 0.8395662307739258
+        },
+        {
+          "id": "infinigen-p11-1762-2979",
+          "cosine": 0.8382755517959595
+        },
+        {
+          "id": "infinigen-p2-987-2290",
+          "cosine": 0.8374412059783936
+        },
+        {
+          "id": "infinigen-p9-3093-4156",
+          "cosine": 0.8372923135757446
+        },
+        {
+          "id": "infinigen-p14-0-1077",
+          "cosine": 0.8364561200141907
+        },
+        {
+          "id": "infinigen-p10-691-1668",
+          "cosine": 0.8361158967018127
+        },
+        {
+          "id": "infinigen-p9-4983-5846",
+          "cosine": 0.8334909677505493
+        },
+        {
+          "id": "infinigen-p1-3141-4415",
+          "cosine": 0.8333441615104675
+        },
+        {
+          "id": "infinigen-p14-3815-5152",
+          "cosine": 0.8330998420715332
+        },
+        {
+          "id": "infinigen-p7-3220-4378",
+          "cosine": 0.832388162612915
+        },
+        {
+          "id": "infinigen-p2-0-1170",
+          "cosine": 0.8322476148605347
+        },
+        {
+          "id": "infinigen-p6-995-2262",
+          "cosine": 0.832125186920166
+        },
+        {
+          "id": "infinigen-p14-4915-5418",
+          "cosine": 0.8318945169448853
+        },
+        {
+          "id": "infinigen-p4-5094-5153",
+          "cosine": 0.8315259218215942
+        },
+        {
+          "id": "infinigen-p1-4227-4420",
+          "cosine": 0.830907940864563
+        },
+        {
+          "id": "infinigen-p1-0-1289",
+          "cosine": 0.8304928541183472
+        },
+        {
+          "id": "infinigen-p14-1849-2999",
+          "cosine": 0.8302965760231018
+        },
+        {
+          "id": "infinigen-p13-2906-4089",
+          "cosine": 0.8300838470458984
+        },
+        {
+          "id": "infinigen-p11-3621-4829",
+          "cosine": 0.8288902640342712
+        },
+        {
+          "id": "infinigen-p13-1993-3067",
+          "cosine": 0.8276325464248657
+        },
+        {
+          "id": "infinigen-p5-1065-2250",
+          "cosine": 0.8276076316833496
+        },
+        {
+          "id": "infinigen-p4-2928-4194",
+          "cosine": 0.8258547782897949
+        },
+        {
+          "id": "infinigen-p7-0-876",
+          "cosine": 0.8256145715713501
+        },
+        {
+          "id": "infinigen-p6-2034-3285",
+          "cosine": 0.8253268003463745
+        },
+        {
+          "id": "infinigen-p5-2056-3242",
+          "cosine": 0.8250967860221863
+        },
+        {
+          "id": "infinigen-p4-2024-3102",
+          "cosine": 0.8249987363815308
+        },
+        {
+          "id": "infinigen-p8-3833-5106",
+          "cosine": 0.8247534036636353
+        },
+        {
+          "id": "infinigen-p8-1834-3058",
+          "cosine": 0.8244757652282715
+        },
+        {
+          "id": "infinigen-p12-4414-5397",
+          "cosine": 0.8223276138305664
+        },
+        {
+          "id": "infinigen-p18-4189-4521",
+          "cosine": 0.8220511078834534
+        },
+        {
+          "id": "infinigen-p14-2813-4027",
+          "cosine": 0.8219224214553833
+        },
+        {
+          "id": "infinigen-p3-3404-4533",
+          "cosine": 0.8213011026382446
+        },
+        {
+          "id": "infinigen-p6-3091-4362",
+          "cosine": 0.8209179043769836
+        },
+        {
+          "id": "infinigen-p3-1765-2740",
+          "cosine": 0.8202491402626038
+        },
+        {
+          "id": "infinigen-p14-859-2024",
+          "cosine": 0.8194456696510315
+        },
+        {
+          "id": "infinigen-p9-0-1279",
+          "cosine": 0.8187453150749207
+        },
+        {
+          "id": "infinigen-p5-3032-4211",
+          "cosine": 0.8183097839355469
+        },
+        {
+          "id": "infinigen-p8-0-1029",
+          "cosine": 0.8176544308662415
+        },
+        {
+          "id": "infinigen-p5-0-1273",
+          "cosine": 0.8176326751708984
+        },
+        {
+          "id": "infinigen-p15-0-1016",
+          "cosine": 0.8169924020767212
+        },
+        {
+          "id": "infinigen-p15-4295-4693",
+          "cosine": 0.8151349425315857
+        },
+        {
+          "id": "infinigen-p4-0-1194",
+          "cosine": 0.8142609596252441
+        },
+        {
+          "id": "infinigen-p5-4999-6112",
+          "cosine": 0.8135594129562378
+        },
+        {
+          "id": "infinigen-p9-3997-5198",
+          "cosine": 0.8131446838378906
+        },
+        {
+          "id": "infinigen-p13-3884-5125",
+          "cosine": 0.8127398490905762
+        },
+        {
+          "id": "infinigen-p15-2598-3628",
+          "cosine": 0.8124150633811951
+        },
+        {
+          "id": "infinigen-p2-3101-4181",
+          "cosine": 0.8115208148956299
+        },
+        {
+          "id": "infinigen-p2-4002-5149",
+          "cosine": 0.8113940358161926
+        },
+        {
+          "id": "infinigen-p7-4180-5129",
+          "cosine": 0.8106139898300171
+        },
+        {
+          "id": "infinigen-p4-986-2225",
+          "cosine": 0.8099858164787292
+        },
+        {
+          "id": "infinigen-p15-1723-2768",
+          "cosine": 0.809982180595398
+        },
+        {
+          "id": "infinigen-p16-3593-4670",
+          "cosine": 0.8096591830253601
+        },
+        {
+          "id": "infinigen-p3-0-981",
+          "cosine": 0.809421181678772
+        },
+        {
+          "id": "infinigen-p15-3449-4475",
+          "cosine": 0.8093269467353821
+        },
+        {
+          "id": "infinigen-p2-2072-3263",
+          "cosine": 0.8091009855270386
+        },
+        {
+          "id": "infinigen-p6-0-1207",
+          "cosine": 0.808630108833313
+        },
+        {
+          "id": "infinigen-p8-835-2056",
+          "cosine": 0.8067907094955444
+        },
+        {
+          "id": "infinigen-p4-3964-5153",
+          "cosine": 0.8065922260284424
+        },
+        {
+          "id": "infinigen-p1-1078-2330",
+          "cosine": 0.8065531253814697
+        },
+        {
+          "id": "infinigen-p13-4921-5386",
+          "cosine": 0.8057272434234619
+        },
+        {
+          "id": "infinigen-p17-0-1036",
+          "cosine": 0.8056225180625916
+        },
+        {
+          "id": "infinigen-p18-1644-2680",
+          "cosine": 0.8043553829193115
+        },
+        {
+          "id": "infinigen-p16-1696-2921",
+          "cosine": 0.8039836883544922
+        },
+        {
+          "id": "infinigen-p7-690-1710",
+          "cosine": 0.8034608960151672
+        },
+        {
+          "id": "infinigen-p15-863-1877",
+          "cosine": 0.8029863834381104
+        },
+        {
+          "id": "infinigen-p9-1061-2287",
+          "cosine": 0.8029736280441284
+        },
+        {
+          "id": "infinigen-p18-2543-3521",
+          "cosine": 0.8029285073280334
+        },
+        {
+          "id": "infinigen-p8-2860-4025",
+          "cosine": 0.8024575710296631
+        },
+        {
+          "id": "infinigen-p17-3362-4353",
+          "cosine": 0.8019543290138245
+        },
+        {
+          "id": "infinigen-p5-5989-6112",
+          "cosine": 0.8019267916679382
+        },
+        {
+          "id": "infinigen-p5-3988-5218",
+          "cosine": 0.8015379905700684
+        },
+        {
+          "id": "infinigen-p17-884-1839",
+          "cosine": 0.8014634847640991
+        },
+        {
+          "id": "infinigen-p8-4873-5161",
+          "cosine": 0.8010609149932861
+        },
+        {
+          "id": "infinigen-p17-2522-3542",
+          "cosine": 0.8007642030715942
+        },
+        {
+          "id": "infinigen-p7-5057-5330",
+          "cosine": 0.7998725771903992
+        },
+        {
+          "id": "infinigen-p3-2580-3561",
+          "cosine": 0.7998546361923218
+        },
+        {
+          "id": "infinigen-p2-4947-5527",
+          "cosine": 0.7997180223464966
+        },
+        {
+          "id": "infinigen-p7-1513-2626",
+          "cosine": 0.7990884184837341
+        },
+        {
+          "id": "infinigen-p17-1685-2704",
+          "cosine": 0.7984628081321716
+        },
+        {
+          "id": "infinigen-p6-4168-5143",
+          "cosine": 0.7979505658149719
+        },
+        {
+          "id": "infinigen-p3-792-1941",
+          "cosine": 0.7975552082061768
+        },
+        {
+          "id": "infinigen-p1-2103-3369",
+          "cosine": 0.797436535358429
+        },
+        {
+          "id": "infinigen-p17-4191-4353",
+          "cosine": 0.7943142652511597
+        },
+        {
+          "id": "infinigen-p18-3334-4311",
+          "cosine": 0.7930808067321777
+        },
+        {
+          "id": "infinigen-p16-0-1028",
+          "cosine": 0.7930561304092407
+        },
+        {
+          "id": "infinigen-p18-0-969",
+          "cosine": 0.792757511138916
+        },
+        {
+          "id": "infinigen-p16-2723-3743",
+          "cosine": 0.7920365333557129
+        },
+        {
+          "id": "infinigen-p3-4352-4618",
+          "cosine": 0.7896904945373535
+        },
+        {
+          "id": "infinigen-p9-2099-3315",
+          "cosine": 0.7895885109901428
+        },
+        {
+          "id": "infinigen-p18-819-1848",
+          "cosine": 0.7844586372375488
+        },
+        {
+          "id": "infinigen-p16-843-1931",
+          "cosine": 0.784197211265564
+        },
+        {
+          "id": "infinigen-p16-4507-4670",
+          "cosine": 0.7579363584518433
+        }
+      ]
+    }
+  ]
+}

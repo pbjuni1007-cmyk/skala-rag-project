@@ -1,0 +1,6 @@
+{
+  "file": "execution-metadata.json",
+  "original_sha256": "897faf305f38e3c1a273d4f3a53515a6f4faeaf8a0dd99fdbaedba27c4a6cd5e",
+  "published_sha256": "bc77002dd1ef14a3733b187fa67f4be5a494a91b4d39921f540d5faac86e4cd9",
+  "change": "Python executable paths are expressed relative to the project. Experimental settings, timestamps and observations are unchanged."
+}

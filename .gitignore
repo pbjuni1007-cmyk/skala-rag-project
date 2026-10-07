@@ -215,3 +215,4 @@
 !/tests/test_research_followup.py
 !/tests/test_research_agent.py
 !/tests/test_research_isolation.py
+!/tests/test_research_feedback.py

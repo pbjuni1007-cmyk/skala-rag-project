@@ -10,10 +10,17 @@ from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
-from agents.researchers.contract import Chunk, NodeError, Source
+from agents.researchers.contract import (
+    Chunk,
+    NodeError,
+    ResearchRequest,
+    ResearchResult,
+    Source,
+)
 from rag.budget import BudgetExceeded
 from rag.llm import APIError
 from rag.request_budget import InputBudgetExceeded
+from rag.schemas import Assessment
 
 
 class RetrievalFailure(RuntimeError):
@@ -232,3 +239,74 @@ def node_error(exc: Exception, stage: str) -> NodeError:
     stage_label = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(stage).strip())[:64] or "research"
     message = f"{stage_label}: {type(exc).__name__}: {_ERROR_REASONS[code]}"[:200]
     return NodeError(code=code, message=message, retryable=False)
+
+
+def _request_model(request: Mapping[str, Any] | BaseModel) -> ResearchRequest:
+    if isinstance(request, ResearchRequest):
+        return request
+    return ResearchRequest.model_validate(_as_dict(request))
+
+
+def failed_result(
+    request: Mapping[str, Any] | BaseModel,
+    error: NodeError | Mapping[str, Any],
+) -> ResearchResult:
+    """Create the contract's empty failed shape while echoing its request envelope."""
+    request_model = _request_model(request)
+    error_model = error if isinstance(error, NodeError) else NodeError.model_validate(_as_dict(error))
+    envelope = request_model.model_dump(
+        mode="python",
+        include={"contract_version", "run_id", "request_id", "attempt", "context"},
+    )
+    return ResearchResult.model_validate(
+        {
+            **envelope,
+            "view": request_model.view,
+            "status": "failed",
+            "assessments": {},
+            "chunks": [],
+            "sources": {},
+            "error": error_model,
+        }
+    )
+
+
+def build_result(
+    request: Mapping[str, Any] | BaseModel,
+    assessments: Mapping[str, Mapping[str, Any] | BaseModel],
+    chunk_lookup: Mapping[str, Mapping[str, Any] | BaseModel],
+    source_registry: Mapping[str, Mapping[str, Any] | BaseModel],
+) -> ResearchResult:
+    """Assemble only cited artifacts and fail closed on any contract violation."""
+    request_model = _request_model(request)
+    try:
+        assessment_models = {
+            name: Assessment.model_validate(_assessment_dict(value))
+            for name, value in assessments.items()
+        }
+        chunks, sources = cited_artifacts(assessment_models, chunk_lookup, source_registry)
+        status = "ok" if all(value.status == "ok" for value in assessment_models.values()) else "insufficient"
+        envelope = request_model.model_dump(
+            mode="python",
+            include={"contract_version", "run_id", "request_id", "attempt", "context"},
+        )
+        result = ResearchResult.model_validate(
+            {
+                **envelope,
+                "view": request_model.view,
+                "status": status,
+                "assessments": assessment_models,
+                "chunks": chunks,
+                "sources": sources,
+                "error": None,
+            }
+        )
+        errors = trace_errors(result)
+        if errors:
+            raise ArtifactMismatch("; ".join(errors))
+        return result
+    except (KeyError, ValidationError, ValueError) as exc:
+        # Keep the full diagnostic in caller-owned local logs; only the safe
+        # classification crosses the ResearchResult boundary.
+        error = node_error(ArtifactMismatch(str(exc)), "result_assembly")
+        return failed_result(request_model, error)

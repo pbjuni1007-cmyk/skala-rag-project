@@ -82,7 +82,7 @@ class Settings:
         parts = purpose.lower().split("_")
         if any(part in {"repair", "query", "queries", "rewrite"} for part in parts) or purpose.startswith("retrieval_review"):
             return "low"
-        if purpose == "synthesis_report" or purpose.startswith("synthesis_gaps_"):
+        if purpose in {"synthesis_report", "report_quality_judge"} or purpose.startswith("synthesis_gaps_"):
             return "max"
         if parts[0] in {"research", "market", "stakeholder", "domain", "perspective", "facet"}:
             return "medium"
@@ -99,4 +99,4 @@ class Settings:
                 "effective_reasoning_efforts": {purpose: self.reasoning_effort(purpose) for purpose in
                     ("research_queries", "rewrite", "retrieval_review", "research", "market", "stakeholder",
                      "domain", "market_reassessment_facet_costs", "synthesis_report_repair",
-                     "synthesis_report", "synthesis_gaps_0", "unknown")}}
+                     "synthesis_report", "report_quality_judge", "synthesis_gaps_0", "unknown")}}

@@ -14,6 +14,7 @@ def test_submission_writes_markdown_and_pdf_from_same_body(tmp_path, report_fixt
     assert (tmp_path / "report.md").read_text() == text
     assert text.startswith("# SUMMARY\n")
     assert text.rsplit("# ", 1)[1].startswith("REFERENCE\n")
+    assert "\N{MIDDLE DOT}" not in text
     assert "Unused Source Title" not in text
     assert "KIVI Source Title" in text and "InfiniGen Source Title" in text
     checks = json.loads((tmp_path / "document_validation.json").read_text())
@@ -82,18 +83,18 @@ def test_comparison_cells_link_full_conditions_and_escape_claim_pipes(tmp_path, 
     assert "비용 &#124; 선택 조건" in body
     assert "A100" not in body
     assert "다른 설정과 비교 금지" not in body
-    assert "[조건·한계·원문](citation_review.md#claim-1)" in body
+    assert "[조건, 한계, 원문](citation_review.md#claim-1)" in body
     assert "**한계:** 다른 설정과 비교 금지" in Path(paths["citation_review"]).read_text()
     assert "**조건:** A100 | batch 8" in Path(paths["citation_review"]).read_text()
 
 
-@pytest.mark.parametrize("technology, label", [("KIVI", "KIVI"), ("InfiniGen", "InfiniGen"), ("both", "KIVI · InfiniGen")])
+@pytest.mark.parametrize("technology, label", [("KIVI", "KIVI"), ("InfiniGen", "InfiniGen"), ("both", "KIVI / InfiniGen")])
 def test_summary_names_technology_even_when_claim_uses_an_implicit_subject(tmp_path, report_fixture, technology, label):
     report, joined, sources, settings, config = report_fixture
     joined["claims"]["claim-1"].update(technology=technology, text="운영자의 관리 부담을 함께 고려한다.")
     paths = render_report(tmp_path, report, joined, sources, settings, config)
     summary = Path(paths["markdown"]).read_text().split("**대상 기술:**")[0]
-    assert f"**{label}** · [출처 사실] 운영자의 관리 부담을 함께 고려한다." in summary
+    assert f"**{label}** [출처 사실] 운영자의 관리 부담을 함께 고려한다." in summary
 
 
 def test_table_moves_long_details_without_mutating_or_losing_originals(tmp_path, report_fixture):
@@ -111,7 +112,7 @@ def test_table_moves_long_details_without_mutating_or_losing_originals(tmp_path,
     assert target["text"] in body and target["text"] in annex
     assert target["references"][0]["quote"] in annex
     assert "[1, 물리 p.1]" in body
-    assert "[조건·한계·원문](citation_review.md#claim-1)" in body
+    assert "[조건, 한계, 원문](citation_review.md#claim-1)" in body
     assert joined == before
 
 

@@ -213,7 +213,8 @@ def test_valid_report_allows_summary_reuse_and_passes_identified_gaps_to_synthes
     p.gateway = FakeGateway([{k: v for k, v in report.items() if k != "gap_decisions"},
                              {"gap_decisions": report["gap_decisions"]}])
     result = p.synthesize({"joined": joined})
-    assert result["run_status"] == "validated"
+    assert result["run_status"] == "report_drafted"
+    assert result["report"]["gap_decisions"] == report["gap_decisions"]
     assert p.gateway.calls[1][2]["gap_records"] == joined["gap_records"]
     assert result["joined"]["gaps"] == joined["gaps"]
     assert result["joined"]["gap_records"] == joined["gap_records"]
@@ -292,7 +293,7 @@ def test_synthesis_batches_gaps_and_keeps_final_schema(tmp_path):
         return json.dumps({"gap_decisions": [{"gap_id": g["id"], "status": "unresolved", "resolution": "Evidence absent", "claim_ids": []} for g in batch]})
     p.gateway.generate = generate
     result = p.synthesize({"joined": joined})
-    assert result["run_status"] == "validated"
+    assert result["run_status"] == "report_drafted"
     assert seen == [5, 5, 1]
     assert len(Report.model_validate(result["report"]).gap_decisions) == 11
 

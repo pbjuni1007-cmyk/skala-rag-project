@@ -31,12 +31,14 @@ def test_metric_without_conditions_rejected():
 
 
 class GraphProbe(Pipeline):
-    def __init__(self, failed=None, delays=None):
+    def __init__(self, failed=None, delays=None, quality_failed=False):
         self.finished = []
         self.joins = 0
         self.failed = failed
         self.delays = delays or {}
         self.rendered = False
+        self.evaluated = False
+        self.quality_failed = quality_failed
 
     def research(self, state):
         return {"run_status": "research_ok", "tech_assessment": {"KIVI": {"frozen": True}}}
@@ -53,7 +55,11 @@ class GraphProbe(Pipeline):
         return {"run_status": "incomplete" if self.failed else "joined"}
 
     def synthesize(self, state):
-        return {"run_status": "validated"}
+        return {"run_status": "report_drafted"}
+
+    def evaluate_report(self, state):
+        self.evaluated = True
+        return {"run_status": "revision_requested" if self.quality_failed else "validated"}
 
     def render(self, state):
         self.rendered = True
@@ -64,7 +70,14 @@ class GraphProbe(Pipeline):
 def test_parallel_join_runs_once_after_every_branch(delays):
     p = GraphProbe(delays=delays)
     state = p.compile().invoke({}, {"max_concurrency": 3})
-    assert p.joins == 1 and p.rendered and state["tech_assessment"]["KIVI"]["frozen"]
+    assert p.joins == 1 and p.evaluated and p.rendered and state["tech_assessment"]["KIVI"]["frozen"]
+
+
+def test_quality_evaluator_runs_after_writer_and_blocks_render_on_revision_request():
+    p = GraphProbe(quality_failed=True)
+    state = p.compile().invoke({}, {"max_concurrency": 3})
+    assert p.evaluated and not p.rendered
+    assert state["run_status"] == "revision_requested"
 
 
 @pytest.mark.parametrize("branch", ["market", "stakeholder", "domain"])

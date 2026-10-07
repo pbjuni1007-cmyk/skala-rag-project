@@ -19,7 +19,7 @@ from rag.graph import BASE
     ('retrieval_review_kivi_0', 'low'), ('research_kivi_0', 'medium'),
     ('market', 'medium'), ('stakeholder', 'medium'), ('domain', 'medium'),
     ('market_reassessment_facet_costs', 'medium'),
-    ('synthesis_report', 'max'), ('synthesis_gaps_0', 'max'),
+    ('synthesis_report', 'max'), ('report_quality_judge', 'max'), ('synthesis_gaps_0', 'max'),
     ('synthesis_report_repair', 'low'), ('synthesis_gaps_0_reference_repair', 'low'),
     ('unrecognized', 'max'),
 ])

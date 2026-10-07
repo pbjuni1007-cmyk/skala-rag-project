@@ -12,16 +12,16 @@ from langgraph.graph import StateGraph, START, END
 from pydantic import ValidationError
 
 from rag.budget import write_json, BudgetExceeded
-from rag.corpus import normalized
 from rag.context import build_research_context, assessment_evidence
-from rag.evidence import (validate_assessment, collect_evidence, report_errors,
-                          validate_retrieval_review, validate_perspective, gap_decision_errors, CORE_FACETS)
+from rag.evidence import (validate_assessment, collect_evidence, validate_retrieval_review,
+                          validate_perspective, gap_decision_errors, CORE_FACETS)
+from rag.evaluator import evaluate_report as evaluate_report_quality
 from rag.llm import APIError
 from rag.request_budget import InputBudgetExceeded, STRUCTURED_REPAIR_HEADROOM, deduplicate_chunks
 from rag.reassessment import reassess_facets
-from rag.payloads import synthesis_payload
 from rag.repair import REPAIR_INSTRUCTIONS, restore_sufficient, plan_repairs, apply_patch, restore_verbatim_references
-from rag.schemas import Assessment, Queries, Report, State, RetrievalReview, ReportDraft, GapDecisions, PerspectiveQueries
+from rag.schemas import Assessment, Queries, Report, State, RetrievalReview, GapDecisions, PerspectiveQueries
+from rag.writer import source_claims, write_report
 
 BASE = """당신은 공개 근거를 보존하는 한국어 KV Cache 기술 평가 연구자다.
 사용자가 지정한 단일 도메인: 기업의 IT 사업 문서 검토를 지원하는 Agentic AI.
@@ -440,76 +440,74 @@ class Pipeline:
         return {"joined": joined, "run_status": "incomplete" if any(r["status"] == "failed" for r in assessments.values()) else "joined"}
 
     def synthesize(self, state):
-        joined = state["joined"]
-        compact = [{"id": c["id"], "text": c["text"], "technology": c["technology"], "kind": c["kind"],
-                    "facet": c["facet"], "perspective": c["perspective"],
-                    "references": c["references"], "caveats": c["caveats"], "conditions": c["conditions"]} for c in joined["claims"].values()]
+        """Writer node. It emits a draft for the separate quality evaluator."""
+        joined = source_claims(state["joined"])
+        revision_requests = state.get("report_revision_requests", [])
+        previous_report = state.get("report")
+
+        def review_gaps(index, batch):
+            compact = [{key: claim[key] for key in ("id", "kind", "text", "conditions", "caveats")}
+                       for claim in joined["claims"].values()]
+            result = self.structured(f"synthesis_gaps_{index}", GapDecisions,
+                "종합 역할의 근거 공백 재판정만 수행하라. 제공된 gap_records 각 ID를 정확히 한 번 판정하라. "
+                "resolved는 공백 전체가 기존 주장으로 해소됐을 때만 사용하고 근거 claim_ids를 연결하라. "
+                "unknown 주장만으로 해소하지 마라. 부분 해소, 채택, 비용 등 미확인 정보는 unresolved로 유지하라. "
+                "각 resolution은 확인 범위와 남은 한계를 간결히 적고 새 사실이나 출처를 만들지 마라.",
+                {"gap_records": batch, "source_metadata": self.metadata(), "claims": compact},
+                lambda value: gap_decision_errors(value["gap_decisions"], batch, joined["claims"]))
+            return result["gap_decisions"]
+
         try:
-            def check_report(report):
-                errors = validate_assessment({"claims": report["synthesis_claims"]}, self.all_chunks)
-                previous_refs = {(r["chunk_id"], normalized(r["quote"])) for c in compact for r in c["references"]}
-                for c in report["synthesis_claims"]:
-                    if c["kind"] != "team_inference":
-                        errors.append("Synthesis may only add explicitly labeled team inferences")
-                    if any((r["chunk_id"], normalized(r["quote"])) not in previous_refs for r in c["references"]):
-                        errors.append("Synthesis must reuse existing evidence verbatim")
-                if errors:
-                    return errors
-                extra, _ = collect_evidence({"synthesis": {"claims": report["synthesis_claims"]}}, self.all_chunks)
-                return report_errors(report, {**joined["claims"], **extra}, self.all_chunks)
+            def build_draft():
+                return write_report(self.structured, joined, self.all_chunks,
+                                    revision_requests=revision_requests, previous_report=previous_report)
 
-            def build_report():
-                return self.structured("synthesis_report", ReportDraft,
-                    "기존 claim을 배치하고 상충을 종합하라. 새 사실·출처·웹 검색을 추가하지 마라. "
-                    "각 claim의 reference_ids는 reference_table의 전체 원문 인용을 가리킨다. 종합 주장에는 해당 표의 chunk_id와 quote를 그대로 복사하라. "
-                    "summary_claim_ids는 중복 없이 2~3개를 고른다. 종합 claim을 최소 하나, market/stakeholder/domain 선행 claim을 최소 하나 포함하라. "
-                    "요약은 TRL 판단만 반복하지 말고 양 기술의 시장성·역할별 효익과 부담·업무 적용 조건을 함께 보여 줘야 한다. "
-                    "선택한 주장 본문과 인용·기술명 표기를 합쳐 1200자 안에 담기도록 간결한 주장을 고른다. "
-                    "sections는 기술 성숙도, 시장성, 이해관계자, 도메인 적용, 관점 간 상충과 한계 순서로 작성하라. "
-                    "각 관점에는 양 기술의 claim을 배치하라. 기술 성숙도 장에는 research_로 시작하는 모든 claim을 포함해 원리·한계·실험조건·TRL을 보존하라. "
-                    "synthesis_claims는 관점 간 상충을 설명하는 2개 team_inference로, 기존 quote만 재사용한다. "
-                    "첫 종합은 stakeholder 평가와 conflicts에 나타난 실제 역할 간 효익·부담의 충돌을 기술명과 함께 설명하라. "
-                    "둘째 종합은 그 충돌을 market의 도입 판단과 domain의 적용·검증 조건에 연결하라. "
-                    "어떤 조건에서 각 관점의 판단이 달라지는지를 제시하고 특정 기술을 무조건 우승자로 추천하지 마라. "
-                    "실험 수치끼리 직접 비교하기 어렵다는 주의만 두 종합에 반복하지 마라. 비교 한계는 해당 판단의 caveats에 남긴다. "
-                    "선행 근거에서 역할 충돌이 확인되지 않으면 그 범위를 명시하고 조건부 팀 해석으로 작성하라. "
-                    "새 종합 claim ID는 synthesis-1, synthesis-2로 sections와 summary에서 참조할 수 있다. 선행 평가의 한계·조건을 지우지 마라. "
-                    "마지막 관점 간 상충과 한계 장에는 synthesis claim만 배치하라. 같은 claim을 여러 본문 장에 반복하지 마라. summary 재사용은 허용한다. "
-                    "기존 모든 claim을 자기 관점 본문에 한 번씩 포함하라. 공백 판정은 별도 호출이 맡으므로 수행하지 마라.",
-                    synthesis_payload(compact, joined["conflicts"]), check_report)
+            if revision_requests and previous_report:
+                draft = build_draft()
+                gap_decisions = previous_report["gap_decisions"]
+            else:
+                gaps = joined.get("gap_records", [])
+                with ThreadPoolExecutor(max_workers=min(3, self.settings.integer("RAG_MAX_CONCURRENCY", 1))) as pool:
+                    report_future = submit(pool, build_draft)
+                    gap_futures = [submit(pool, review_gaps, i // 5, gaps[i:i + 5])
+                                   for i in range(0, len(gaps), 5)]
+                    draft = report_future.result()
+                    gap_decisions = [decision for future in gap_futures for decision in future.result()]
 
-            def review_gaps(index, batch):
-                result = self.structured(f"synthesis_gaps_{index}", GapDecisions,
-                    "종합 역할의 근거 공백 재판정만 수행하라. 제공된 gap_records 각 ID를 정확히 한 번 판정하라. "
-                    "resolved는 공백 전체가 기존 주장으로 해소됐을 때만 사용하고 근거 claim_ids를 연결하라. "
-                    "unknown 주장만으로 해소하지 마라. 부분 해소·채택·비용 등 미확인 정보는 unresolved로 유지하라. "
-                    "각 resolution은 확인 범위와 남은 한계를 간결히 적고 새 사실·출처를 만들지 마라.",
-                    {"gap_records": batch, "source_metadata": self.metadata(), "claims": [{k: c[k] for k in
-                        ("id", "kind", "text", "conditions", "caveats")} for c in compact]},
-                    lambda value: gap_decision_errors(value["gap_decisions"], batch, joined["claims"]))
-                return result["gap_decisions"]
-
-            gaps = joined.get("gap_records", [])
-            with ThreadPoolExecutor(max_workers=min(3, self.settings.integer("RAG_MAX_CONCURRENCY", 1))) as pool:
-                report_future = submit(pool, build_report)
-                gap_futures = [submit(pool, review_gaps, i // 5, gaps[i:i + 5]) for i in range(0, len(gaps), 5)]
-                report = report_future.result()
-                report["gap_decisions"] = [d for future in gap_futures for d in future.result()]
-            report = Report.model_validate(report).model_dump()
+            report = Report.model_validate({**draft, "gap_decisions": gap_decisions}).model_dump()
             synthesis, evidence = collect_evidence({"synthesis": {"claims": report["synthesis_claims"]}}, self.all_chunks)
             claims = {**joined["claims"], **synthesis}
-            errors = report_errors(report, claims, self.all_chunks, joined.get("gap_records", []))
-            if errors:
-                write_json(self.out / "invalid" / "report-validation.json", errors)
-                return {"report": report, "validation_result": {"passed": False, "errors": errors}, "run_status": "incomplete"}
             joined = {**joined, "claims": claims, "evidence": {**joined["evidence"], **evidence}}
             write_json(self.out / "claims.json", claims)
             write_json(self.out / "evidence.json", joined["evidence"])
             write_json(self.out / "report_sections.json", report)
-            return {"report": report, "joined": joined,
-                    "validation_result": {"passed": True, "semantic_support": "human_review_pending"}, "run_status": "validated"}
+            return {"report": report, "joined": joined, "report_revision_requests": [],
+                    "run_status": "report_drafted"}
         except (ValueError, APIError, BudgetExceeded, KeyError) as exc:
             return {"validation_result": {"passed": False, "error": str(exc)}, "run_status": "incomplete"}
+
+    def evaluate_report(self, state):
+        """Quality Judge node. Findings are returned for the Supervisor to route."""
+        try:
+            result = evaluate_report_quality(self.structured, state["report"], state["joined"],
+                                             self.all_chunks, self.corpus.sources)
+            passed = result["status"] == "pass"
+            write_json(self.out / "quality_evaluation.json", result)
+            validation = {"passed": passed, "method": result["method"],
+                          "criteria": {item["criterion"]: item["status"] for item in result["criteria"]},
+                          "limitations": result["limitations"]}
+            return {"quality_evaluation": result, "validation_result": validation,
+                    "report_revision_requests": result["revision_requests"],
+                    "run_status": "validated" if passed else "revision_requested"}
+        except (ValueError, APIError, BudgetExceeded, KeyError) as exc:
+            failure = {"status": "unavailable", "method": "hybrid",
+                       "error": type(exc).__name__,
+                       "scope": ["Judge 실행이 완료되지 않아 품질을 통과로 판정하지 않았습니다."],
+                       "limitations": ["Judge가 완료되지 않았습니다. 결과를 수정 통과로 취급하지 마세요."]}
+            write_json(self.out / "quality_evaluation.json", failure)
+            return {"quality_evaluation": failure,
+                    "validation_result": {"passed": False, "method": "hybrid", "error": type(exc).__name__},
+                    "report_revision_requests": [], "run_status": "incomplete"}
 
     def render(self, state):
         from rag.render import render_report
@@ -527,12 +525,16 @@ class Pipeline:
         for name in ("market", "stakeholder", "domain"):
             graph.add_node(name, traced_node(name, lambda state, n=name: self.perspective(n, state)))
         graph.add_node("join", traced_node("join", self.join))
-        graph.add_node("synthesize", traced_node("synthesize", self.synthesize))
+        graph.add_node("synthesize", traced_node("report_writer", self.synthesize))
         graph.add_node("render", traced_node("render", self.render))
         graph.add_edge(START, "research")
         graph.add_conditional_edges("research", lambda s: ["market", "stakeholder", "domain"] if s["run_status"] == "research_ok" else END, ["market", "stakeholder", "domain", END])
         graph.add_edge(["market", "stakeholder", "domain"], "join")
         graph.add_conditional_edges("join", lambda s: "synthesize" if s["run_status"] == "joined" else END, ["synthesize", END])
-        graph.add_conditional_edges("synthesize", lambda s: "render" if s["run_status"] == "validated" else END, ["render", END])
+        graph.add_node("evaluate_report", traced_node("quality_evaluator", self.evaluate_report))
+        graph.add_conditional_edges("synthesize", lambda s: "evaluate_report" if s["run_status"] == "report_drafted" else END,
+                                    ["evaluate_report", END])
+        graph.add_conditional_edges("evaluate_report", lambda s: "render" if s["run_status"] == "validated" else END,
+                                    ["render", END])
         graph.add_edge("render", END)
         return graph.compile()

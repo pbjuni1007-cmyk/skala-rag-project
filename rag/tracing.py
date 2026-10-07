@@ -21,7 +21,8 @@ def safe_metadata(values):
             result[key] = value
         elif key in _LABELS and isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', value):
             result[key] = value
-        elif key == 'status' and value in ('research_ok', 'joined', 'validated', 'human_review_pending', 'incomplete', 'failed', 'completed'):
+        elif key == 'status' and value in ('research_ok', 'joined', 'report_drafted', 'revision_requested',
+                                            'validated', 'human_review_pending', 'incomplete', 'failed', 'completed'):
             result[key] = value
         elif key == 'cache_hit' and type(value) is bool:
             result[key] = value

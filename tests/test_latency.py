@@ -23,7 +23,7 @@ from rag.graph import BASE
     ('market', 'medium'), ('stakeholder', 'medium'), ('domain', 'medium'),
     ('market_reassessment_facet_costs', 'medium'),
     ('supervisor', 'medium'), ('supervisor_0123456789abcdef-supervisor-3', 'medium'),
-    ('synthesis_report', 'max'), ('synthesis_gaps_0', 'max'),
+    ('synthesis_report', 'max'), ('report_quality_judge', 'max'), ('synthesis_gaps_0', 'max'),
     ('synthesis_report_repair', 'low'), ('synthesis_gaps_0_reference_repair', 'low'),
     ('unrecognized', 'max'),
 ])

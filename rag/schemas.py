@@ -1,5 +1,5 @@
 from typing import Literal, TypedDict
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Strict(BaseModel):
@@ -105,6 +105,45 @@ class Report(ReportDraft):
     gap_decisions: list[GapDecision]
 
 
+QualityCriterion = Literal["groundedness", "neutrality", "bias_control", "coverage"]
+PerspectiveLabel = Literal["기술 성숙도", "시장성", "이해관계자", "도메인 적용"]
+
+
+class QualityFinding(Strict):
+    criterion: QualityCriterion
+    target: str = Field(min_length=1)
+    claim_ids: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    issue: str = Field(min_length=1)
+    revision_request: str = Field(min_length=1)
+    missing_perspectives: list[PerspectiveLabel] = Field(default_factory=list)
+
+
+class QualityCriterionResult(Strict):
+    criterion: QualityCriterion
+    status: Literal["pass", "revise"]
+    rationale: str = Field(min_length=1)
+    findings: list[QualityFinding] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def revision_has_findings(self):
+        if self.status == "revise" and not self.findings:
+            raise ValueError("A revise verdict requires at least one finding")
+        return self
+
+
+class QualityJudgeDraft(Strict):
+    criteria: list[QualityCriterionResult]
+
+    @model_validator(mode="after")
+    def has_each_quality_criterion_once(self):
+        expected = {"groundedness", "neutrality", "bias_control", "coverage"}
+        actual = [item.criterion for item in self.criteria]
+        if len(actual) != len(expected) or set(actual) != expected:
+            raise ValueError("Judge must return each of the four quality criteria exactly once")
+        return self
+
+
 class State(TypedDict, total=False):
     run_config: dict
     source_registry: dict
@@ -121,7 +160,12 @@ class State(TypedDict, total=False):
     domain_result: dict
     joined: dict
     report: dict
+    report_result: dict
+    markdown: str
+    evaluation_result: dict
+    report_revision_requests: list
     validation_result: dict
     report_attempts: int
+    evaluation_attempts: int
     output_paths: dict
     run_status: str

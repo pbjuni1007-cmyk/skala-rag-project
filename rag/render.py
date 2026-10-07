@@ -60,7 +60,7 @@ def filename(settings, kind):
     return f"RAG-{kind}_{campus_part}_{people}.pdf"
 
 
-def render_report(out, report, joined, sources, settings, config):
+def render_report(out, report, joined, sources, settings, config, markdown=None):
     """Complete only when both formats and their review sheets have been written."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -68,7 +68,7 @@ def render_report(out, report, joined, sources, settings, config):
     for name in ("document_validation.json", "pdf_validation.json"):
         write_json(out / name, pending)
     try:
-        return _render_report(out, report, joined, sources, settings, config)
+        return _render_report(out, report, joined, sources, settings, config, markdown)
     except Exception as exc:
         failure = {**pending, "render_status": "failed", "render_error": str(exc), "semantic_review": "pending"}
         for name in ("document_validation.json", "pdf_validation.json"):
@@ -76,13 +76,9 @@ def render_report(out, report, joined, sources, settings, config):
         raise
 
 
-def _render_report(out, report, joined, sources, settings, config):
-    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
-    import hashlib
-    out = Path(out)
-    out.mkdir(parents=True, exist_ok=True)
+def build_report_markdown(report, joined, sources, config):
+    """Build the stable Markdown body without writing files or creating a PDF."""
     claims, evidence = joined["claims"], joined["evidence"]
-    conflict_records = conflicts_for_joined(joined)
     used_claims = list(dict.fromkeys(report["summary_claim_ids"] + [c for section in report["sections"] for c in section["claim_ids"]]))
     used_evidence = list(dict.fromkeys(e for c in used_claims for e in claims[c]["evidence_ids"]))
     used_sources = sorted({evidence[e]["source_id"] for e in used_evidence})
@@ -104,28 +100,25 @@ def _render_report(out, report, joined, sources, settings, config):
 
     def claim_text(cid, table=False):
         c = claims[cid]
-        parts = [f"**{LABELS[c['kind']]} · {cid}**", c["text"] + " " + citations(c)]
+        parts = [f"**{LABELS[c['kind']]} | {cid}**", c["text"] + " " + citations(c)]
         if table:
-            parts.append(f"[조건·한계·원문](citation_review.md#{cid})")
+            parts.append(f"[조건, 한계, 원문](citation_review.md#{cid})")
         else:
             for label, key in (("조건", "conditions"), ("한계", "caveats")):
                 if c[key].strip():
                     parts.append(f"**{label}:** {c[key]}")
         return "<br><br>".join(cell(x) for x in parts) if table else "\n\n".join(parts)
 
-    def technology_label(claim):
-        return "KIVI · InfiniGen" if claim["technology"] == "both" else claim["technology"]
-
-    summary = [f"**{technology_label(claims[c])}** · [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
+    summary = [f"**{_technology_label(claims[c])}** [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
                for c in report["summary_claim_ids"]]
     if len("\n".join(summary)) > 1200:
         raise ValueError("SUMMARY draft is too long; shorten before user PDF conversion")
     md = ["# SUMMARY", "", *[part for text in summary for part in (text, "")],
           "**대상 기술:** KIVI / InfiniGen  ", "**단일 도메인:** " + config["domain"], "",
           "**적용 가정:** " + config["scenario"], ""]
-    facets = {"adoption": "채택 동기·공개 신호", "alternatives": "대안·연동", "costs": "비용·유지 부담",
-              "user": "문서 검토자", "operator": "AI·인프라 운영자", "governance": "구매·보안·관리 담당자",
-              "fit": "적합 조건", "risks": "정확도·운영 위험", "evaluation": "확인할 실험"}
+    facets = {"adoption": "채택 동기, 공개 신호", "alternatives": "대안, 연동", "costs": "비용, 유지 부담",
+              "user": "문서 검토자", "operator": "AI, 인프라 운영자", "governance": "구매, 보안, 관리 담당자",
+              "fit": "적합 조건", "risks": "정확도, 운영 위험", "evaluation": "확인할 실험"}
     body_seen = set()
     for section in report["sections"]:
         title = section["title"]
@@ -149,7 +142,7 @@ def _render_report(out, report, joined, sources, settings, config):
                     md.extend([claim_text(cid), ""])
         else:
             for cid in ids:
-                md.extend([f"## {claims[cid]['technology']} · {cid}", "", claim_text(cid), ""])
+                md.extend([f"## {claims[cid]['technology']} | {cid}", "", claim_text(cid), ""])
         if title == "관점 간 상충과 한계":
             unresolved = [g for g in gap_records if decisions.get(g["id"], {}).get("status") != "resolved"]
             md.extend(["## 남은 근거 공백", ""])
@@ -162,7 +155,7 @@ def _render_report(out, report, joined, sources, settings, config):
             else:
                 md.extend(["종합 단계의 해소 판단과 근거를 공백 검수표에 정리했습니다.", ""])
             md.extend(["공백별 판단 근거와 후속 확인 항목: [공백 검수표](gap_review.md).", ""])
-            md.extend(["상충의 원문·관련 주장 후보·조건·해소 상태: [상충 검수표](conflict_review.md).", ""])
+            md.extend(["상충의 원문, 관련 주장 후보, 조건, 해소 상태: [상충 검수표](conflict_review.md).", ""])
     md.extend(["# REFERENCE", ""])
     for sid in used_sources:
         source = sources[sid]
@@ -174,16 +167,42 @@ def _render_report(out, report, joined, sources, settings, config):
         md.extend([f"[{numbering[sid]}] {author} ({date}). **{source['title']}**. {venue}. "
                    f"조회 {source['accessed_at'][:10]}.  ", source["url"], ""])
     document = "\n".join(md)
+    return document, {"used_claims": used_claims, "used_evidence": used_evidence,
+                     "used_sources": used_sources, "summary_characters": len("\n".join(summary)),
+                     "body_unique_claims": len(body_seen)}
+
+
+def _technology_label(claim):
+    return "KIVI / InfiniGen" if claim["technology"] == "both" else claim["technology"]
+
+
+def _render_report(out, report, joined, sources, settings, config, markdown=None):
+    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
+    import hashlib
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    claims, evidence = joined["claims"], joined["evidence"]
+    conflict_records = conflicts_for_joined(joined)
+    generated_markdown, context = build_report_markdown(report, joined, sources, config)
+    if markdown is not None and markdown != generated_markdown:
+        raise ValueError("Writer Markdown differs from the report and citation registry")
+    document = markdown if markdown is not None else generated_markdown
     path = out / filename(settings, "Output").replace(".pdf", ".md")
     path.write_text(document)
     (out / "report.md").write_text(document)
+    used_claims = context["used_claims"]
+    used_evidence = context["used_evidence"]
+    used_sources = context["used_sources"]
+    gap_records = joined.get("gap_records", [{"id": f"legacy-{i}", "perspective": "legacy", "text": gap}
+                                           for i, gap in enumerate(joined.get("gaps", []), 1)])
+    decisions = {d["gap_id"]: d for d in report.get("gap_decisions", [])}
 
     review_claims = list(dict.fromkeys(used_claims + [cid for d in decisions.values() for cid in d["claim_ids"]]
                         + [cid for r in conflict_records for cid in r["candidate_claim_ids"] + r["verified_claim_ids"]]))
-    review = ["# 인용 검수", "", "각 주장의 전체 본문·실험조건·한계를 원문과 대조하는 검수표입니다. 현재 의미 검수는 대기 중입니다.", ""]
+    review = ["# 인용 검수", "", "각 주장의 전체 본문, 실험조건, 한계를 원문과 대조하는 검수표입니다. 의미 검수는 대기 중입니다.", ""]
     for cid in review_claims:
         c = claims[cid]
-        review.extend(["## " + cid, "", f"**기술:** {technology_label(c)} · **주장 종류:** {LABELS[c['kind']]}", "",
+        review.extend(["## " + cid, "", f"**기술:** {_technology_label(c)} | **주장 종류:** {LABELS[c['kind']]}", "",
                        c["text"], "", "**조건:** " + c["conditions"], "",
                        "**한계:** " + c["caveats"], "", "판정: 미검수", ""])
         for eid in c["evidence_ids"]:
@@ -194,7 +213,7 @@ def _render_report(out, report, joined, sources, settings, config):
     gap_review = ["# 근거 공백 검수", "", "원래 공백을 삭제하지 않고 종합 시점의 판단과 근거를 보존합니다. 해소 여부의 의미 검수는 사람에게 남깁니다.", ""]
     for gap in gap_records:
         decision = decisions.get(gap["id"], {"status": "unreviewed", "resolution": "이전 실행: 종합 공백 판정 없음", "claim_ids": []})
-        gap_review.extend([f"## {gap['id']} · {gap['perspective']}", "", "**원래 공백:** " + gap["text"], "",
+        gap_review.extend([f"## {gap['id']} | {gap['perspective']}", "", "**원래 공백:** " + gap["text"], "",
                            "**종합 판단:** " + decision["status"], "", "**판단 이유:** " + decision["resolution"], "",
                            "**근거 주장:** " + (", ".join(f"[{cid}](citation_review.md#{cid})" for cid in decision["claim_ids"]) or "없음"),
                            "", "**사람 검수:** 미검수", ""])
@@ -205,9 +224,9 @@ def _render_report(out, report, joined, sources, settings, config):
     pdf_checks.update(used_sources=used_sources, used_claims=used_claims, used_evidence=used_evidence)
     write_json(out / "pdf_validation.json", pdf_checks)
     write_json(out / "document_validation.json", {"format": ["markdown", "pdf"], "pdf_generated": True,
-        "summary_characters": len("\n".join(summary)), "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
+        "summary_characters": context["summary_characters"], "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
         "used_sources": used_sources, "used_claims": used_claims, "used_evidence": used_evidence,
-        "body_unique_claims": len(body_seen), "gap_count": len(gap_records),
+        "body_unique_claims": context["body_unique_claims"], "gap_count": len(gap_records),
         "conflict_count": len(conflict_records),
         "resolved_conflicts": sum(r["status"] == "resolved" for r in conflict_records),
         "resolved_gaps": sum(decisions.get(g["id"], {}).get("status") == "resolved" for g in gap_records),
@@ -286,7 +305,7 @@ def _write_pdf(out, document, settings):
         raise ValueError("SUMMARY exceeds half of the physical page; revise the summary selection")
     # The PDF explains where its linked Markdown annexes live without adding a new chapter.
     story.insert(len(summary_flowables), Paragraph(
-        "상세 조건·원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
+        "상세 조건과 원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
     path = out / filename(settings, "Output")
     with NamedTemporaryFile(dir=out, suffix=".pdf", delete=False) as handle:
         temporary = Path(handle.name)

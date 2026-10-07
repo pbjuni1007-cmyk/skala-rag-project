@@ -1,14 +1,24 @@
-version: 2
+version: 4
 purpose: Compare KIVI and InfiniGen for enterprise IT document review
 technologies: [KIVI, InfiniGen]
-roles: [research, market, stakeholder, domain, synthesis]
+roles: [research, market, stakeholder, domain, writer, quality_evaluator]
 report:
   sections: [기술 성숙도, 시장성, 이해관계자, 도메인 적용, 관점 간 상충과 한계]
+  markdown_headings: [SUMMARY, 기술 성숙도, 시장성, 이해관계자, 도메인 적용, 관점 간 상충과 한계, REFERENCE]
   summary_claim_count: [2, 3]
   summary_includes: [synthesis, followup_perspective]
   synthesis_claim_count: 2
   retain_all_body_claims: true
   evidence: verbatim_source_quotes_with_page_or_web_section
+  evaluation:
+    method: hybrid
+    criteria: [groundedness, neutrality, bias_control, coverage]
+    code_checks: [report_schema, citation_id_mapping, quotation_exists, perspective_placement]
+    llm_judge_checks: [semantic_support, neutrality, source_bias, coverage]
+    failed_status: revision_requested
+    feedback_state_key: report_revision_requests
+    judge_is_independent_model: false
+    does_not_replace: [human_semantic_review, pdf_page_review]
   output_format: [markdown, pdf]
   final_status: human_review_pending
 retrieval:

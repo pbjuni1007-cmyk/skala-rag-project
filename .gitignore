@@ -179,6 +179,8 @@
 !/experiments/retrieval-regression-20260922/
 !/experiments/rewrite-20260922/
 !/rag/conflicts.py
+!/rag/evaluator.py
+!/rag/writer.py
 !/scripts/revalidate_retrieval.py
 !/scripts/evaluate_rewrite.py
 !/tests/test_conflicts.py
@@ -187,10 +189,12 @@
 !/eval/retrieval-baseline.json
 !/eval/rewrite-pairs.json
 !/docs/domain-validation-plan.md
+!/docs/report-markdown-sample.md
 !/docs/retrieval-regression.md
 !/experiments/retrieval-regression-20260922/candidate.json
 !/experiments/retrieval-regression-20260922/checked.json
 !/experiments/rewrite-20260922/results.json
+!/tests/test_report_evaluator.py
 
 # Agent collaboration contract and mock examples
 !/docs/agent-contract.md

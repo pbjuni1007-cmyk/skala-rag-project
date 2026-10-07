@@ -252,3 +252,7 @@
 !/tests/test_research_supervisor_integration.py
 !/tests/test_agent_execution_integration.py
 !/tests/fixtures/research/main01_citations.json
+
+!/docs/evaluation-report.md
+!/docs/reference-check-main08.md
+!/docs/requirements-review.md

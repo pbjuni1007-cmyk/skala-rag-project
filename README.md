@@ -7,32 +7,32 @@
 - **Objective** : KIVI와 InfiniGen의 근거·조건·한계를 여러 관점에서 비교하여 기업 IT 사업 문서 검토 시나리오의 적용 후보를 평가합니다.
 - **Pattern** : Supervisor가 근거의 충분성과 보고서 품질을 판단하고, 필요한 관점에 재조사·수정을 요청합니다. 중앙에서 상태와 재개를 관리하기 쉽지만 조정 호출과 직렬 처리에 시간이 듭니다.
 - **동적 처리** : 기술 조사 후 시장성·이해관계자·도메인 조사 순서는 현재 공백에 따라 선택합니다. 네 관점의 근거가 충분해야 작성하며, 평가 실패 시 지정 관점 또는 Writer로 돌아갑니다.
-- **시나리오** : 공개 SK AX AiPMO 사례를 참고한 RFP·계약·사업 문서 검토입니다. 장문·반복 요청과 두 기술의 적용은 팀의 가정이며, SK AX 내부 도입 사실로 주장하지 않습니다.
+- **시나리오** : 공개 SK AX AiPMO 설명을 참고한 RFP·계약·사업 문서 검토입니다. 장문·반복 요청과 KIVI·InfiniGen 적용은 팀이 설정한 실험 가정입니다.
 
-현재 통합은 실제 실행 검증 중입니다. 1차 제출물은 부분 조사 결과를 편집한 보고서이며, Agent의 최종 자동 생성·평가 통과 보고서는 아직 확보하지 못했습니다. [검증 상태와 남은 항목](docs/integration-status.md)을 참고하세요.
+최근 실행에서 보고서 작성·품질 평가·재조사를 확인했습니다. [제출 보고서](docs/evaluation-report.md)는 실행 결과에 원문 검토와 편집을 반영했습니다. [실행 결과와 검증 상태](docs/integration-status.md)에서 실제 처리 경로를 확인할 수 있습니다.
 
 ## Selected Technologies
 
 - **SW : KIVI** — KV cache의 키와 값 특성에 맞춘 저비트 양자화입니다. 메모리 사용과 정확도의 관계를 소프트웨어 관점에서 평가하기 위해 선정했습니다. [논문 v2](https://arxiv.org/abs/2402.02750v2)
 - **HW : InfiniGen** — CPU–GPU 메모리 계층과 데이터 전송을 함께 다루는 동적 KV cache 관리 시스템입니다. 연산·메모리·전송의 제약을 평가하기 위해 선정했습니다. [논문 v1](https://arxiv.org/abs/2406.19707v1)
 
-이 프로젝트는 공개 자료를 바탕으로 두 기술을 평가합니다. 서로 다른 논문 실험의 수치를 동일 조건의 직접 비교로 해석하지 않습니다.
+두 기술은 각 논문의 모델·장비·워크로드 조건에 따라 평가합니다.
 
 ## Features
 
 - PDF 페이지·웹 스냅샷에서 정보를 추출하고, 주장→인용→청크→원문 위치를 연결합니다.
 - 기술 성숙도·시장성·이해관계자·도메인 적용을 조사하고, 부족한 근거를 추가 검색합니다.
 - **확증 편향 방지 전략** : 기술별 장점과 한계, 적용 조건과 반대 근거를 함께 조사합니다. 사실·저자 보고·팀 추론·시나리오·미확인을 구분하고 상충하는 이해관계를 보존합니다.
-- **보고서 품질 평가** : 코드의 구조·인용 검사와 LLM Judge를 결합해 근거성, 중립성, 편향 통제, 관점 포함 여부를 판정합니다. 코드 검사 실패는 모델의 긍정 판정으로 통과시키지 않습니다.
-- 현재 보고서와 평가가 일치하고 네 기준을 통과해야 Markdown·PDF·인용 검수표를 출력합니다. PDF는 10페이지 이하이며 최종 사람 검수가 남습니다.
+- **보고서 품질 평가** : 코드의 구조·인용 검사와 LLM Judge를 결합해 근거성, 중립성, 편향 통제, 관점 포함 여부를 판정합니다. 구조·인용 검사와 네 품질 기준을 모두 충족해야 통과합니다.
+- 현재 보고서와 평가가 일치하고 네 기준을 통과해야 Markdown·PDF·인용 검수표를 출력합니다. PDF는 10페이지 이하로 구성합니다.
 - 실행 상태와 비용 장부를 저장합니다. 완료 여부가 불명확한 호출은 자동 반복하지 않습니다.
 
 ## Tech Stack
 
 - **Framework** : LangGraph · Python 3.11–3.13 · Pydantic
 - **LLM / Generator** : `gpt-5.6-luna` — 현재 설정. 조사·Supervisor는 `medium`, Writer는 `max` 추론 설정을 사용합니다.
-- **LLM / Judge** : `gpt-5.6-luna` · `max` — 같은 모델에 별도 평가 프롬프트를 사용하며, 독립 원문 검토를 추가합니다.
-- **Retrieval** : 로컬 NumPy 벡터 검색(`vectors.npy`, `index.json`), 운영 K=5. 영어 24문항의 저장 순위 재집계에서 **Hit Rate@5 87.5%, MRR@5 0.6194**입니다. 알려진 질문의 검색 회귀 지표이며 답변 정확도나 Agent 성공률이 아닙니다. [정의·측정 범위](docs/retrieval-metrics.md)
+- **LLM / Judge** : `gpt-5.6-luna` · `max` — 생성과 분리된 평가 프롬프트를 사용합니다.
+- **Retrieval** : 로컬 NumPy 벡터 검색(`vectors.npy`, `index.json`), 운영 K=5. 영어 24문항의 저장 순위 재집계에서 **Hit Rate@5 87.5%, MRR@5 0.6194**입니다. 평가 범위는 알려진 질문의 검색 순위입니다. [정의·측정 범위](docs/retrieval-metrics.md)
 - **Embedding** : 오픈소스 `intfloat/multilingual-e5-small` · CPU · 384차원. revision `614241f622f53c4eeff9890bdc4f31cfecc418b3`, 청크 300토큰·중첩 50토큰입니다.
 - **Parsing / Output / Tracing** : PyPDF · Beautiful Soup · ReportLab · LangSmith. LangSmith에는 허용된 실행 메타데이터를 보내고 원문·프롬프트·보고서 본문은 로컬에 보관합니다.
 
@@ -67,7 +67,7 @@
 
 ![Supervisor 구조와 재작업 흐름](docs/supervisor-architecture.png)
 
-위 이미지는 역할과 조건을 요약한 설계도입니다. [컴파일된 그래프](docs/supervisor-graph.mmd)와 [구현](agents/supervisor.py)을 함께 제공합니다. 실제 실행 경로는 실행별 trace로 확인합니다.
+[컴파일된 그래프](docs/supervisor-graph.mmd) · [Supervisor 구현](agents/supervisor.py) · [실제 실행 경로](docs/integration-status.md)
 
 ## Directory Structure
 

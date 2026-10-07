@@ -12,6 +12,10 @@ Supervisor는 현재 수집된 관점과 근거를 보고 다음 작업을 고�
 
 근거 충분성 판단과 선택 재조사를 직접 표현할 수 있어 Supervisor를 선택했다. 직렬 실행은 상태 갱신과 재개를 단순하게 만들지만 관점 병렬 처리보다 느릴 수 있다. 추가 모델 호출은 기존 Gateway의 입력·비용 제한을 따른다. 호출 횟수를 고정해 보고서로 넘기지 않는다.
 
+`GatewayDecider`는 공통 식별자와 `allowed_actions`, `summaries`, `attempts`, `feedback`만 모델에 전달한다. 청크 원문과 출처 목록을 포함한 완전한 결과는 로컬 파일과 노드 연결에 보존한다. 프롬프트는 요약의 발견 사항·공백·보완 지시로 판단하도록 지시한다. `ok`나 근거 개수만으로 충분성을 승인해서는 안 된다.
+
+입력 토큰 상한 검사는 그대로 적용한다. `balanced` 프로필의 Supervisor 추론 강도는 `medium`이며, `fixed` 프로필은 사용자가 설정한 강도를 따른다.
+
 ```mermaid
 flowchart TD
     START --> S[Supervisor]
@@ -61,7 +65,7 @@ context = RunContext(
 state = coordinator.run(run_id, context, identity=execution_fingerprint)
 ```
 
-`execution_fingerprint`는 #4가 하위 노드 코드, 모델·설정, 고정 자료와 비용 장부를 묶어 만든 식별값이다. Supervisor는 자신의 코드·프롬프트·잠금 파일, context, 실행 상한과 run ID를 자동으로 결합한다. 값이 달라지면 새 실행 폴더를 사용한다. 키를 식별값이나 로그 본문에 넣지 않는다.
+`execution_fingerprint`는 #4가 하위 노드 코드, 모델·설정, 고정 자료와 비용 장부를 묶어 만든 식별값이다. `agents/researchers/` 같은 하위 디렉터리의 코드 변경도 이 값에 반영해야 한다. Supervisor는 자신의 코드·프롬프트·잠금 파일, context, 실행 상한과 run ID를 자동으로 결합한다. 값이 달라지면 새 실행 폴더를 사용한다. 키를 식별값이나 로그 본문에 넣지 않는다.
 
 요청에는 `contract_version`, `run_id`, `request_id`, `attempt`, `context`가 공통으로 들어간다. 응답은 이를 그대로 돌려줘야 한다. 출처·청크 ID 충돌, 위조 인용, 다른 보고서의 평가, 원래 주장·근거·공백의 변경은 연결 단계에서 거부한다. 생성된 보고서의 구조 문제는 평가 대상이 될 수 있지만 긍정 평가가 기존 구조 검사 실패를 덮을 수는 없다.
 

@@ -7,9 +7,12 @@ import urllib.error
 
 import pytest
 
+from agents.contracts import COMMON_FIELDS
+from agents.decision import GatewayDecider
 from rag.llm import APIError, Gateway
 from test_gateway import settings, completed, no_network_or_retry_wait
 from test_facet_reassessment import setup
+from test_team_contracts import example
 from rag.reassessment import reassess_facets
 from rag.graph import BASE
 
@@ -19,6 +22,7 @@ from rag.graph import BASE
     ('retrieval_review_kivi_0', 'low'), ('research_kivi_0', 'medium'),
     ('market', 'medium'), ('stakeholder', 'medium'), ('domain', 'medium'),
     ('market_reassessment_facet_costs', 'medium'),
+    ('supervisor', 'medium'), ('supervisor_0123456789abcdef-supervisor-3', 'medium'),
     ('synthesis_report', 'max'), ('synthesis_gaps_0', 'max'),
     ('synthesis_report_repair', 'low'), ('synthesis_gaps_0_reference_repair', 'low'),
     ('unrecognized', 'max'),
@@ -32,6 +36,38 @@ def test_effective_role_routing(settings, tmp_path, purpose, effort):
     fixed = gateway.build_payload(purpose, 'i', 'x')
     assert fixed['reasoning']['effort'] == 'max'
     assert (balanced_hash == gateway.payload_hash(fixed)) == (effort == 'max')
+
+
+@pytest.mark.parametrize('profile,configured,expected', [
+    ('balanced', 'max', 'medium'), ('balanced', 'high', 'medium'),
+    ('fixed', 'max', 'max'), ('fixed', 'high', 'high'),
+])
+def test_supervisor_gateway_payload_and_public_metadata_agree(
+        settings, tmp_path, monkeypatch, profile, configured, expected):
+    settings.values.update(LLM_REASONING_PROFILE=profile, OPENAI_REASONING_EFFORT=configured)
+    gateway = Gateway(settings, 'supervisor-routing', tmp_path / 'out')
+    decision = example('supervisor_research')
+    decision['request_id'] = '0123456789abcdef-supervisor-3'
+    callback_request = {**{field: decision[field] for field in COMMON_FIELDS},
+                        'allowed_actions': ['research', 'stop'], 'summaries': {},
+                        'attempts': {}, 'feedback': {}, 'results': {}}
+    calls = []
+
+    def request(path, payload):
+        calls.append((path, payload))
+        return ({'input_tokens': 100} if path == 'responses/input_tokens'
+                else completed(json.dumps(decision)))
+
+    monkeypatch.setattr(gateway, 'request', request)
+    assert GatewayDecider(gateway)(callback_request).model_dump(mode='json') == decision
+    assert [path for path, _ in calls] == ['responses/input_tokens', 'responses']
+    assert all(payload['reasoning']['effort'] == expected for _, payload in calls)
+    assert calls[-1][1]['text']['format']['name'] == 'supervisor_0123456789abcdef_supervisor_3'
+    public = settings.public()
+    assert public['LLM_REASONING_PROFILE'] == profile
+    assert public['effective_reasoning_efforts']['supervisor'] == expected
+    assert public['effective_reasoning_efforts']['unknown'] == configured
+    assert gateway.build_payload('unknown', 'instruction', 'input')['reasoning']['effort'] == configured
 
 
 def test_nested_pools_share_global_generation_cap_and_keep_telemetry(settings, tmp_path, monkeypatch, capsys):

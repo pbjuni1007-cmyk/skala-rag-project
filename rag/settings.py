@@ -80,6 +80,8 @@ class Settings:
         if self.get("LLM_REASONING_PROFILE", "balanced") == "fixed":
             return fallback
         parts = purpose.lower().split("_")
+        if parts[0] == "supervisor":
+            return "medium"
         if any(part in {"repair", "query", "queries", "rewrite"} for part in parts) or purpose.startswith("retrieval_review"):
             return "low"
         if purpose == "synthesis_report" or purpose.startswith("synthesis_gaps_"):
@@ -98,5 +100,5 @@ class Settings:
                 "RAG_MAX_CONCURRENCY": str(self.integer("RAG_MAX_CONCURRENCY", 3)),
                 "effective_reasoning_efforts": {purpose: self.reasoning_effort(purpose) for purpose in
                     ("research_queries", "rewrite", "retrieval_review", "research", "market", "stakeholder",
-                     "domain", "market_reassessment_facet_costs", "synthesis_report_repair",
+                     "domain", "supervisor", "market_reassessment_facet_costs", "synthesis_report_repair",
                      "synthesis_report", "synthesis_gaps_0", "unknown")}}

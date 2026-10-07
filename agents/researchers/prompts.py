@@ -81,17 +81,27 @@ _PERSPECTIVE_INTRODUCTIONS = {
     "domain": "동일한 문서 검토 시나리오에서 두 기술의 적용조건, 정확도·지연·메모리 trade-off, 확인할 실험과 적용 한계를 비교한다.",
 }
 
+PERSPECTIVE_SUFFICIENCY_RULES = """\
+목표는 공개 근거로 적용조건·부담·검증 계획을 평가하는 것이며 실제 기업 도입 성과를 입증하는 것이 아니다.
+확인된 기술 근거로 각 facet에 답하고 적용 판단을 team_inference/scenario로 구분했으면,
+미확인 기업 도입·업무 실측·동일 조건 직접 비교를 caveats/gaps에 남긴 채 status=ok일 수 있다.
+이 미확인을 사실이나 입증된 효익으로 바꾸지 마라. 조건부 검토 후보와 실제 도입 권고도 구분하라.
+status=insufficient는 필수 기술 원리·성능 사실 또는 해당 facet의 판단 근거 자체가 부족할 때 사용한다.
+이때 부족한 기술·facet·주장과 필요한 원문을 gaps에 특정하고 해당 주장을 unknown으로 남겨라.
+제시된 근거로 뒷받침하지 못하는 수치·성능·도입 사실을 단정한 채 ok를 반환하면 안 된다.
+"""
+
 _PERSPECTIVE_ASSESSMENT_RULES = """\
  양 기술 각각 정확히 3개 claim, 총 6개를 다음 facet별 하나씩 작성하라: {facets}.
 기술의 벤치마크를 반복 요약하지 말고 해당 관점의 판단 질문에 답하라.
 tech_assessment의 conditions/caveats/references를 보존해서 판단하라. 알려진 공통 장비는 유지하되
 서로 다른 수치 실험의 모델·길이·배치 조건을 합치지 마라. 사실 근거와 팀 해석을 구분하라.
 conflicts에는 누가 어떤 효과를 얻고 누가 어떤 추가 부담을 맡는지, 둘이 충돌하는 조건을 적어라.
-자료가 부족한 facet도 unknown과 caveats로 표시하고 status=insufficient와 gaps를 남겨라.
 """
 
 PERSPECTIVE_PROMPTS = {
-    view: introduction + _PERSPECTIVE_ASSESSMENT_RULES.format(facets=FACET_DESCRIPTIONS[view]) + COMMON_RESEARCH_RULES
+    view: introduction + _PERSPECTIVE_ASSESSMENT_RULES.format(facets=FACET_DESCRIPTIONS[view])
+    + PERSPECTIVE_SUFFICIENCY_RULES + COMMON_RESEARCH_RULES
     for view, introduction in _PERSPECTIVE_INTRODUCTIONS.items()
 }
 
@@ -101,13 +111,13 @@ PERSPECTIVE_REWRITE_PROMPT = """\
 
 PERSPECTIVE_REASSESSMENT_PROMPT = """\
  이전 평가의 충분한 facet을 보존하고 missing_facets만 새 근거로 재평가하라.
-양 기술 각 3개 총6개 claim과 원래 facet을 유지한다. 남은 자료 부족은 unknown/insufficient로 둔다.
+양 기술 각 3개 총6개 claim과 원래 facet을 유지한다. 필수 판단 근거가 여전히 부족하면 unknown/insufficient로 둔다.
 일반 논문 실험의 부분 확인과 기업업무 미검증을 구분하라.
 선행 tech_assessment에서 확인된 조건을 미확인으로 되돌리지 마라.
 실제 장비의 wall-clock 실험이 확인됐다면 그 사실과 반복 횟수·소프트웨어 세부의 미확인을 분리하라.
 text/conditions/caveats/gaps의 근거 부족 표현은 제공된 자료·검색 발췌 범위로 한정하고,
 '공개 근거가 없다'처럼 전체 공개 자료의 부재로 단정하지 마라.
-""" + COMMON_RESEARCH_RULES
+""" + PERSPECTIVE_SUFFICIENCY_RULES + COMMON_RESEARCH_RULES
 
 
 __all__ = [

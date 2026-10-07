@@ -207,3 +207,4 @@
 !/tests/test_research_contract.py
 !/tests/test_research_trace.py
 !/tests/test_research_status.py
+!/tests/test_research_balance.py

@@ -210,3 +210,4 @@
 !/tests/test_research_status.py
 !/tests/test_research_balance.py
 !/tests/test_research_maturity.py
+!/agents/researchers/followup.py

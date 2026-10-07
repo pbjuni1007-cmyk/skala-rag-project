@@ -44,8 +44,9 @@ def summarize(result):
         "status": result["status"], "request_id": result["request_id"],
         "claim_count": len(claims),
         "evidence_count": len({r["chunk_id"] for c in claims for r in c["references"]}),
-        "gaps": [g[:300] for a in assessments for g in a["gaps"]][:8],
-        "findings": [c["text"][:220] for c in claims][:8],
+        "gaps": [(f"[{name}] " + gap)[:300]
+                 for name, assessment in result["assessments"].items() for gap in assessment["gaps"]][:8],
+        "findings": [(f"[{c['technology']} / {c['facet']}] " + c["text"])[:220] for c in claims][:8],
     }
 
 

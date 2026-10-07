@@ -16,6 +16,10 @@ class Queries(Strict):
     queries: list[Query]
 
 
+class TechnologyQueries(Strict):
+    queries: list[Query] = Field(min_length=4, max_length=4)
+
+
 class RetrievalReviewItem(Strict):
     facet: Literal["mechanism", "limitation", "conditions", "maturity"]
     sufficient: bool

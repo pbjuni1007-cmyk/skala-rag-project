@@ -12,7 +12,7 @@ import re
 from rag.budget import write_json
 from rag.context import build_research_context
 from rag.evidence import CORE_FACETS, validate_assessment, validate_retrieval_review
-from rag.schemas import Assessment, Queries, RetrievalReview
+from rag.schemas import Assessment, Queries, RetrievalReview, TechnologyQueries
 from rag.tracing import submit
 
 from agents.researchers.prompts import (
@@ -279,7 +279,7 @@ def _technology_research(pipeline, technology, initial_queries, feedback):
 
             rewrite = pipeline.structured(
                 f"rewrite_{technology.lower()}",
-                Queries,
+                TechnologyQueries,
                 RETRIEVAL_REWRITE_PROMPT,
                 {
                     "technology": technology,
@@ -353,7 +353,7 @@ def run_maturity(pipeline, request):
                 previous_queries = _previous_queries(pipeline, previous_result, technology)
                 rewritten = pipeline.structured(
                     f"rewrite_{technology.lower()}_feedback",
-                    Queries,
+                    TechnologyQueries,
                     RETRIEVAL_REWRITE_PROMPT + (
                         "\nSupervisor feedback와 질문을 검색어에 반영하되, 이전 Assessment의 부족한 근거를 "
                         "보완하라. 네 facet과 대상 기술은 그대로 유지하라."

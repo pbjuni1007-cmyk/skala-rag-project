@@ -458,6 +458,22 @@ def test_optional_observability_hook_gets_only_metadata_and_cannot_break_the_run
         assert "telemetry_error" in (tmp_path / "events.jsonl").read_text()
 
 
+def test_summary_retains_the_assessment_scope_of_conflicting_gaps():
+    result = example("research_ok")
+    gap = "제공된 이번 검색 결과에는 InfiniGen의 mechanism 근거가 없다."
+    result["assessments"]["research_kivi"]["gaps"] = [gap]
+    original = deepcopy(result)
+
+    summary = summarize(result)
+
+    assert summary["gaps"] == ["[research_kivi] " + gap]
+    assert any(text.startswith("[InfiniGen / mechanism] ") for text in summary["findings"])
+    assert len(summary["findings"]) <= 8
+    assert all(len(text) <= 220 for text in summary["findings"])
+    assert all(len(text) <= 300 for text in summary["gaps"])
+    assert result == original
+
+
 def gateway_request():
     request = {field: example("supervisor_research")[field] for field in COMMON}
     results = {"research": example("research_ok"), "market": example("market_insufficient")}

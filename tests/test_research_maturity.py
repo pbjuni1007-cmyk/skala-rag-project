@@ -151,6 +151,9 @@ def test_deficient_reviews_rewrite_once_then_return_insufficient_with_reasons(tm
     assert not any(call[0].startswith("research_kivi_") for call in p.gateway.calls)
     assert len([call for call in p.gateway.calls if call[0].startswith("retrieval_review_kivi_")]) == 2
     assert len([call for call in p.gateway.calls if call[0] == "rewrite_kivi"]) == 1
+    rewrite_schema = next(call[3] for call in p.gateway.calls if call[0] == "rewrite_kivi")
+    assert rewrite_schema["properties"]["queries"].get("minItems") == 4
+    assert rewrite_schema["properties"]["queries"].get("maxItems") == 4
     searched = [query for query, technology, _ in p.corpus.searches if technology == "KIVI"]
     assert any(query.endswith("revised") for query in searched)
 

@@ -47,6 +47,9 @@ sufficient=true이면 missing은 빈 목록이어야 한다. 이는 잠정 판�
 
 RESEARCH_ASSESSMENT_PROMPT = """\
 논문을 근거로 이 기술만 평가하라. 정확히 4개 claim으로 mechanism, limitation, conditions, maturity를 하나씩 작성하라.
+technology에 지정된 한 기술이 이번 평가의 담당 범위다. 다른 기술은 별도 호출에서 평가한다.
+questions와 feedback이 두 기술을 언급해도 이번 기술에 해당하는 부분만 분석하라.
+gaps에는 이번 기술의 미확인 근거를 적고, 다른 기술의 청크가 이번 입력에 없다는 사실을 공백으로 넣지 마라.
 maturity에는 공개 정보 기반 잠정 TRL 범위와 근거·실증 한계를 적고 kind=team_inference로 표시하라.
 TRL 기준은 1 기초원리, 2 개념정립, 3 개념검증, 4 실험실검증, 5 대표 사용조건 검증,
 6 관련환경 시스템시연, 7 운용환경 시제품, 8 적격성 검증된 완성시스템, 9 실제 지속운용이다.
@@ -58,6 +61,8 @@ conditions claim의 kind는 source_fact 또는 author_reported_result, condition
 
 RETRIEVAL_REWRITE_PROMPT = """\
 이전 검색·평가의 실패 이유를 해결하도록 질문을 다시 작성하라. 같은 기술과 네 facet을 유지하라.
+technology에 지정된 한 기술만 대상으로 mechanism, limitation, conditions, maturity 질문을 하나씩, 정확히 4개 반환하라.
+questions와 feedback에 다른 기술이 포함돼도 이번 출력에 그 기술의 질문을 추가하지 마라.
 missing_reasons와 이전 후보 내용을 읽고 부족한 핵심 원문을 겨냥하라.
 query는 영어 ASCII 400자 이내의 짧은 검색문이다. 부족 항목을 모두 나열한 보고서 작성 지시를 만들지 마라.
 한 facet마다 구체적 검색어 5~30단어를 고르고 논문에 없는 운용 실증까지 요구하지 마라.

@@ -6,6 +6,9 @@ from pathlib import Path
 from threading import Lock
 from types import SimpleNamespace
 
+import pytest
+from pydantic import ValidationError
+
 from agents.researchers.followup import run_followup
 from agents.researchers.maturity import run_maturity
 from agents.researchers.prompts import DEFAULT_WEB_QUERIES
@@ -266,6 +269,11 @@ def test_research_feedback_targets_non_ok_technology_and_preserves_other_assessm
     assert rewrite["questions"] == QUESTIONS
     assert rewrite["previous_assessment"] == old_assessments["research_kivi"]
     assert rewrite["previous_queries"] == prior_queries
+    rewrite_schema = pipeline.calls[0]["schema"]
+    rewrite_schema.model_validate(feedback_queries("KIVI"))
+    with pytest.raises(ValidationError):
+        rewrite_schema.model_validate(core_plan())
+    assert rewrite_schema.model_json_schema()["properties"]["queries"]["maxItems"] == 4
     assert {technology for _, technology, _ in pipeline.corpus.search_calls} == {"KIVI"}
     assert {query for query, _, _ in pipeline.corpus.search_calls} == {
         item["query"] for item in feedback_queries("KIVI", " feedback revised")["queries"]

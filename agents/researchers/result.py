@@ -102,3 +102,80 @@ def cited_artifacts(
             sources[chunk.source_id] = contract_source(source_registry[chunk.source_id])
 
     return chunks, sources
+
+
+def _normalized(text: str) -> str:
+    return " ".join(text.split())
+
+
+def trace_errors(result: Mapping[str, Any] | BaseModel) -> list[str]:
+    """Report broken or unused claim -> chunk -> source links in a result."""
+    payload = _as_dict(result)
+    chunks = [_as_dict(chunk) for chunk in payload.get("chunks", [])]
+    sources = {
+        source_id: _as_dict(source)
+        for source_id, source in payload.get("sources", {}).items()
+    }
+    errors: list[str] = []
+
+    chunks_by_id: dict[str, dict[str, Any]] = {}
+    for chunk in chunks:
+        chunk_id = chunk["id"]
+        if chunk_id in chunks_by_id:
+            errors.append(f"duplicate chunk id: {chunk_id}")
+        else:
+            chunks_by_id[chunk_id] = chunk
+
+    cited_chunk_ids: set[str] = set()
+    assessments = payload.get("assessments", {})
+    for assessment in assessments.values():
+        for claim_index, claim in enumerate(assessment.get("claims", [])):
+            for reference_index, reference in enumerate(claim.get("references", [])):
+                chunk_id = reference["chunk_id"]
+                cited_chunk_ids.add(chunk_id)
+                chunk = chunks_by_id.get(chunk_id)
+                where = f"claim {claim_index} reference {reference_index} ({chunk_id})"
+                if chunk is None:
+                    errors.append(f"{where}: reference points to missing chunk")
+                    continue
+
+                quote = _normalized(reference["quote"])
+                if len(quote) < 12:
+                    errors.append(f"{where}: normalized quote is shorter than 12 characters")
+                elif quote not in _normalized(chunk["text"]):
+                    errors.append(f"{where}: quote not found in chunk")
+
+    cited_source_ids: set[str] = set()
+    for chunk in chunks:
+        chunk_id = chunk["id"]
+        source_id = chunk["source_id"]
+        if chunk_id not in cited_chunk_ids:
+            errors.append(f"chunk {chunk_id}: chunk is not cited")
+        if source_id not in sources:
+            errors.append(f"chunk {chunk_id}: missing source {source_id}")
+            continue
+
+        source = sources[source_id]
+        if chunk_id in cited_chunk_ids:
+            cited_source_ids.add(source_id)
+
+        if source.get("type") == "paper_pool":
+            page = chunk.get("page")
+            if type(page) is not int or page < 1:
+                errors.append(f"chunk {chunk_id}: paper_pool chunk must have an integer page >= 1")
+            if chunk.get("section") is not None:
+                errors.append(f"chunk {chunk_id}: paper_pool chunk must have section=null")
+        elif source.get("type") == "external_web":
+            section = chunk.get("section")
+            if chunk.get("page") is not None:
+                errors.append(f"chunk {chunk_id}: external_web chunk must have page=null")
+            if not isinstance(section, str) or not section.strip():
+                errors.append(f"chunk {chunk_id}: external_web chunk must have a non-blank section")
+        else:
+            errors.append(f"chunk {chunk_id}: source has an unsupported type")
+
+    for source_id in sources:
+        if source_id not in cited_source_ids:
+            errors.append(f"source {source_id}: unused source")
+
+    return errors

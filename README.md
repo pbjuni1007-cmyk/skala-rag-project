@@ -4,13 +4,13 @@
 
 ## Overview
 
-기업 IT 사업 문서 검토를 지원하는 Agentic AI를 적용 시나리오로 삼아 **KIVI와 InfiniGen의 선택 조건을 비교하는 보고서 생성기**입니다. KIVI는 KV 캐시를 양자화해 저장량을 줄이고, InfiniGen은 CPU의 KV 중 필요한 항목을 GPU로 가져옵니다. 논문과 공식 자료를 검색해 기술 성숙도·시장성·이해관계자·도메인 적용을 평가합니다.
+기업 IT 사업 문서 검토를 지원하는 Agentic AI를 적용 시나리오로 삼아 **KIVI와 InfiniGen의 선택 조건을 비교하는 보고서 생성기**입니다. KIVI는 KV 캐시를 양자화해 저장량을 줄이고, InfiniGen은 CPU의 KV 중 필요한 항목을 GPU로 가져옵니다. 논문과 공식 자료를 검색해 기술 성숙도, 시장성, 이해관계자, 도메인 적용을 평가합니다.
 
-[설계서](docs/design-report.md) · [평가 보고서](reports/latest/report.md) · [인용 검수표](reports/latest/citation_review.md) · [실행 검증](docs/validation.md)
+[설계서](docs/design-report.md) | [평가 보고서](reports/latest/report.md) | [인용 검수표](reports/latest/citation_review.md) | [실행 검증](docs/validation.md) | [Markdown 출력 샘플](docs/report-markdown-sample.md)
 
-- **Objective:** KIVI와 InfiniGen을 기술 성숙도·시장성·이해관계자·도메인 적용 관점에서 비교하고, 조건에 따른 선택 근거와 상충을 설명합니다.
-- **Method:** LangGraph 기반 Multi-Agent + Agentic RAG. 기술 조사 결과를 공유하고 세 관점을 병렬 평가한 뒤 종합합니다.
-- **Tools:** 논문·공식 웹 자료 수집, 로컬 임베딩 검색, 원문 인용 검증, Markdown·PDF 보고서 생성, 선택적 LangSmith 추적을 사용합니다.
+- **Objective:** KIVI와 InfiniGen을 기술 성숙도, 시장성, 이해관계자, 도메인 적용 관점에서 비교하고 조건에 따른 선택 근거와 상충을 설명합니다.
+- **Method:** LangGraph 기반 Multi-Agent와 Agentic RAG입니다. 기술 조사 뒤 시장성, 이해관계자, 도메인 관점을 병렬 평가하고 보고서를 작성한 다음 별도 품질 평가를 수행합니다.
+- **Tools:** 논문과 공식 웹 자료 수집, 로컬 임베딩 검색, 원문 인용 검증, Markdown과 PDF 보고서 생성, 선택적 LangSmith 추적을 사용합니다.
 
 ## Selected Technologies
 
@@ -19,11 +19,12 @@
 
 ## Features
 
-- **자료 기반 평가:** KIVI·InfiniGen 논문과 공식 웹 자료에서 원리·한계·실험 조건을 수집합니다.
-- **관점별 평가와 통합:** 기술 조사 근거를 공유하고 시장성·이해관계자·도메인 평가를 종합합니다.
+- **자료 기반 평가:** KIVI와 InfiniGen 논문 및 공식 웹 자료에서 원리, 한계, 실험 조건을 수집합니다.
+- **관점별 평가와 통합:** 기술 성숙도, 시장성, 이해관계자, 도메인 적용의 네 관점을 조건과 근거에 맞춰 종합합니다.
 - **확증편향 방지:** 장점과 한계, 반대 근거를 함께 검토하고 논문 결과와 업무 적용 추론을 구분합니다. 부족한 근거는 재검색하고 남은 공백을 보고서에 표시합니다.
-- **근거·상충 검수:** 주장마다 출처와 원문 인용을 연결하고 관점 간 상충을 별도 검수 기록으로 남깁니다.
-- **실행 관리와 출력:** 입력·비용 한도, 호출 병렬화, 검색 설정 회귀 검사를 적용하고 Markdown과 PDF를 함께 생성합니다.
+- **근거와 상충 검수:** 주장마다 출처와 원문 인용을 연결하고 관점 간 상충을 별도 검수 기록으로 남깁니다.
+- **작성과 품질 평가 분리:** Writer가 조사 결과를 SUMMARY, 네 관점, REFERENCE가 있는 Markdown으로 작성합니다. 별도 Evaluator가 근거 연결, 중립성, 편향 통제, 관점 커버리지를 평가합니다.
+- **실행 관리와 출력:** 입력과 비용 한도, 호출 병렬화, 검색 설정 회귀 검사를 적용하고 평가 통과 뒤 Markdown과 PDF를 생성합니다.
 
 ### 자료와 검색 실험
 
@@ -37,21 +38,21 @@ KIVI 15페이지와 InfiniGen 18페이지를 물리 페이지 단위로 추출�
 
 ### 평가 결과 검수
 
-인용 구절이 원문에 존재하는지와 그 구절이 주장 전체를 뒷받침하는지는 다른 질문입니다. 자동 검사는 구절·출처·페이지 연결, 주장 누락·중복, 본문 순서와 요약 개수를 확인합니다. 팀은 인용 검수표에서 실험조건과 해석을, 공백 검수표에서 해소 판정을 확인합니다.
+보고서 작성 뒤 별도 품질 평가 노드가 실행됩니다. Hybrid 방식에서 코드는 Markdown 계약, claim ID와 인용 ID 연결, 원문 구절 존재, 네 관점의 배치를 검사합니다. LLM Judge는 주장과 함께 제공된 인용 구절을 읽고 의미적 근거 연결, 중립성, 편향 통제, 관점 커버리지를 각각 판정합니다. 네 항목 중 하나라도 보완이 필요하면 문제, 대상 주장, 빠진 관점, 구체적인 수정 요청을 반환합니다.
 
-공개 자료로 확인한 실험과 기업 업무에 대한 적용 가정을 구분합니다. 이 프로젝트는 KIVI·InfiniGen 자체의 성능을 재현하지 않으며, 서로 다른 실험 수치로 우열을 단정하지 않습니다. 최종 PDF의 SUMMARY 반 페이지, 한글·표·페이지 배치도 별도로 확인합니다.
+코드가 인용 문자열의 존재를 확인해도 그 인용이 주장을 의미상 뒷받침한다고 증명하지는 않습니다. Judge는 생성기와 같은 설정 모델을 별도 역할 프롬프트로 사용하므로 독립 모델 판정이 아니며, 오류를 놓치거나 모델 편향을 공유할 수 있습니다. 출처 집중도는 편향을 검토할 신호로 전달하며, 임의의 비율 하나를 합격 기준으로 쓰지 않습니다. 공개 실험과 기업 업무 적용 가정을 구분하고, PDF의 페이지 배치와 사람의 최종 의미 검수는 별도로 남깁니다.
 
 ## Tech Stack
 
 | 구분 | 사용 기술과 설정 |
 | --- | --- |
 | Framework | Python 3.11~3.13, LangGraph |
-| LLM / Generator | OpenAI `gpt-5.6-luna`; 질의·수정 `low`, 기술·관점 평가 `medium`, 최종 종합 `max` |
-| LLM / Judge | 별도 Judge 모델 없이 역할별 평가·재평가와 코드 기반 구조·인용 검증을 결합하며, 의미 검수는 사람이 수행 |
+| LLM / Generator | OpenAI `gpt-5.6-luna`; 질의와 수정 `low`, 기술과 관점 평가 `medium`, 보고서 작성과 품질 Judge `max` |
+| LLM / Judge | 같은 설정 모델을 별도 Judge 프롬프트로 호출하고 코드 기반 구조, 인용, 커버리지 검사를 결합합니다. 독립 모델 판정이 아니며 사람 검수를 대체하지 않습니다. |
 | Retrieval | 별도 Vector DB 없이 NumPy 기반 로컬 벡터 검색·코사인 유사도; 공식 웹 자료는 어휘 검색 |
 | Embedding | `intfloat/multilingual-e5-small`, CPU, 384차원; 청크 300토큰·겹침 50·검색 상위 5개 |
 | 검색 평가 | 운영 설정의 2,000토큰 문맥에서 등록 근거 완전 회수: 선택 14/16, 최종 검증 7/8. 측정 정의와 원시 결과는 위 검색 실험 기록 참조 |
-| Output / Tracing | Markdown·PDF, 주장·인용·상충 JSON 및 검수표, 선택적 LangSmith |
+| Output / Tracing | SUMMARY와 REFERENCE가 있는 Markdown 및 PDF, 주장, 인용, 상충, 품질 평가 JSON, 선택적 LangSmith |
 
 ## Agents
 
@@ -61,25 +62,27 @@ KIVI 15페이지와 InfiniGen 18페이지를 물리 페이지 단위로 추출�
 | 시장성 | 기술별 채택 동기·대안·도입 및 운영 비용 비교 |
 | 이해관계자 | 문서 검토자·운영자·구매 및 보안 담당자의 효익과 부담 비교 |
 | 도메인 적용 | 같은 문서 업무의 적합 조건·위험·검증 실험 제안 |
-| 종합·보고서 | 관점별 주장을 배치하고 이익과 부담의 상충, 선택 조건과 근거 공백 정리 |
+| Writer | 네 관점의 주장을 배치하고 이익과 부담의 상충, 선택 조건, 근거 공백을 Markdown으로 종합 |
+| Quality Evaluator | 네 품질 기준을 항목별 판정하고 문제와 문장 단위 보완 요청을 반환. 실제 재작업 경로는 Supervisor가 소유 |
 
 ## Architecture
 
 ```mermaid
 flowchart LR
- P[자료 수집·고정] --> R[기술 조사·성숙도]
+ P[자료 수집과 고정] --> R[기술 조사와 성숙도]
  R --> M[시장성]
  R --> S[이해관계자]
  R --> D[도메인 적용]
  M --> J[결과 합류]
  S --> J
  D --> J
- J --> Y[종합·보고서]
- Y --> V[구조·인용 검증]
- V --> O[Markdown·PDF·검수표]
+ J --> Y[Writer]
+ Y --> V[품질 Evaluator]
+ V -->|통과| O[Markdown, PDF, 검수표]
+ V -->|보완 필요| F[quality_evaluation와 report_revision_requests]
 ```
 
-LangGraph가 선행 조사, 세 관점의 병렬 평가, 합류와 종료를 제어합니다. 기술 조사는 두 기술을 최대 2개, 후속 평가는 최대 3개 동시 호출로 처리합니다. 각 역할은 질문·입력·응답 구조·검증 규칙을 따로 사용하고 모델 호출과 예산 관리는 공유합니다.
+LangGraph가 선행 조사, 세 후속 관점의 병렬 평가, Writer, Evaluator와 종료를 제어합니다. 기술 조사는 두 기술을 최대 2개, 후속 평가는 최대 3개 동시 호출로 처리합니다. 각 역할은 질문, 입력, 응답 구조, 검증 규칙을 따로 사용하고 모델 호출과 예산 관리는 공유합니다. 품질 미달이면 현재 실행을 통과 처리하지 않고 `quality_evaluation`과 `report_revision_requests`를 State에 남깁니다. Supervisor는 이 요청을 Writer에 전달하고 수정 보고서를 Evaluator에 다시 제출할 수 있습니다. Evaluator 자체는 재작업 경로를 소유하지 않습니다.
 
 기술 조사는 논문을 **벡터 검색**합니다. 후속 세 관점도 관점별 질의로 고정된 공식 웹 자료를 **어휘 검색**하고 공통 논문 근거와 함께 사용합니다. 부족한 이유를 바탕으로 질의를 한 번 수정하는 검색·재평가 절차가 있습니다. 실제 사내 문서를 검색하거나 RFP를 검토하는 서비스는 이 보고서 생성기의 구현 범위에 포함되지 않습니다.
 
@@ -107,7 +110,7 @@ LangGraph가 선행 조사, 세 관점의 병렬 평가, 합류와 종료를 제
 | `app.py`, `rag/graph.py`, `rag/schemas.py` | 실행 진입점, 역할별 그래프, 공유 State와 구조화 응답 |
 | `rag/corpus.py`, `rag/source_discovery.py` | 원문 수집·청킹·임베딩·검색·출처 관리 |
 | `rag/llm.py`, `rag/budget.py`, `rag/request_budget.py`, `rag/repair.py` | API 호출·입력 한도·비용·제한된 오류 수정 |
-| `rag/evidence.py`, `rag/render.py` | 주장·인용·보고서 구조 검증과 Markdown·PDF 작성 |
+| `rag/evidence.py`, `rag/writer.py`, `rag/evaluator.py`, `rag/render.py` | 근거 구조 검사, 보고서 작성, Hybrid 품질 평가, Markdown 및 PDF 출력 |
 | `config/`, `eval/`, `tests/` | 실행·보고서 명세, 고정 검색 질문, 회귀 검사 |
 | `scripts/`, `experiments/` | 로컬 검색 실험 도구와 측정 결과 |
 | `docs/`, `reports/latest/` | 설계·기술 기록과 최신 보고서·검수표 |
@@ -137,11 +140,11 @@ uv run python app.py --resume outputs/<실행ID> # 동일 코드·입력의 완�
 
 코드를 수정한 뒤에는 `--reuse-calls outputs/<실행ID>`를 사용할 수 있습니다. 자료·검색 정책·모델·설정·의존성·공개 보고서 명세가 같아야 하며, 정확히 같은 요청의 정상 완료 응답만 재사용합니다. 변경된 요청은 새로 생성하고 현재 검증을 다시 거칩니다. 조건이 달라졌으면 복구 옵션 없이 새로 실행합니다.
 
-결과는 `outputs/<실행ID>/`의 `report.md`, `citation_review.md`, `gap_review.md`에 저장됩니다. 주장·인용·출처·실행 설정도 JSON으로 보존합니다. `human_review_pending`은 생성과 자동 검증을 마치고 인용 의미 검수를 기다리는 상태입니다. 일반 실행과 `--render`는 같은 보고서 내용으로 `.md`와 `.pdf`를 함께 생성합니다. PDF는 `RAG-Output_<캠퍼스>_<반>_<팀원>.pdf`이며 제출 정보가 없으면 `RAG-Output_review.pdf`로 저장합니다. `--render`는 추가 GPT 호출 없이 저장된 결과를 다시 출력합니다. PDF 생성에 실패하면 실행은 `incomplete`로 종료됩니다. 팀은 생성된 PDF의 의미와 페이지 배치를 검수합니다. 저장 루트는 `RAG_OUTPUT_DIR`로 바꿀 수 있습니다.
+결과는 `outputs/<실행ID>/`의 `report.md`, `quality_evaluation.json`, `citation_review.md`, `gap_review.md`에 저장됩니다. 주장, 인용, 출처, 실행 설정도 JSON으로 보존합니다. Judge 미달 보고서는 PDF로 출력하지 않고, `quality_evaluation.json`과 `state.json`에 구체적인 `report_revision_requests`를 남깁니다. `human_review_pending`은 Hybrid 품질 평가와 문서 생성을 마치고 사람의 인용 의미 검수와 PDF 페이지 검수를 기다리는 상태입니다. 일반 실행과 `--render`는 같은 보고서 내용으로 `.md`와 `.pdf`를 함께 생성합니다. PDF는 `RAG-Output_<캠퍼스>_<반>_<팀원>.pdf`이며 제출 정보가 없으면 `RAG-Output_review.pdf`로 저장합니다. `--render`는 추가 GPT 호출 없이 저장된 통과 결과를 다시 출력합니다. PDF 생성에 실패하면 실행은 `incomplete`로 종료됩니다. 팀은 생성된 PDF의 의미와 페이지 배치를 검수합니다. 저장 루트는 `RAG_OUTPUT_DIR`로 바꿀 수 있습니다.
 
 `reports/latest/`는 검토·편집한 공유용 사본으로, 새 실행 때 자동 갱신되지 않습니다. 새 결과를 공유할 때는 해당 실행의 보고서와 두 검수표를 함께 검토해 옮기고 `run.json`의 실행 ID와 파일 해시를 갱신합니다. 실행 원본은 `outputs/<실행ID>/`에 보존합니다.
 
-제출용 PDF: [설계서](output/pdf/RAG-Design_판교-7반_김기현+김도현+박병준+홍수정.pdf) · [평가 보고서](output/pdf/RAG-Output_판교_7반_김기현+김도현+박병준+홍수정.pdf). 원본 Markdown: [설계서](docs/design-report.md) · [평가 보고서](reports/latest/report.md). 설계의 최신 내용은 Markdown 정본을 기준으로 확인합니다.
+제출용 PDF: [설계서](output/pdf/RAG-Design_판교-7반_김기현+김도현+박병준+홍수정.pdf) | [평가 보고서](output/pdf/RAG-Output_판교_7반_김기현+김도현+박병준+홍수정.pdf). 원본 Markdown: [설계서](docs/design-report.md) | [평가 보고서](reports/latest/report.md). 설계의 최신 내용은 Markdown 정본을 기준으로 확인합니다.
 
 ### 입력 한도와 비용
 
@@ -165,7 +168,7 @@ LANGSMITH_WORKSPACE_ID=
 
 Endpoint는 자신의 LangSmith 리전에 맞게 지정합니다. 여러 workspace에 걸친 키는 Workspace ID도 지정합니다. 셸 환경변수가 `.env.local`보다 우선합니다. 비활성화하려면 `LANGSMITH_TRACING=false`로 설정합니다.
 
-추적 화면의 `rag_run`에 있는 `run_id`가 로컬 출력 폴더의 실행 ID입니다. 그 아래에 조사·시장성·이해관계자·도메인·종합·렌더링 단계와 `generation` 호출이 연결됩니다. `queue_wait_seconds`는 동시 호출 슬롯 대기, `generation_elapsed_seconds`는 모델 HTTP 요청의 소요 시간입니다. 후자는 제공자 내부 대기 시간도 포함합니다. 캐시 재사용은 `cache_reuse`로 표시하며 새 토큰 사용량에 더하지 않습니다. 모델 조회와 입력 토큰 사전 계산은 별도 LLM 생성 호출로 기록하지 않습니다.
+추적 화면의 `rag_run`에 있는 `run_id`가 로컬 출력 폴더의 실행 ID입니다. 그 아래에 조사, 세 관점 평가, `report_writer`, `quality_evaluator`, 렌더링 단계와 `generation` 호출이 연결됩니다. `queue_wait_seconds`는 동시 호출 슬롯 대기, `generation_elapsed_seconds`는 모델 HTTP 요청의 소요 시간입니다. 후자는 제공자 내부 대기 시간도 포함합니다. 캐시 재사용은 `cache_reuse`로 표시하며 새 토큰 사용량에 더하지 않습니다. 모델 조회와 입력 토큰 사전 계산은 별도 LLM 생성 호출로 기록하지 않습니다.
 
 문서·검색 질의·프롬프트·모델 답변·보고서 원문은 전송하지 않습니다. 오류도 고정된 분류만 남깁니다. 보고서는 기존대로 Markdown과 PDF로 저장되며, 추적 전송 실패가 모델 재시도를 유발하지 않습니다. 종료 시 전송을 최대 2초 기다리고 계속 대기 중이면 안내를 출력합니다. 네트워크 장애나 전송 대기열 포화 시 일부 추적이 누락될 수 있으므로 비용·실행 결과의 기준은 로컬 기록입니다. `--prepare`와 `--render`는 추적을 시작하지 않습니다.
 

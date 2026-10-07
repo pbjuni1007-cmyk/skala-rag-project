@@ -195,3 +195,7 @@
 !/experiments/retrieval-regression-20260922/checked.json
 !/experiments/rewrite-20260922/results.json
 !/tests/test_report_evaluator.py
+
+# Agent collaboration contract and mock examples
+!/docs/agent-contract.md
+!/docs/agent-contract-examples.json

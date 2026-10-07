@@ -195,3 +195,10 @@
 # Agent collaboration contract and mock examples
 !/docs/agent-contract.md
 !/docs/agent-contract-examples.json
+
+# Issue #2 research agents
+!/agents/
+!/agents/__init__.py
+!/agents/researchers/
+!/agents/researchers/__init__.py
+!/agents/researchers/contract.py

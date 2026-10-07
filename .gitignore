@@ -217,3 +217,9 @@
 !/tests/test_research_isolation.py
 !/tests/test_research_feedback.py
 !/scripts/export_research_samples.py
+!/tests/fixtures/research/
+!/tests/fixtures/research/README.md
+!/tests/fixtures/research/research.json
+!/tests/fixtures/research/market.json
+!/tests/fixtures/research/stakeholder.json
+!/tests/fixtures/research/domain.json

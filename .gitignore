@@ -205,3 +205,4 @@
 !/agents/researchers/result.py
 !/tests/test_research_contract.py
 !/tests/test_research_trace.py
+!/tests/test_research_status.py

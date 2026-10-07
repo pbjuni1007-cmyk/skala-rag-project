@@ -155,19 +155,30 @@ class Pipeline:
                 raise InputBudgetExceeded(purpose, None, self.settings.integer("LLM_MAX_INPUT_TOKENS", 24000),
                                           reason="repair_parts_limit_8")
             planned = []
+            deterministic_units = []
             for i, unit in enumerate(units):
                 patch_purpose = f"{purpose}_repair_{i}"
                 patch_instructions = BASE + REPAIR_INSTRUCTIONS
                 patch_schema = unit.schema.model_json_schema()
-                # All indivisible units are counted before the first paid repair.
-                self._preflight(patch_purpose, patch_instructions, unit.content, patch_schema)
-                planned.append((patch_purpose, patch_instructions, patch_schema, unit))
+                patch = None
+                if (unit.kind == "reference" and unit.content.get("preserve_quote")
+                        and len(unit.content["chunks"]) == 1):
+                    patch = {"patches": [{"target_id": unit.target_id,
+                        "chunk_id": unit.content["chunks"][0]["id"],
+                        "quote": unit.content["reference"]["quote"]}]}
+                    deterministic_units.append(unit.target_id)
+                else:
+                    # Count all model correction units before the first paid repair.
+                    self._preflight(patch_purpose, patch_instructions, unit.content, patch_schema)
+                planned.append((patch_purpose, patch_instructions, patch_schema, unit, patch))
             repaired = value
             try:
-                for patch_purpose, patch_instructions, patch_schema, unit in planned:
-                    response = self.gateway.generate(patch_purpose, patch_instructions,
-                        json.dumps(unit.content, ensure_ascii=False), patch_schema)
-                    repaired = apply_patch(repaired, unit, unit.schema.model_validate_json(response).model_dump())
+                for patch_purpose, patch_instructions, patch_schema, unit, patch in planned:
+                    if patch is None:
+                        response = self.gateway.generate(patch_purpose, patch_instructions,
+                            json.dumps(unit.content, ensure_ascii=False), patch_schema)
+                        patch = unit.schema.model_validate_json(response).model_dump()
+                    repaired = apply_patch(repaired, unit, patch)
                 # Validate the entire merged schema, original references, conditions,
                 # protected facets and report constraints, not only modified items.
                 repaired, final_errors = validate(json.dumps(repaired, ensure_ascii=False))
@@ -178,7 +189,8 @@ class Pipeline:
                 write_json(self.out / "invalid" / f"{purpose}-repair.json", {"errors": final_errors})
                 raise StructuredValidationError(purpose, final_errors) from exc
             write_json(self.out / "repairs" / f"{purpose}.json",
-                       {"rounds": 1, "units": [u.target_id for u in units], "full_validation": "passed"})
+                       {"rounds": 1, "units": [u.target_id for u in units],
+                        "deterministic_units": deterministic_units, "full_validation": "passed"})
             return repaired
 
         # Generic schema/layout failures get one full repair, only if its exact

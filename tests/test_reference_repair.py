@@ -168,7 +168,7 @@ def test_main01_wrong_existing_chunk_can_rebind_to_supplied_literal_source(tmp_p
     assert fixed == expected and value == before
     assert 'resid- ual' in fixed['claims'][0]['references'][0]['quote']
     assert not validate_assessment(fixed, source_chunks, 'KIVI')
-    assert len(p.gateway.calls) == 2
+    assert len(p.gateway.calls) == 1
 
 
 @pytest.mark.parametrize('excluded', ['not_supplied', 'other_technology'])
@@ -221,3 +221,65 @@ def test_main01_nonliteral_quotes_still_fail_after_one_correction(tmp_path, main
     with pytest.raises(StructuredValidationError, match='quotation does not exist'):
         p.structured('research_kivi_0', Assessment, 'test', {'chunks': source_chunks}, check)
     assert len(p.gateway.calls) == 2
+
+
+@pytest.fixture
+def main05_citations():
+    return json.loads((Path(__file__).parent / 'fixtures/research/main05_citations.json').read_text())
+
+
+def test_main05_unique_rebind_needs_no_generated_quotation(tmp_path, main05_citations):
+    data = main05_citations
+    value = citation_assessment(data['wrongly_bound'])
+    before = deepcopy(value)
+    patch = deepcopy(data['expanded_patch'])
+    patch['patches'][0]['target_id'] = 'claims:0:reference:0'
+    p = pipeline(tmp_path, [value, patch])
+    seen = []
+    def check(answer):
+        seen.append(deepcopy(answer))
+        return validate_assessment(answer, data['chunks'], 'KIVI')
+    fixed = p.structured('domain', Assessment, 'test', {'chunks': data['chunks']}, check)
+    expected = deepcopy(value)
+    expected['claims'][0]['references'][0]['chunk_id'] = data['supporting_chunk_id']
+    assert fixed == expected and value == before
+    assert len(p.gateway.calls) == 1
+    assert seen == [value, expected]
+    receipt = json.loads((tmp_path / 'repairs/domain.json').read_text())
+    assert receipt['deterministic_units'] == ['claims:0:reference:0']
+    assert receipt['full_validation'] == 'passed'
+
+
+def test_ambiguous_rebind_keeps_bounded_model_selection(tmp_path, main05_citations):
+    data = main05_citations
+    source_chunks = deepcopy(data['chunks'])
+    alternative = deepcopy(next(c for c in source_chunks if c['id'] == data['supporting_chunk_id']))
+    alternative['id'] += ':overlap'
+    source_chunks.append(alternative)
+    value = citation_assessment(data['wrongly_bound'])
+    patch = {'patches': [{'target_id': 'claims:0:reference:0', 'chunk_id': alternative['id'],
+                          'quote': data['wrongly_bound']['quote']}]}
+    p = pipeline(tmp_path, [value, patch])
+    fixed = p.structured('domain', Assessment, 'test', {'chunks': source_chunks},
+                         lambda answer: validate_assessment(answer, source_chunks, 'KIVI'))
+    assert fixed['claims'][0]['references'][0] == {
+        'chunk_id': alternative['id'], 'quote': data['wrongly_bound']['quote']}
+    assert len(p.gateway.calls) == 2
+
+
+def test_unique_rebind_preserves_other_correction_and_final_validation(tmp_path, main05_citations):
+    data = main05_citations
+    value = citation_assessment(data['wrongly_bound'])
+    original_id = data['wrongly_bound']['chunk_id']
+    value['claims'][0]['references'].append({'chunk_id': original_id, 'quote': 'This quote is absent.'})
+    source = next(c for c in data['chunks'] if c['id'] == original_id)
+    quote = source['text'][:100]
+    patch = {'patches': [{'target_id': 'claims:0:reference:1', 'quote': quote}]}
+    p = pipeline(tmp_path, [value, patch])
+    fixed = p.structured('domain', Assessment, 'test', {'chunks': data['chunks']},
+                         lambda answer: validate_assessment(answer, data['chunks'], 'KIVI'))
+    assert fixed['claims'][0]['references'] == [
+        {'chunk_id': data['supporting_chunk_id'], 'quote': data['wrongly_bound']['quote']},
+        {'chunk_id': original_id, 'quote': quote}]
+    assert [call[0] for call in p.gateway.calls] == ['domain', 'domain_repair_1']
+    assert not validate_assessment(fixed, data['chunks'], 'KIVI')

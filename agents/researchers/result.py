@@ -4,11 +4,35 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from copy import deepcopy
+import json
+import re
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
-from agents.researchers.contract import Chunk, Source
+from agents.researchers.contract import Chunk, NodeError, Source
+from rag.budget import BudgetExceeded
+from rag.llm import APIError
+from rag.request_budget import InputBudgetExceeded
+
+
+class RetrievalFailure(RuntimeError):
+    """Raised when search or retrieval-context construction fails."""
+
+
+class ArtifactMismatch(ValueError):
+    """Raised when an artifact identity or cited-content invariant is violated."""
+
+
+_ERROR_REASONS = {
+    "retrieval_error": "검색 자료를 가져오지 못했습니다",
+    "invalid_response": "구조화된 조사 결과를 검증하지 못했습니다",
+    "api_error": "모델 호출에 실패했습니다",
+    "budget_exceeded": "요청 예산 한도를 넘었습니다",
+    "input_budget_exceeded": "입력 토큰 한도를 넘었습니다",
+    "uncertain_request": "요청 완료 여부를 확인할 수 없습니다",
+    "artifact_mismatch": "주장·청크·출처의 연결을 검증하지 못했습니다",
+}
 
 
 def _as_dict(value: Mapping[str, Any] | BaseModel) -> dict[str, Any]:
@@ -179,3 +203,32 @@ def trace_errors(result: Mapping[str, Any] | BaseModel) -> list[str]:
             errors.append(f"source {source_id}: unused source")
 
     return errors
+
+
+def node_error(exc: Exception, stage: str) -> NodeError:
+    """Map known execution failures to a safe, short contract error."""
+    # Import lazily because rag.graph will import the research-agent boundary.
+    from rag.graph import StructuredValidationError
+
+    if isinstance(exc, RetrievalFailure):
+        code = "retrieval_error"
+    elif isinstance(exc, InputBudgetExceeded):
+        code = "input_budget_exceeded"
+    elif isinstance(exc, BudgetExceeded):
+        code = "budget_exceeded"
+    elif isinstance(exc, APIError):
+        code = "uncertain_request" if "reservation retained" in str(exc).lower() else "api_error"
+    elif isinstance(exc, (StructuredValidationError, ValidationError, json.JSONDecodeError)):
+        code = "invalid_response"
+    elif isinstance(exc, ArtifactMismatch):
+        code = "artifact_mismatch"
+    elif isinstance(exc, ValueError) and "Conflicting duplicate source chunk" in str(exc):
+        code = "artifact_mismatch"
+    elif isinstance(exc, ValueError):
+        code = "invalid_response"
+    else:
+        raise exc
+
+    stage_label = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(stage).strip())[:64] or "research"
+    message = f"{stage_label}: {type(exc).__name__}: {_ERROR_REASONS[code]}"[:200]
+    return NodeError(code=code, message=message, retryable=False)

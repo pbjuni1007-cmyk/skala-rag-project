@@ -4,6 +4,95 @@
 
 Agent 협업의 입력·출력과 연결 규칙: [계약 v1](docs/agent-contract.md) · [가상 응답 예시](docs/agent-contract-examples.json). 역할과 완료 기준은 이슈 #1~#4를 따른다.
 
+## Agent Supervisor — 이슈 #1
+
+박병준 담당 [이슈 #1](https://github.com/pbjuni1007-cmyk/skala-rag-project/issues/1)은 공통 자료형, State와 Supervisor를 구현한다. 조사·보고서·평가·출력 담당자가 제공한 함수를 연결하며, 기존 `app.py`의 RAG 실행은 아래 Overview 이후에 설명한다.
+
+Supervisor는 현재 수집된 관점과 근거를 보고 다음 작업을 고른다. 기술 조사 이후 세 관점의 순서를 고정하지 않는다. 모든 관점이 `ok`여도 Supervisor가 근거 충분성을 명시적으로 승인해야 작성할 수 있다. 품질 평가가 보완 대상을 반환하면 해당 관점이나 writer에 이유·주장 ID·공백 ID를 전달한다. 하위 역할은 다른 하위 역할을 호출하지 않으며, 성공·실패·출력 결과 모두 Supervisor로 돌아온다.
+
+근거 충분성 판단과 선택 재조사를 직접 표현할 수 있어 Supervisor를 선택했다. 직렬 실행은 상태 갱신과 재개를 단순하게 만들지만 관점 병렬 처리보다 느릴 수 있다. 추가 모델 호출은 기존 Gateway의 입력·비용 제한을 따른다. 호출 횟수를 고정해 보고서로 넘기지 않는다.
+
+```mermaid
+flowchart TD
+    START --> S[Supervisor]
+    S -->|선택한 조사·보완 대상| W[research / market / stakeholder / domain]
+    W --> S
+    S -->|네 관점 ok + 근거 충분 승인| R[writer]
+    R --> S
+    S -->|새 보고서| E[evaluator]
+    E -->|판정 + 보완 대상| S
+    S -->|현재 보고서의 네 기준 통과| P[publish]
+    P --> S
+    S -->|완료 / 오류 / 상한| END
+```
+
+실제 컴파일한 그래프는 [supervisor-graph.mmd](docs/supervisor-graph.mmd)에 있다. 분기 구현은 [agents/supervisor.py](agents/supervisor.py)의 `add_conditional_edges`를 사용한다. [LangGraph 공식 Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)의 상태·조건부 분기 규칙을 따른다.
+
+### 연결할 모듈과 함수
+
+| 모듈 | 책임 |
+| --- | --- |
+| `agents/contracts.py` | 공유 계약 v1의 요청·응답 형식, 공통 식별자와 근거 검증 |
+| `agents/state.py` | 원문을 누적하지 않는 State와 실행 상한 |
+| `agents/supervisor.py` | 허용 작업 판단, 팀 함수 호출, 선택 재작업과 그래프 연결 |
+| `agents/store.py` | 실행 잠금, 원자적 snapshot, 변경 불가 결과 파일과 해시 확인 |
+| `agents/decision.py` | 기존 Gateway로 판단을 요청하는 `GatewayDecider` |
+
+네 하위 함수는 JSON 사전을 받아 해당 계약의 JSON 사전 또는 Pydantic 모델을 반환한다. 동기 함수 경계를 사용한다. 비동기 노드는 실행 담당이 동기 연결 계층을 준비해야 하며 coroutine을 그대로 반환하지 않는다.
+
+```python
+from agents.contracts import RunContext
+from agents.decision import GatewayDecider
+from agents.state import Limits
+from agents.store import RunStore
+from agents.supervisor import Nodes, Supervisor
+
+# 각 담당자가 제공한 함수를 연결하는 예시다.
+# research: #2, write_report/evaluate_report: #3, publish/gateway/config: #4.
+nodes = Nodes(research, write_report, evaluate_report, publish)
+coordinator = Supervisor(
+    nodes, GatewayDecider(gateway), RunStore(run_directory),
+    Limits(worker_attempts=2, writer_attempts=3, supervisor_steps=24),
+)
+context = RunContext(
+    technologies=["KIVI", "InfiniGen"],
+    domain=config["domain"], scenario=config["scenario"],
+)
+state = coordinator.run(run_id, context, identity=execution_fingerprint)
+```
+
+`execution_fingerprint`는 #4가 하위 노드 코드, 모델·설정, 고정 자료와 비용 장부를 묶어 만든 식별값이다. Supervisor는 자신의 코드·프롬프트·잠금 파일, context, 실행 상한과 run ID를 자동으로 결합한다. 값이 달라지면 새 실행 폴더를 사용한다. 키를 식별값이나 로그 본문에 넣지 않는다.
+
+요청에는 `contract_version`, `run_id`, `request_id`, `attempt`, `context`가 공통으로 들어간다. 응답은 이를 그대로 돌려줘야 한다. 출처·청크 ID 충돌, 위조 인용, 다른 보고서의 평가, 원래 주장·근거·공백의 변경은 연결 단계에서 거부한다. 생성된 보고서의 구조 문제는 평가 대상이 될 수 있지만 긍정 평가가 기존 구조 검사 실패를 덮을 수는 없다.
+
+### State 설계 근거
+
+| 가이드 항목 | 구현과 이유 |
+| --- | --- |
+| 제어와 페이로드 분리 | State에는 다음 작업·시도수·현재 상태·작은 요약·파일 참조를 둔다. 원문과 완전한 결과는 호출 경계에서만 읽는다. |
+| 관측성 위치 | 결정 전문과 이유는 로컬 `artifacts/supervisor/`와 `events.jsonl`에 남긴다. `on_event`에는 ID·역할·시도·상태·결정 분류만 전달한다. |
+| 지속성 비용 | 역할별 최신 참조만 snapshot에 저장하고 크기를 64 KiB로 제한한다. 과거 결과는 별도 파일이다. 실행 파일 수도 역할별 상한으로 제한하며 자동 삭제하지 않는다. |
+| 상관 | `run_id`는 snapshot·요청·응답·이벤트를 연결한다. `request_id`는 역할·시도별로 다르다. |
+| 재개·복구 | 호출 전에 pending과 누적 시도수를 저장하고 완료 후 snapshot을 교체한다. 완료 결과의 해시를 검증하고 이어 간다. 완료 여부가 불명확한 pending은 재호출하지 않는다. |
+| 동시 처리 | 한 역할씩 실행하므로 reducer가 필요 없다. 같은 실행 폴더의 다른 프로세스는 잠금으로 거부한다. 역할 내부 병렬 작업도 State를 직접 수정하지 않는다. |
+| 종료 보장 | 조사 역할별 2회, writer 3회, Supervisor 결정 24회가 기본 상한이다. 상한은 성공 조건이 아니며 `incomplete`로 끝난다. |
+
+재개는 같은 인자로 `resume=True`를 지정한다. `pause_after=N`은 이번 호출에서 그래프 노드 N개를 완료한 뒤 멈추는 검증용 옵션이다. `needs_attention`은 확인되지 않은 호출이 있다는 뜻이다. 실행 오류의 `retryable` 표시만으로 Supervisor가 API·예산·불확실한 요청을 다시 보내지 않는다. 실행 잠금은 macOS/Linux의 `fcntl`을 사용한다.
+
+research가 바뀌면 세 후속 관점과 보고서·평가·출력 참조를 무효화한다. 다른 관점 하나만 바뀌면 나머지 관점은 보존하고 보고서 이후를 무효화한다. 시도수는 초기화하지 않는다. 복수 보완 요청의 원문과 ID는 별도 평가 파일 참조로 보존해 첫 관점 수정 후에도 나머지 요청을 잃지 않는다.
+
+### 검증과 다음 연결
+
+```bash
+uv run pytest -q tests/test_team_contracts.py tests/test_team_supervisor.py tests/test_team_store.py
+```
+
+테스트는 계약 문서의 가상 응답을 사용한다. 서로 다른 조사 순서, 근거 부족 재조사, 보고서·관점 재작업, 오류·상한, 중단 후 재개, 결과 변조와 경로 이탈을 검증한다. 모의 publisher가 만드는 파일은 실제 평가 PDF가 아니다.
+
+#2·#3·#4의 함수와 연결한 실제 모델 실행, PDF 조판·실제 페이지 수 검사, LangSmith 수신·화면 캡처는 아직 남아 있다. Supervisor는 출력 파일의 해시와 Markdown 일치 및 선언된 페이지 상한을 확인한다. 실제 PDF 내용 검수는 #4가 수행한다. `completed`도 사람의 의미·제출 검수 완료를 뜻하지 않는다.
+
+추적 연결은 `Supervisor(..., on_event=handler)`를 사용한다. hook 실패는 로컬 `telemetry_error`로 기록하며 업무 실행을 중단시키지 않는다. 기본 LangGraph 자동 추적은 State·요청 전문 노출을 막기 위해 실행 중 비활성화한다. 기존 `rag.tracing.safe_metadata()`는 새 결정 분류를 아직 허용하지 않으므로 #4가 명시적인 허용 목록으로 연결해야 한다.
+
 ## Overview
 
 기업 IT 사업 문서 검토를 지원하는 Agentic AI를 적용 시나리오로 삼아 **KIVI와 InfiniGen의 선택 조건을 비교하는 보고서 생성기**입니다. KIVI는 KV 캐시를 양자화해 저장량을 줄이고, InfiniGen은 CPU의 KV 중 필요한 항목을 GPU로 가져옵니다. 논문과 공식 자료를 검색해 기술 성숙도·시장성·이해관계자·도메인 적용을 평가합니다.

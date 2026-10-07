@@ -11,15 +11,34 @@ import sys
 _SESSION = ContextVar('rag_trace_session', default=None)
 _PARENT = ContextVar('rag_trace_parent', default=None)
 _NUMBERS = {'attempt', 'queue_wait_seconds', 'generation_elapsed_seconds', 'http_status'}
-_LABELS = {'purpose', 'model', 'effort', 'run_id'}
+_LABELS = {'purpose', 'model', 'effort', 'run_id', 'request_id', 'role',
+           'next_action', 'reason_code', 'error_code', 'result_status'}
+_ACTIONS = {'research', 'market', 'stakeholder', 'domain', 'writer', 'evaluator', 'publish', 'stop'}
+_WORKER_ROLES = {'research', 'market', 'stakeholder', 'domain', 'writer', 'evaluator'}
+_REASONS = {'initial_research', 'missing_view', 'evidence_gap', 'evidence_ready',
+            'report_ready', 'quality_rework', 'quality_passed', 'limit_exceeded', 'fatal_error'}
+_ERRORS = {'retrieval_error', 'invalid_response', 'api_error', 'budget_exceeded',
+           'input_budget_exceeded', 'uncertain_request', 'artifact_mismatch', 'render_error'}
+_CONTROL_CODES = {'role': _WORKER_ROLES | {'publish', 'supervisor'}, 'next_action': _ACTIONS,
+                  'reason_code': _REASONS, 'error_code': _ERRORS,
+                  'result_status': {'ok', 'insufficient', 'failed'}}
 
 
 def safe_metadata(values):
     result = {}
     for key, value in values.items():
-        if key in _NUMBERS and type(value) in (int, float) and math.isfinite(value) and value >= 0:
+        if key == 'attempt' and type(value) is int and value >= 1:
             result[key] = value
-        elif key in _LABELS and isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', value):
+        elif key in _NUMBERS and key != 'attempt' and type(value) in (int, float) and math.isfinite(value) and value >= 0:
+            result[key] = value
+        elif key in _LABELS and isinstance(value, str):
+            if key in _CONTROL_CODES and value in _CONTROL_CODES[key]:
+                result[key] = value
+            elif key in {'run_id', 'request_id'} and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}', value):
+                result[key] = value
+            elif key not in _CONTROL_CODES and key not in {'run_id', 'request_id'} and re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', value):
+                result[key] = value
+        elif key in {'evidence_sufficient', 'passed'} and type(value) is bool:
             result[key] = value
         elif key == 'status' and value in ('research_ok', 'joined', 'validated', 'human_review_pending', 'incomplete', 'failed', 'completed'):
             result[key] = value
@@ -175,6 +194,34 @@ def traced_node(name, function):
                 metadata['status'] = result.get('run_status')
             return result
     return run
+
+
+def trace_decision(decision):
+    """Record only the contract's routing fields, never reason or feedback text."""
+    with span('supervisor_decision', role='supervisor',
+              run_id=decision.get('run_id'), request_id=decision.get('request_id'),
+              attempt=decision.get('attempt'), next_action=decision.get('next_action'),
+              reason_code=decision.get('reason_code'),
+              evidence_sufficient=decision.get('evidence_sufficient')):
+        pass
+
+
+def trace_agent_call(role, request, function):
+    """Run a contract worker in a metadata-only span and return its response."""
+    if role not in _WORKER_ROLES:
+        raise ValueError('Unsupported traced Agent role')
+    with span(role, role=role, run_id=request.get('run_id'),
+              request_id=request.get('request_id'), attempt=request.get('attempt')) as metadata:
+        result = function(request)
+        if isinstance(result, dict):
+            metadata['result_status'] = result.get('status')
+            metadata['status'] = 'failed' if result.get('status') == 'failed' else 'completed'
+            if role == 'evaluator':
+                metadata['passed'] = result.get('passed')
+            error = result.get('error')
+            if isinstance(error, dict):
+                metadata['error_code'] = error.get('code')
+        return result
 
 
 def submit(pool, function, *args, **kwargs):

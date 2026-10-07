@@ -310,3 +310,109 @@ def build_result(
         # classification crosses the ResearchResult boundary.
         error = node_error(ArtifactMismatch(str(exc)), "result_assembly")
         return failed_result(request_model, error)
+
+
+def balance_findings(
+    view: str,
+    assessment: Mapping[str, Any] | BaseModel,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Add deterministic caveat/counter-facet gaps and local source-balance counts."""
+    counter_facets = {
+        "research": "limitation",
+        "market": "costs",
+        "stakeholder": None,
+        "domain": "risks",
+    }
+    if view not in counter_facets:
+        raise ValueError(f"Unknown research view: {view}")
+
+    local = _as_dict(assessment)
+    local_chunks = []
+    for key in ("chunks", "searched_chunks"):
+        values = local.pop(key, None)
+        if isinstance(values, list):
+            local_chunks.extend(values)
+    technology_hint = local.pop("technology", None)
+    if "assessment" in local and "claims" not in local:
+        assessment_value = local.pop("assessment")
+        payload = _assessment_dict(assessment_value)
+    else:
+        payload = local
+
+    value = Assessment.model_validate(payload)
+    assessment_payload = value.model_dump(mode="python")
+    claims = assessment_payload["claims"]
+    claim_technologies = {
+        claim["technology"]
+        for claim in claims
+        if claim["technology"] in {"KIVI", "InfiniGen", "both"}
+    }
+    if view == "research":
+        if technology_hint in {"KIVI", "InfiniGen"}:
+            technologies = [technology_hint]
+        else:
+            technologies = [
+                tech for tech in ("KIVI", "InfiniGen")
+                if tech in claim_technologies or "both" in claim_technologies
+            ]
+    else:
+        technologies = ["KIVI", "InfiniGen"]
+
+    findings = []
+    counter_facet = counter_facets[view]
+    for technology in technologies:
+        tech_claims = [
+            claim for claim in claims
+            if claim["technology"] in {technology, "both"}
+        ]
+        if not any(
+            isinstance(claim["caveats"], str) and claim["caveats"].strip()
+            for claim in tech_claims
+        ):
+            findings.append(f"{technology}: 한계·반대 근거를 기재한 주장이 없음")
+
+        if counter_facet:
+            counter_claims = [claim for claim in tech_claims if claim["facet"] == counter_facet]
+            if not counter_claims or all(claim["kind"] == "unknown" for claim in counter_claims):
+                findings.append(f"{technology} {counter_facet}: 한계·위험 근거 미확인")
+
+    assessment_payload["gaps"] = list(dict.fromkeys(assessment_payload["gaps"] + findings))
+    if findings:
+        assessment_payload["status"] = "insufficient"
+    updated = Assessment.model_validate(assessment_payload).model_dump(mode="python")
+
+    chunk_sources = {}
+    for chunk in local_chunks:
+        item = _as_dict(chunk)
+        chunk_id, source_id = item.get("id"), item.get("source_id")
+        if isinstance(chunk_id, str) and isinstance(source_id, str) and source_id.strip():
+            chunk_sources[chunk_id] = source_id
+
+    source_counts = {tech: {} for tech in technologies}
+    for claim in claims:
+        if claim["technology"] == "both":
+            claim_technologies_for_counts = technologies
+        elif claim["technology"] in source_counts:
+            claim_technologies_for_counts = [claim["technology"]]
+        else:
+            claim_technologies_for_counts = []
+        for reference in claim["references"]:
+            source_id = chunk_sources.get(reference["chunk_id"])
+            if source_id is None:
+                continue
+            for technology in claim_technologies_for_counts:
+                counts = source_counts[technology]
+                counts[source_id] = counts.get(source_id, 0) + 1
+
+    diagnostics = {
+        "view": view,
+        "technologies": {},
+    }
+    for technology, counts in source_counts.items():
+        total = sum(counts.values())
+        diagnostics["technologies"][technology] = {
+            "distinct_sources": len(counts),
+            "max_source_share": max(counts.values(), default=0) / total if total else 0.0,
+        }
+
+    return updated, diagnostics

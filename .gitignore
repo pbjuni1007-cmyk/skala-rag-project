@@ -211,3 +211,4 @@
 !/tests/test_research_balance.py
 !/tests/test_research_maturity.py
 !/agents/researchers/followup.py
+!/tests/test_research_followup.py

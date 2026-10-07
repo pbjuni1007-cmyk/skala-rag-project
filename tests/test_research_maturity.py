@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 from types import SimpleNamespace
 
@@ -9,6 +10,7 @@ import pytest
 
 from agents.researchers.maturity import FACETS, run_maturity
 from agents.researchers.result import RetrievalFailure, node_error
+from rag.graph import StructuredValidationError
 from rag.llm import APIError
 from tests.test_pipeline_improvements import assessment, pipeline, review
 
@@ -209,27 +211,63 @@ def test_api_errors_propagate_and_map_to_contract_codes(tmp_path, message, expec
     assert [call[0] for call in p.gateway.calls] == ["research_queries"]
 
 
-def test_invalid_assessment_after_rewrite_is_failed_and_calls_stay_bounded(tmp_path):
+@pytest.mark.parametrize('failure', ['schema', 'citation'])
+def test_invalid_assessment_stops_without_research_and_preserves_success(tmp_path, failure):
     responses = successful_responses()
     responses.update({
-        "research_kivi_0": ["{}"],
-        "research_kivi_0_repair": ["{}"],
         "rewrite_kivi": queries_for("KIVI", " revised"),
         "retrieval_review_kivi_1": review_for("KIVI"),
-        "research_kivi_1": ["{}"],
-        "research_kivi_1_repair": ["{}"],
+        "research_kivi_1": assessment("KIVI"),
     })
+    if failure == 'schema':
+        responses.update(research_kivi_0="{}", research_kivi_0_repair="{}")
+        repair_purpose = 'research_kivi_0_repair'
+    else:
+        bad = assessment("KIVI")
+        quote = 'The source does not contain this quotation.'
+        bad['claims'][0]['references'][0]['quote'] = quote
+        responses.update(research_kivi_0=bad, research_kivi_0_repair_0={
+            'patches': [{'target_id': 'claims:0:reference:0', 'quote': quote}],
+        })
+        repair_purpose = 'research_kivi_0_repair_0'
+    good = deepcopy(responses['research_infinigen_0'])
     p = make_pipeline(tmp_path, responses)
 
-    with pytest.raises(ValueError) as exc:
-        run_maturity(p, request())
+    assessments, _ = run_maturity(p, request())
 
-    assert error_code(node_error(exc.value, "research")) == "invalid_response"
+    assert assessments['research_kivi']['status'] == 'insufficient'
+    assert assessments['research_kivi']['claims'] == []
+    assert any('구조·인용 검증' in gap for gap in assessments['research_kivi']['gaps'])
+    assert assessments['research_infinigen'] == good
     purposes = [call[0] for call in p.gateway.calls]
     assert purposes.count("retrieval_review_kivi_0") == 1
-    assert purposes.count("retrieval_review_kivi_1") == 1
-    assert purposes.count("rewrite_kivi") == 1
+    assert "retrieval_review_kivi_1" not in purposes
+    assert "rewrite_kivi" not in purposes
     assert purposes.count("research_kivi_0") == 1
-    assert purposes.count("research_kivi_1") == 1
-    assert purposes.count("research_kivi_0_repair") == 1
-    assert purposes.count("research_kivi_1_repair") == 1
+    assert "research_kivi_1" not in purposes
+    assert purposes.count(repair_purpose) == 1
+    assert len([s for s in p.corpus.searches if s[1] == 'KIVI']) == 4
+    stored = json.loads((tmp_path / "retrieval/research.json").read_text())
+    diagnostic, = stored['technologies']['KIVI']
+    assert diagnostic['status'] == 'invalid_response'
+    assert diagnostic['failure_stage'] == 'assessment'
+    assert diagnostic['missing_facets'] == [] and diagnostic['errors']
+
+
+def test_invalid_retrieval_review_fails_without_interpreting_error_as_missing_evidence(tmp_path):
+    responses = successful_responses()
+    responses.update({
+        'retrieval_review_kivi_0': '{}',
+        'retrieval_review_kivi_0_repair': '{}',
+        'rewrite_kivi': queries_for('KIVI', ' revised'),
+        'retrieval_review_kivi_1': review_for('KIVI'),
+        'research_kivi_1': assessment('KIVI'),
+    })
+    p = make_pipeline(tmp_path, responses)
+    with pytest.raises(StructuredValidationError) as exc:
+        run_maturity(p, request())
+    assert error_code(node_error(exc.value, 'research')) == 'invalid_response'
+    purposes = [call[0] for call in p.gateway.calls]
+    assert 'rewrite_kivi' not in purposes and 'research_kivi_0' not in purposes
+    assert purposes.count('retrieval_review_kivi_0_repair') == 1
+    assert len([s for s in p.corpus.searches if s[1] == 'KIVI']) == 4

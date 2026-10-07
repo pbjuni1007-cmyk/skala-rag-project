@@ -218,7 +218,10 @@ def _technology_research(pipeline, technology, initial_queries, feedback):
                     assessment = pipeline.structured(
                         f"research_{technology.lower()}_{retrieval_attempt}",
                         Assessment,
-                        RESEARCH_ASSESSMENT_PROMPT,
+                        RESEARCH_ASSESSMENT_PROMPT + (
+                            "\n각 quote는 해당 chunk_id 원문의 한 연속 구간을 그대로 복사하라. "
+                            "생략부호로 떨어진 구간을 연결하거나 표현·대소문자·하이픈을 바꾸지 마라."
+                        ),
                         {
                             "technology": technology,
                             "retrieval_attempt": retrieval_attempt,
@@ -233,13 +236,26 @@ def _technology_research(pipeline, technology, initial_queries, feedback):
                     assessment, balance = _balance(technology, assessment, chunks)
                     return assessment, chunks, diagnostics, query_log, balance
             except StructuredValidationError as exc:
+                errors = deepcopy(exc.errors)
                 round_log.update(
                     status="invalid_response",
-                    errors=deepcopy(getattr(exc, "errors", ["Invalid structured response"])),
+                    errors=errors,
+                    failure_stage="assessment" if review is not None else "retrieval_review",
+                    missing_facets=[],
                 )
-                reasons = deepcopy(getattr(exc, "errors", ["Invalid structured response"]))
-                if retrieval_attempt:
+                # structured() has already exhausted its one correction round.
+                # Invalid output is not evidence of missing retrieval facets.
+                if review is None:
                     raise
+                reason = (
+                    "검색 검토에서 부족한 항목은 없었으나 조사 결과의 구조·인용 검증에 실패했습니다. "
+                    "허용된 보정을 마쳐 미검증 주장을 제외하고 전체 재검색을 중단했습니다. "
+                    "검증 오류: " + json.dumps(errors, ensure_ascii=False)
+                )
+                assessment, balance = _balance(
+                    technology, _assessment("insufficient", [reason]), chunks
+                )
+                return assessment, chunks, diagnostics, query_log, balance
 
             if reasons is None:
                 raise RuntimeError("Research review produced no decision")

@@ -1,7 +1,11 @@
 from copy import deepcopy
+import json
+from pathlib import Path
 import pytest
-from rag.evidence import validate_perspective
-from rag.repair import plan_repairs, apply_patch
+from rag.evidence import validate_assessment, validate_perspective
+from rag.graph import StructuredValidationError
+from rag.repair import plan_repairs, apply_patch, source_verbatim_quote
+from rag.schemas import Assessment
 from test_pipeline_improvements import perspective_assessment, chunks, pipeline
 
 
@@ -125,3 +129,95 @@ def test_typography_restoration_avoids_paid_correction_but_runs_validator(tmp_pa
                          lambda v: validate_perspective(v, source_chunks, 'domain'))
     assert fixed['claims'][0]['references'][-1]['quote'] == 'The model preserves accu- racy.'
     assert len(p.gateway.calls) == 1
+
+
+@pytest.fixture
+def main01_citations():
+    return json.loads((Path(__file__).parent / 'fixtures/research/main01_citations.json').read_text())
+
+
+def citation_assessment(reference):
+    value = perspective_assessment('domain')
+    value['claims'] = [value['claims'][0]]
+    value['claims'][0]['references'] = [deepcopy(reference)]
+    return value
+
+
+def test_main01_wrong_existing_chunk_can_rebind_to_supplied_literal_source(tmp_path, main01_citations):
+    data = main01_citations
+    source_chunks = data['chunks']
+    value = citation_assessment(data['wrongly_bound'])
+    before = deepcopy(value)
+    errors = validate_assessment(value, source_chunks, 'KIVI')
+    assert errors == ['claim 0: quotation does not exist in supplied chunk kivi:p9:t500']
+
+    unit, = plan_repairs(value, errors, {}, source_chunks)
+    assert unit.kind == 'reference'
+    supporting = next(c for c in source_chunks if c['id'] == data['supporting_chunk_id'])
+    assert unit.content['chunks'] == [supporting]
+    patch = {'patches': [{'target_id': unit.target_id, 'chunk_id': supporting['id'],
+                          'quote': data['wrongly_bound']['quote']}]}
+    p = pipeline(tmp_path, [value, patch])
+    fixed = p.structured('research_kivi_0', Assessment, 'test', {'chunks': source_chunks},
+                         lambda answer: validate_assessment(answer, source_chunks, 'KIVI'))
+    expected = deepcopy(value)
+    expected['claims'][0]['references'][0] = {
+        'chunk_id': supporting['id'],
+        'quote': source_verbatim_quote(data['wrongly_bound']['quote'], supporting['text']),
+    }
+    assert fixed == expected and value == before
+    assert 'resid- ual' in fixed['claims'][0]['references'][0]['quote']
+    assert not validate_assessment(fixed, source_chunks, 'KIVI')
+    assert len(p.gateway.calls) == 2
+
+
+@pytest.mark.parametrize('excluded', ['not_supplied', 'other_technology'])
+def test_main01_reference_cannot_rebind_outside_supplied_technology(main01_citations, excluded):
+    data = main01_citations
+    value = citation_assessment(data['wrongly_bound'])
+    source_chunks = deepcopy(data['chunks'])
+    supporting = next(c for c in source_chunks if c['id'] == data['supporting_chunk_id'])
+    if excluded == 'not_supplied':
+        source_chunks.remove(supporting)
+    else:
+        supporting['technology'] = 'InfiniGen'
+    unit, = plan_repairs(value, validate_assessment(value, source_chunks, 'KIVI'), {}, source_chunks)
+    assert unit.kind == 'citation'
+    assert all(c['id'] != supporting['id'] for c in unit.content['chunks'])
+
+
+@pytest.mark.parametrize('change', ['different_literal', 'other_chunk', 'invented'])
+def test_main01_rebind_preserves_the_original_quote_and_verified_candidates(main01_citations, change):
+    data = main01_citations
+    value = citation_assessment(data['wrongly_bound'])
+    source_chunks = data['chunks']
+    unit, = plan_repairs(value, validate_assessment(value, source_chunks, 'KIVI'), {}, source_chunks)
+    item = {'target_id': unit.target_id, 'chunk_id': data['supporting_chunk_id'],
+            'quote': data['wrongly_bound']['quote']}
+    if change == 'different_literal':
+        item['quote'] = 'The effect of residual length.'
+    elif change == 'other_chunk':
+        item['chunk_id'] = data['wrongly_bound']['chunk_id']
+        item['quote'] = 'Table 5: Ablation study of KIVI by changing group size G and residual length R.'
+    else:
+        item['chunk_id'] = 'kivi:invented'
+    with pytest.raises(ValueError):
+        apply_patch(value, unit, {'patches': [item]})
+
+
+@pytest.mark.parametrize('failure', ['paraphrased', 'non_contiguous'])
+def test_main01_nonliteral_quotes_still_fail_after_one_correction(tmp_path, main01_citations, failure):
+    data = main01_citations
+    value = citation_assessment(data[failure])
+    source_chunks = data['chunks']
+    source = next(c for c in source_chunks if c['id'] == data[failure]['chunk_id'])
+    assert source_verbatim_quote(data[failure]['quote'], source['text']) == data[failure]['quote']
+    check = lambda answer: validate_assessment(answer, source_chunks, 'KIVI')
+    errors = check(value)
+    assert len(errors) == 1 and 'quotation does not exist' in errors[0]
+    unit, = plan_repairs(value, errors, {}, source_chunks)
+    patch = {'patches': [{'target_id': unit.target_id, 'quote': data[failure]['quote']}]}
+    p = pipeline(tmp_path, [value, patch])
+    with pytest.raises(StructuredValidationError, match='quotation does not exist'):
+        p.structured('research_kivi_0', Assessment, 'test', {'chunks': source_chunks}, check)
+    assert len(p.gateway.calls) == 2

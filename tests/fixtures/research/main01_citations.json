@@ -1,0 +1,71 @@
+{
+  "provenance": {
+    "run_id": "agent-20261007-main-01",
+    "index_hash": "d0dfc6b526c9acae7d1499fadf604af60ddd1a9d7a716f0f061cc8cfe17cb503",
+    "files_sha256": {
+      "runtime/index/index.json": "78c7035148e49932be942dcbcbd5e1bc8fd0c11fb580868b66047cd3d2d69e58",
+      "live/agent-20261007-main-01/research/research/c1d02664aef0b2d3-research-1/invalid/research_kivi_0-0.json": "34043c63f678cf9e7fac1760e843facf9390b13eb16830beb0d61b1aa8f47a6b",
+      "live/agent-20261007-main-01/research/research/c1d02664aef0b2d3-research-1/invalid/research_kivi_1-0.json": "4a09d050832f893230b2c33cb65004f3f5ed715e806d0074a1e131b8c4411098"
+    }
+  },
+  "wrongly_bound": {
+    "chunk_id": "kivi:p9:t500",
+    "quote": "while a residual length of 128 achieves good results, 32 and 96 yield similar outcomes, but a residual length of 64 results in the worst performance."
+  },
+  "supporting_chunk_id": "kivi:p7:t750",
+  "paraphrased": {
+    "chunk_id": "kivi:p2:t0",
+    "quote": "Our findings indicate that: • For key cache, there are a few fixed channels whose magnitudes are very large"
+  },
+  "non_contiguous": {
+    "chunk_id": "kivi:p7:t750",
+    "quote": "the performance significantly decreases when the group size reaches 128. ... a residual length of 64 results in the worst performance."
+  },
+  "chunks": [
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 2,
+      "text": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache per-token quantization per-channel quantization Figure 1: Definition of per-token and per-channel quantiza- tion. X∈ Rlprompt×d is key/value cache where lprompt is the number of tokens and d is the number of channels. zX is the zero-point, sX is the scaling factor. plore the element distribution of KV cache to understand the hardness and limitation of KV cache quantization. To fill the gap, we study the element distribution of KV cache. Our analysis suggests: • For key cache, there are a few fixed channels whose magnitudes are very large, which is consistent with previous finding (Lin et al., 2023; Xiao et al., 2023a). Thus, as shown in Figure 1 right, key cache should be quantized per-channel, i.e., group elements along the channel dimension and quantize them together. In this way, it can confine the error to each individual channel, without impacting the other normal channels. • For value cache, there is no obvious outlier pattern. Al- though value cache has no obvious outlier pattern, we experimentally show that it can only be quantized per- token because it is used to calculate the attention output, which is essential",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache per-token quantization per-channel quantization Figure 1: Definition of per-token and per-channel ",
+      "id": "kivi:p2:t0",
+      "token_start": 0,
+      "char_start": 0,
+      "char_end": 1201,
+      "captions": [
+        "Figure 1: Definition of per-token and per-channel quantiza- tion",
+        "Figure 1 right, key cache should be quantized per-channel, i"
+      ]
+    },
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 7,
+      "text": "eld similar results, whereas the performance significantly decreases when the group size reaches 128. Note the zero-point and the scaling factor mentioned in Section 3.1 are calculated according to this group size; where the choice of group size will greatly impact the KV cache compression effect under a long input. The effect of residual length. We fix the group size at 32 and vary the residual length across 32, 64, 96, and 128. As shown in Table 5, there is no consistent pattern between residual lengths and model accuracy. Namely, while a resid- ual length of 128 achieves good results, 32 and 96 yield similar outcomes, but a residual length of 64 results in the worst performance. We emphasize that while we observe no significance among residual lengths of{32, 96, 128}, hav- ing a reasonably large residual length is important; as it brings much performance boosts on hard tasks like GSM8K, again as shown in Table 5. 4.2.4. E FFICIENCY COMPARISON To evaluate the wall-clock time efficiency ofKIVI, follow- ing vLLM (Kwon et al., 2023), we synthesize workloads based on ShareGPT (sha, 2023), which contain input and output texts of real LLM services. On average, the data set has an input prompt length lpromp",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache 0.5K2K4K7K9K11K13K16K18K20K Word Count 0.0 0.11 0.22 0.33 0.44 0.56 0.67 0.78 0.89 1.0 Depth 20K w",
+      "id": "kivi:p7:t750",
+      "token_start": 750,
+      "char_start": 2074,
+      "char_end": 3295,
+      "captions": [
+        "Table 5, there is no consistent pattern between residual lengths and model accuracy",
+        "Table 5"
+      ]
+    },
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 9,
+      "text": "Mistral-7B 16bit 8.12 19.98 19.99 67.50 89.80 41.69 66.59 58.99 46.58 KIVI-4 7.89 20.06 20.58 67.50 89.80 41.56 66.45 58.62 46.56 KIVI-2 6.92 19.71 17.92 66.50 89.63 41.66 65.52 58.99 45.85 Table 5: Ablation study of KIVI by changing group size G and residual length R. Model Group Size GSM8K Llama2-13B 32 20.77 64 21.00 128 17.29 Model Residual Length GSM8K Llama2-13B 32 20.62 64 19.86 96 20.55 128 20.77 One essential recipe of KIVI is the per-channel quantiza- tion scheme designed based on the observation made in Section 3.2 and Figure 2. ATOM (Zhao et al., 2024) also indicates that key cache exhibits more outliers compared to the value cache. KIVI provides further extensive analysis and leverages this observation to implement per-channel quantization. A similar observation and approach has been independently discovered and developed in the concurrent work KVQuant (Hooper et al., 2024). vLLM (Kwon et al., 2023) and S3 (Jin et al., 2023) are system-level works, which include memory management through the use of Paged",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache Table 4: Performance evaluation of KIVI on various models across a range of benchmarks in LongBenc",
+      "id": "kivi:p9:t500",
+      "token_start": 500,
+      "char_start": 1328,
+      "char_end": 2360,
+      "captions": [
+        "Table 5: Ablation study of KIVI by changing group size G and residual length R",
+        "Figure 2"
+      ]
+    }
+  ]
+}

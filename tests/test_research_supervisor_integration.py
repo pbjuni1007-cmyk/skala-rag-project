@@ -171,19 +171,33 @@ def test_actual_empty_search_is_insufficient_and_stops_at_worker_limit(tmp_path)
     assert [call[0] for call in pipeline.gateway.calls] == ["research_queries"]
 
 
-def test_actual_partial_research_feedback_rechecks_only_missing_technology(tmp_path):
+@pytest.mark.parametrize('cause', ['empty_search', 'invalid_citation'])
+def test_actual_partial_research_feedback_rechecks_only_missing_technology(tmp_path, cause):
     supervisor, pipeline = _supervisor(tmp_path, scores="paper")
-    search = pipeline.corpus.search
-    pipeline.corpus.search = lambda query, technology, top_k: (
-        [] if technology == "KIVI" and "feedback" not in query
-        else search(query, technology, top_k)
-    )
+    if cause == 'empty_search':
+        search = pipeline.corpus.search
+        pipeline.corpus.search = lambda query, technology, top_k: (
+            [] if technology == "KIVI" and "feedback" not in query
+            else search(query, technology, top_k)
+        )
+    else:
+        good = deepcopy(pipeline.gateway.responses['research_kivi_0'])
+        bad = deepcopy(good)
+        quote = 'A quotation absent from every supplied source.'
+        bad['claims'][0]['references'][0]['quote'] = quote
+        pipeline.gateway.responses['research_kivi_0'] = [bad, good]
+        pipeline.gateway.responses['research_kivi_0_repair_0'] = {
+            'patches': [{'target_id': 'claims:0:reference:0', 'quote': quote}],
+        }
     pipeline.gateway.responses["rewrite_kivi_feedback"] = queries_for("KIVI", " feedback")
     initial = _run(supervisor, pause_after=2)
     previous = supervisor.store.get(initial["results"]["research"])
     assert ResearchResult.model_validate(previous).status == "insufficient"
     assert previous["assessments"]["research_kivi"]["claims"] == []
     assert previous["assessments"]["research_infinigen"]["status"] == "ok"
+    if cause == 'invalid_citation':
+        assert any('구조·인용 검증' in gap for gap in previous['assessments']['research_kivi']['gaps'])
+        assert 'rewrite_kivi' not in [call[0] for call in pipeline.gateway.calls]
 
     state = _run(supervisor, resume=True, pause_after=2)
 

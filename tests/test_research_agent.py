@@ -156,3 +156,24 @@ def test_runner_failure_returns_failed_result_and_writes_error_json(tmp_path):
     assert json.loads((request_dir / "error.json").read_text()) == result["error"]
     assert json.loads((request_dir / "result.json").read_text()) == result
     assert (request_dir / "retrieval" / "research.json").is_file()
+
+
+def test_invalid_core_citation_preserves_other_technology_in_insufficient_v1_result(tmp_path):
+    responses = successful_responses()
+    bad = assessment('KIVI')
+    quote = 'A quotation absent from every supplied source.'
+    bad['claims'][0]['references'][0]['quote'] = quote
+    responses.update(research_kivi_0=bad, research_kivi_0_repair_0={
+        'patches': [{'target_id': 'claims:0:reference:0', 'quote': quote}],
+    })
+    pipeline = _pipeline(tmp_path, responses)
+    result = ResearchAgent(pipeline).research(_request('research', 'citation-failure-1'))
+
+    assert ResearchResult.model_validate(result).status == 'insufficient'
+    assert result['error'] is None
+    assert result['assessments']['research_kivi']['claims'] == []
+    assert any('구조·인용 검증' in gap for gap in result['assessments']['research_kivi']['gaps'])
+    assert result['assessments']['research_infinigen'] == assessment('InfiniGen')
+    assert [chunk['id'] for chunk in result['chunks']] == ['InfiniGen']
+    assert set(result['sources']) == {'InfiniGen'}
+    assert trace_errors(result) == []

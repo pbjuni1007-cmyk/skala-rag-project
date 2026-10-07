@@ -16,6 +16,8 @@ REPAIR_INSTRUCTIONS = (
     '주어진 오류 항목만 수정하고 지정된 patch schema로 답하라. '
     '요청한 문장·필드 외에는 변경하지 말고 사실·실험조건·한계를 보존하라. '
     '인용은 제공된 전체 원문에서 그대로 복사하며 하이픈·띄어쓰기를 추정해서 바꾸지 마라. '
+    'quote는 한 청크의 연속된 원문 구간이어야 하며 생략부호로 다른 구간을 이어 붙이지 마라. '
+    '주장을 뒷받침하는 원문을 찾지 못하면 인용을 만들지 말고 기존 값을 그대로 반환하라. '
     '지정된 target_id를 정확히 한 번씩 반환하고 새 ID·근거·주장을 추가하지 마라.'
 )
 
@@ -126,12 +128,21 @@ def plan_repairs(value, errors, content, source_chunks):
                 return None
             for j, ref in bad:
                 target = f'{collection}:{index}:reference:{j}'
-                if ref['chunk_id'] not in lookup:
-                    relevant = [deepcopy(c) for c in chunks
-                                if c.get('technology') in (None, claim['technology'], 'both')]
+                relevant = [deepcopy(c) for c in chunks
+                            if c.get('technology') in (None, claim['technology'], 'both')]
+                if ref['chunk_id'] in lookup:
+                    # A real ID can still point to the wrong chunk. Permit a
+                    # rebind only when another supplied source contains this
+                    # quotation, allowing the existing PDF-wrap restoration.
+                    relevant = [c for c in relevant if c['id'] != ref['chunk_id']
+                                and len(normalized(ref['quote'])) >= 12
+                                and normalized(source_verbatim_quote(ref['quote'], c['text']))
+                                in normalized(c['text'])]
+                if ref['chunk_id'] not in lookup or relevant:
                     units.append(RepairUnit('reference', target, ReferencePatches,
                         {'target_id': target, 'claim': deepcopy(claim), 'reference': deepcopy(ref),
                          'errors': failures, 'chunks': relevant,
+                         'preserve_quote': ref['chunk_id'] in lookup,
                          'correction': 'Replace only this invalid reference with a supplied chunk ID and its exact quotation.'},
                         collection, index, j))
                     continue
@@ -220,6 +231,10 @@ def apply_patch(value, unit, patch):
         quote = normalized(verbatim)
         if len(quote) < 12 or quote not in normalized(chunk['text']):
             raise ValueError('Reference patch quotation must exist in the supplied full source chunk')
+        if unit.content.get('preserve_quote'):
+            original = source_verbatim_quote(unit.content['reference']['quote'], chunk['text'])
+            if quote != normalized(original):
+                raise ValueError('Reference rebind must preserve the original quotation')
         claim['references'][unit.reference_index] = {'chunk_id': item['chunk_id'], 'quote': verbatim}
     elif unit.kind == 'citation':
         original_ref = result[unit.collection][unit.index]['references'][unit.reference_index]

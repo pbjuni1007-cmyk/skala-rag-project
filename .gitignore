@@ -245,3 +245,4 @@
 !/tests/test_research_samples.py
 !/tests/test_research_supervisor_integration.py
 !/tests/test_agent_execution_integration.py
+!/tests/fixtures/research/main01_citations.json

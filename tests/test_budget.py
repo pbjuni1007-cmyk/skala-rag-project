@@ -62,3 +62,16 @@ def test_wrong_tier_never_releases_reservation(settings):
     with pytest.raises(RuntimeError):
         b.settle(r, {"service_tier": "fast", "usage": {"input_tokens": 10, "output_tokens": 10}})
     assert b.summary()["unsettled_calls"] == 1
+
+
+def test_explicit_report_input_limit_preserves_default_and_prices_reservation(settings):
+    assert settings.integer("LLM_MAX_INPUT_TOKENS", 24000) == 24000
+    settings.values["LLM_MAX_INPUT_TOKENS"] = "40000"
+    settings.validate_paid()
+    assert round(Budget(settings).cost(40000, 64000), 2) == 143.22
+
+
+def test_input_above_reviewed_report_limit_is_rejected(settings):
+    settings.values["LLM_MAX_INPUT_TOKENS"] = "40001"
+    with pytest.raises(ValueError, match="40,000"):
+        settings.validate_paid()

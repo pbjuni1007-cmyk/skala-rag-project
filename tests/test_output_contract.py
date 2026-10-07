@@ -1,10 +1,24 @@
 """The generated report must follow the approved Markdown reading order."""
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
+import yaml
 
 from rag.evidence import report_errors
 from test_pipeline_improvements import chunks, report_fixture
+
+
+def test_public_report_contract_records_writer_and_hybrid_judge_boundary():
+    contract = yaml.safe_load((Path(__file__).resolve().parents[1] / "config/report-contract.yaml").read_text())
+    evaluation = contract["report"]["evaluation"]
+
+    assert contract["version"] == 4
+    assert {"writer", "quality_evaluator"} <= set(contract["roles"])
+    assert evaluation["method"] == "hybrid"
+    assert set(evaluation["criteria"]) == {"groundedness", "neutrality", "bias_control", "coverage"}
+    assert evaluation["feedback_state_key"] == "report_revision_requests"
+    assert evaluation["judge_is_independent_model"] is False
 
 
 @pytest.mark.parametrize("summary_count", [2, 3])

@@ -1,0 +1,98 @@
+{
+  "provenance": {
+    "run_id": "agent-20261007-main-07",
+    "source": "Actual initial stakeholder response; source chunks from unchanged frozen corpus; public source excerpts only.",
+    "cases": "Wrong ID and initial case; overlapping identical physical span; initial case only."
+  },
+  "cases": [
+    {
+      "case": "wrong_chunk_and_case",
+      "technology": "KIVI",
+      "reference": {
+        "chunk_id": "kivi:p7:t500",
+        "quote": "we fix the group size at 32 and vary the residual length across 32, 64, 96, and 128."
+      },
+      "expected_chunk_id": "kivi:p7:t750"
+    },
+    {
+      "case": "overlapping_same_span",
+      "technology": "KIVI",
+      "reference": {
+        "chunk_id": "kivi:p9:t500",
+        "quote": "the performance significantly decreases when the group size reaches 128."
+      },
+      "expected_chunk_id": "kivi:p7:t500"
+    },
+    {
+      "case": "initial_case_only",
+      "technology": "InfiniGen",
+      "reference": {
+        "chunk_id": "infinigen:p11:t500",
+        "quote": "we choose a Counter-based victim selection policy instead of an LRU-based approach"
+      },
+      "expected_chunk_id": "infinigen:p11:t500"
+    }
+  ],
+  "chunks": [
+    {
+      "source_id": "infinigen",
+      "technology": "InfiniGen",
+      "page": 11,
+      "text": "accuracy similar to the full-cache baseline. Our skew- ing method effectively skews key and query matrices such that a few columns can better represent the original matrices. KV Cache Pool Management. Table 2 shows the perplexity of five different models with or without limiting the memory capacity for WikiText-2 and PTB. We compare FIFO-based, LRU-based, and Counter-based victim selection policies in Section 4.4 under the 80% memory limit of a full KV cache. We also present the perplexity results with no memory limit (100%). The FIFO-based approach shows the worst model performance because it simply deletes the oldest KV entry regardless of its importance. The LRU and Counter-based approaches show perplexity that is almost similar to that with no memory limit. We choose a Counter-based victim selection policy instead of an LRU-based approach because the LRU- based approach typically needs to maintain a doubly linked list queue with locks for atomic memory updates. 0 200 400 600 UVM UVM FlexGen FlexGen FlexGen InfiniGen Latency (s) Prefill Decode 2007.4 + H2O+ H2O + INT4 Figure 14: Inference latency on OPT-13B with a sequence length of 2048 (1920 input and 128 output tokens) and a batch size of 20.",
+      "section": "Table 2: Perplexity on WikiText-2 and PTB with 2048 sequence length with or without KV cache memory limits. Lower is better. Scheme OPT-6.7B OPT-13B OPT-30B Lla",
+      "id": "infinigen:p11:t500",
+      "token_start": 500,
+      "char_start": 1762,
+      "char_end": 2979,
+      "captions": [
+        "Table 2 shows the perplexity of five different models with or without limiting the memory capacity for WikiText-2 and PTB",
+        "Figure 14: Inference latency on OPT-13B with a sequence length of 2048 (1920 input and 128 output tokens) and a batch size of 20"
+      ]
+    },
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 7,
+      "text": "the tokenizer difference. The final token length is noted in the upper right corners of each figure. Detailed setting can be found in Appendix B. ious hard long context generation tasks. We present ad- ditional results using Llama3-8b, Mistral-7B-v0.2, and LongChat-7B-v1.5, which can be found in Appendix D. NIAH Results. From Figure 4, we observe that KIVI can still maintain the retrieval ability of LLMs even with 2bit KV Cache. Detailed NIAH setting can be found in Appendix B. 4.2.3. A BLATION In this section, we benchmark KIVI on GSM8K, one of the hardest generation tasks, to show the effect of hyperpa- rameters group size G and residual length R on the model performance. For full results of KIVI with a residual length of 32, please refer to Appendix C. The effect of group size. We fix the residual length at 128 and vary the group sizes to 32, 64, and 128. From Table 5, we observe that group sizes 32 and 64 yield similar results, whereas the performance significantly decreases when the group size reaches 128. Note the zero-point and the scaling factor mentioned in Section 3.1 are calculated according to this group size; where the choice of group size will great",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache 0.5K2K4K7K9K11K13K16K18K20K Word Count 0.0 0.11 0.22 0.33 0.44 0.56 0.67 0.78 0.89 1.0 Depth 20K w",
+      "id": "kivi:p7:t500",
+      "token_start": 500,
+      "char_start": 1149,
+      "char_end": 2330,
+      "captions": [
+        "Figure 4, we observe that KIVI can still maintain the retrieval ability of LLMs even with 2bit KV Cache",
+        "Table 5, we observe that group sizes 32 and 64 yield similar results, whereas the performance significantly decreases when the "
+      ]
+    },
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 7,
+      "text": "eld similar results, whereas the performance significantly decreases when the group size reaches 128. Note the zero-point and the scaling factor mentioned in Section 3.1 are calculated according to this group size; where the choice of group size will greatly impact the KV cache compression effect under a long input. The effect of residual length. We fix the group size at 32 and vary the residual length across 32, 64, 96, and 128. As shown in Table 5, there is no consistent pattern between residual lengths and model accuracy. Namely, while a resid- ual length of 128 achieves good results, 32 and 96 yield similar outcomes, but a residual length of 64 results in the worst performance. We emphasize that while we observe no significance among residual lengths of{32, 96, 128}, hav- ing a reasonably large residual length is important; as it brings much performance boosts on hard tasks like GSM8K, again as shown in Table 5. 4.2.4. E FFICIENCY COMPARISON To evaluate the wall-clock time efficiency ofKIVI, follow- ing vLLM (Kwon et al., 2023), we synthesize workloads based on ShareGPT (sha, 2023), which contain input and output texts of real LLM services. On average, the data set has an input prompt length lpromp",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache 0.5K2K4K7K9K11K13K16K18K20K Word Count 0.0 0.11 0.22 0.33 0.44 0.56 0.67 0.78 0.89 1.0 Depth 20K w",
+      "id": "kivi:p7:t750",
+      "token_start": 750,
+      "char_start": 2074,
+      "char_end": 3295,
+      "captions": [
+        "Table 5, there is no consistent pattern between residual lengths and model accuracy",
+        "Table 5"
+      ]
+    },
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 9,
+      "text": "Mistral-7B 16bit 8.12 19.98 19.99 67.50 89.80 41.69 66.59 58.99 46.58 KIVI-4 7.89 20.06 20.58 67.50 89.80 41.56 66.45 58.62 46.56 KIVI-2 6.92 19.71 17.92 66.50 89.63 41.66 65.52 58.99 45.85 Table 5: Ablation study of KIVI by changing group size G and residual length R. Model Group Size GSM8K Llama2-13B 32 20.77 64 21.00 128 17.29 Model Residual Length GSM8K Llama2-13B 32 20.62 64 19.86 96 20.55 128 20.77 One essential recipe of KIVI is the per-channel quantiza- tion scheme designed based on the observation made in Section 3.2 and Figure 2. ATOM (Zhao et al., 2024) also indicates that key cache exhibits more outliers compared to the value cache. KIVI provides further extensive analysis and leverages this observation to implement per-channel quantization. A similar observation and approach has been independently discovered and developed in the concurrent work KVQuant (Hooper et al., 2024). vLLM (Kwon et al., 2023) and S3 (Jin et al., 2023) are system-level works, which include memory management through the use of Paged",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache Table 4: Performance evaluation of KIVI on various models across a range of benchmarks in LongBenc",
+      "id": "kivi:p9:t500",
+      "token_start": 500,
+      "char_start": 1328,
+      "char_end": 2360,
+      "captions": [
+        "Table 5: Ablation study of KIVI by changing group size G and residual length R",
+        "Figure 2"
+      ]
+    }
+  ]
+}

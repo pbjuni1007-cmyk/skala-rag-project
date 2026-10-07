@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import re
 import sys
 import uuid
 import yaml
@@ -45,19 +46,46 @@ def main():
     parser.add_argument("--config", default="config/run.yaml")
     parser.add_argument("--prepare", action="store_true", help="Download sources and build local embeddings, no GPT calls")
     parser.add_argument("--render", type=Path, help="Rewrite Markdown and PDF from a saved, validated run, no GPT calls")
+    parser.add_argument("--agent-publish-request", type=Path,
+                        help="Publish one Agent contract request from JSON, no GPT calls")
+    parser.add_argument("--agent", action="store_true", help="Run the team Supervisor with real research, writer and evaluator nodes")
+    parser.add_argument("--agent-resume", type=Path, help="With --agent, continue the same saved Agent checkpoint and call budget")
     parser.add_argument("--refresh-web", action="store_true")
     recovery = parser.add_mutually_exclusive_group()
     recovery.add_argument("--reuse-calls", type=Path, help="Rerun current graph; reuse only exact successful requests when non-code inputs match")
     recovery.add_argument("--resume", type=Path, help="Reuse exact-input successful calls from a compatible saved run")
     args = parser.parse_args()
+    if args.agent_resume and not args.agent:
+        parser.error("--agent-resume requires --agent")
+    if args.agent and (args.prepare or args.render or args.agent_publish_request or args.resume or args.reuse_calls):
+        parser.error("--agent cannot be combined with legacy RAG execution or call-cache modes")
+    if args.agent_resume and args.refresh_web:
+        parser.error("Agent checkpoint recovery cannot refresh source snapshots")
     settings = Settings.load()
+    if args.agent_publish_request:
+        if args.prepare or args.render or args.refresh_web or args.reuse_calls or args.resume:
+            parser.error("--agent-publish-request cannot be combined with other execution modes")
+        request = json.loads(args.agent_publish_request.read_text(encoding="utf-8"))
+        run_id = request.get("run_id") if isinstance(request, dict) else None
+        if not isinstance(run_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,79}", run_id):
+            raise ValueError("Agent run_id must be a safe output directory name")
+        from rag.render import publish
+        out = Path(settings.get("RAG_OUTPUT_DIR", "outputs")) / run_id
+        with trace_run(settings, run_id) as trace:
+            result = publish(request, out, settings)
+            trace["status"] = "completed" if result["status"] == "ok" else "failed"
+        write_json(out / "publish_result.json", result)
+        print(json.dumps({"run": str(out), "publish_result": result}, ensure_ascii=False))
+        return 0 if result["status"] == "ok" else 2
     config = yaml.safe_load(Path(args.config).read_text())
     if args.render:
         from rag.render import render_report
         state = json.loads((args.render / "state.json").read_text())
         if not state.get("validation_result", {}).get("passed"):
             raise ValueError("Cannot render a run that has not passed citation validation")
-        result = render_report(args.render, state["report"], state["joined"], state["source_registry"], settings, state["run_config"]["config"])
+        sources = state.get("report_result", {}).get("sources", state["source_registry"])
+        result = render_report(args.render, state["report"], state["joined"], sources,
+                               settings, state["run_config"]["config"], markdown=state.get("markdown"))
         print(json.dumps(result, ensure_ascii=False))
         return 0
     from rag.corpus import Corpus
@@ -71,6 +99,13 @@ def main():
     if args.prepare:
         print(json.dumps(index, ensure_ascii=False))
         return 0
+    if args.agent:
+        from rag.agent_runtime import execute_agent
+        result = execute_agent(config_path=args.config, settings=settings, corpus=corpus, index=index,
+                               retrieval_check=retrieval_check, resume=args.agent_resume,
+                               output_root=Path(settings.get("RAG_OUTPUT_DIR", "outputs")))
+        print(json.dumps({key: value for key, value in result.items() if key != "state"}, ensure_ascii=False))
+        return 0 if result["status"] == "completed" else 2
     from rag.llm import Gateway
     from rag.graph import Pipeline
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:6]

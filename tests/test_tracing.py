@@ -3,12 +3,14 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier, Event
 import json
 import time
+from pathlib import Path
 
 import pytest
 
 from rag.settings import Settings
-from rag.tracing import trace_run, span, submit, traced_node
+from rag.tracing import trace_agent_call, trace_decision, trace_run, span, submit, traced_node
 from rag.llm import Gateway, APIError
+from rag.render import build_report_markdown, publish
 from test_gateway import settings, completed, no_network_or_retry_wait
 
 
@@ -82,6 +84,167 @@ def test_parallel_parent_and_content_boundary(client):
     assert all(x['parent_run_id'] == research['id'] and x['trace_id'] == root['id'] for x in calls)
     assert all(x['extra']['metadata']['usage_metadata']['total_tokens'] == 10 for x in calls)
     assert client.kwargs['hide_inputs'] and client.kwargs['hide_outputs']
+
+
+def test_supervisor_decision_trace_keeps_routing_codes_without_raw_reason(client):
+    examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
+    decision = json.loads(examples.read_text(encoding='utf-8'))['examples']['supervisor_research']['payload']
+    with trace_run(enabled(), 'mock-contract-v1'):
+        with span('supervisor'):
+            trace_decision(decision)
+            trace_decision({**decision, 'request_id': 'mock-contract-v1:supervisor:6',
+                            'attempt': 6, 'next_action': 'secretvalue',
+                            'reason_code': 'secretvalue'})
+    creates = [data for kind, data in client.records if kind == 'create']
+    supervisor = next(run for run in creates if run['name'] == 'supervisor')
+    decisions = [run for run in creates if run['name'] == 'supervisor_decision']
+    assert len(decisions) == 2
+    assert all(run['parent_run_id'] == supervisor['id'] for run in decisions)
+    assert all(run['trace_id'] == supervisor['trace_id'] for run in decisions)
+    assert decisions[0]['extra']['metadata'] == {
+        'role': 'supervisor', 'run_id': 'mock-contract-v1',
+        'request_id': 'mock-contract-v1:supervisor:5', 'attempt': 5,
+        'next_action': 'market', 'reason_code': 'evidence_gap',
+        'evidence_sufficient': False,
+    }
+    assert decisions[1]['extra']['metadata'] == {
+        'role': 'supervisor', 'run_id': 'mock-contract-v1',
+        'request_id': 'mock-contract-v1:supervisor:6', 'attempt': 6,
+        'evidence_sufficient': False,
+    }
+    assert decision['reason'] not in json.dumps(client.records, default=str)
+    assert decision['feedback'][0] not in json.dumps(client.records, default=str)
+    assert 'secretvalue' not in json.dumps(client.records, default=str)
+
+
+@pytest.mark.parametrize('role,request_name,result_name', [
+    ('research', 'research_request', 'research_ok'),
+    ('market', 'market_request', 'market_insufficient'),
+    ('writer', 'write_request', 'report_ok'),
+    ('evaluator', 'evaluation_request', 'evaluation_pass'),
+    ('evaluator', 'evaluation_request', 'evaluation_error'),
+])
+def test_contract_worker_traces_ids_and_classification_only(client, role, request_name, result_name):
+    examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
+    payloads = json.loads(examples.read_text(encoding='utf-8'))['examples']
+    request = payloads[request_name]['payload']
+    response = json.loads(json.dumps(payloads[result_name]['payload']))
+    request['private_text'] = 'RAW_SENTINEL'
+    response['private_text'] = 'RAW_SENTINEL'
+    if isinstance(response.get('error'), dict):
+        response['error']['message'] = 'RAW_SENTINEL'
+    with trace_run(enabled(), request['run_id']):
+        assert trace_agent_call(role, request, lambda received: response) is response
+    creates = [data for kind, data in client.records if kind == 'create']
+    root = next(run for run in creates if run['name'] == 'rag_run')
+    worker = next(run for run in creates if run['name'] == role)
+    assert worker['parent_run_id'] == root['id'] and worker['trace_id'] == root['id']
+    metadata = worker['extra']['metadata']
+    assert all(metadata.get(key) == value for key, value in {
+        'role': role, 'run_id': request['run_id'], 'request_id': request['request_id'],
+        'attempt': request['attempt'],
+    }.items())
+    updates = [data for kind, data in client.records if kind == 'update' and data['id'] == worker['id']]
+    assert len(updates) == 1
+    final = updates[0]['extra']['metadata']
+    assert final['result_status'] == response['status']
+    assert final['status'] == ('failed' if response['status'] == 'failed' else 'completed')
+    assert updates[0]['error'] == ('execution_failed' if response['status'] == 'failed' else None)
+    if role == 'evaluator':
+        assert final['passed'] is response['passed']
+    if response.get('error'):
+        assert final['error_code'] == response['error']['code']
+    assert 'RAW_SENTINEL' not in json.dumps(client.records, default=str)
+
+
+def test_contract_worker_rejects_unrecognized_role_before_tracing():
+    with pytest.raises(ValueError, match='Unsupported traced Agent role'):
+        trace_agent_call('RAW_SENTINEL', {}, lambda request: request)
+
+
+@pytest.mark.parametrize('role,example_name,model_name', [
+    ('market', 'market_insufficient', 'ResearchResult'),
+    ('evaluator', 'evaluation_error', 'EvaluationResult'),
+])
+def test_contract_worker_traces_pydantic_results(client, role, example_name, model_name):
+    from agents import contracts
+
+    examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
+    payload = json.loads(examples.read_text(encoding='utf-8'))['examples'][example_name]['payload']
+    result = getattr(contracts, model_name).model_validate(payload)
+    request = {key: payload[key] for key in ('run_id', 'request_id', 'attempt')}
+    with trace_run(enabled(), payload['run_id']):
+        assert trace_agent_call(role, request, lambda received: result) is result
+    updates = [data for kind, data in client.records if kind == 'update']
+    worker = next(data for data in updates if data['name'] == role)
+    metadata = worker['extra']['metadata']
+    assert metadata['result_status'] == result.status
+    assert metadata['status'] == ('failed' if result.status == 'failed' else 'completed')
+    if role == 'evaluator':
+        assert metadata['passed'] is False
+        assert metadata['error_code'] == result.error.code
+
+
+def test_publish_trace_links_request_without_report_or_evaluation_text(client, tmp_path):
+    from test_render import save_evaluated_fixture
+    examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
+    request = json.loads(examples.read_text(encoding='utf-8'))['examples']['publish_request']['payload']
+    report = request['report_result']
+    report['markdown'], _ = build_report_markdown(report['report'], report['joined'], report['sources'], request['context'])
+    save_evaluated_fixture(request, tmp_path)
+    failed = json.loads(json.dumps(request))
+    failed['evaluation_result']['passed'] = False
+    failed['evaluation_result']['checks']['coverage']['reason'] = 'RAW_SENTINEL'
+    with trace_run(enabled(), request['run_id']):
+        assert publish(request, tmp_path, Settings({}))['status'] == 'ok'
+        assert publish(failed, tmp_path, Settings({}))['status'] == 'failed'
+    creates = [data for kind, data in client.records if kind == 'create']
+    root = next(run for run in creates if run['name'] == 'rag_run')
+    outputs = [run for run in creates if run['name'] == 'publish']
+    assert len(outputs) == 2
+    assert all(run['parent_run_id'] == root['id'] and run['trace_id'] == root['id'] for run in outputs)
+    assert all(all(run['extra']['metadata'].get(key) == value for key, value in {
+        'role': 'publish', 'run_id': request['run_id'],
+        'request_id': request['request_id'], 'attempt': 1,
+    }.items()) for run in outputs)
+    assert 'RAW_SENTINEL' not in json.dumps(client.records, default=str)
+
+
+def test_real_supervisor_graph_links_mock_node_and_decision_spans(client, tmp_path):
+    from agents.supervisor import Nodes
+    from rag.agent_runtime import run_team_agent
+    from test_team_contracts import example
+    from test_team_supervisor import AdaptiveDecider, FakeNodes
+    from test_agent_runtime_integration import canonical_writer
+
+    run_id = 'mock-graph-trace'
+    root = tmp_path / run_id
+    fake = FakeNodes(root)
+    callbacks = fake.nodes()
+    settings = enabled()
+    nodes = Nodes(callbacks.research, canonical_writer(callbacks.write_report), callbacks.evaluate_report,
+                  lambda request: publish(request, root, settings))
+    state = run_team_agent(
+        config_path=Path(__file__).resolve().parents[1] / 'config/run.yaml',
+        run_id=run_id, identity='mock-code-data-config', nodes=nodes,
+        decide=AdaptiveDecider(), settings=settings, output_root=tmp_path,
+    )
+    assert state['status'] == 'completed'
+    creates = [data for kind, data in client.records if kind == 'create']
+    root_run = next(run for run in creates if run['name'] == 'rag_run')
+    expected = {'research', 'market', 'stakeholder', 'domain', 'writer', 'evaluator',
+                'publish', 'supervisor_decision'}
+    assert expected <= {run['name'] for run in creates}
+    assert all(run['parent_run_id'] == root_run['id'] and run['trace_id'] == root_run['id']
+               for run in creates if run['name'] in expected)
+    decisions = [run['extra']['metadata'] for run in creates if run['name'] == 'supervisor_decision']
+    assert any(item.get('reason_code') == 'evidence_ready' and item.get('next_action') == 'writer'
+               for item in decisions)
+    assert any(item.get('reason_code') == 'quality_passed' and item.get('next_action') == 'publish'
+               for item in decisions)
+    payload = json.dumps(client.records, default=str)
+    assert 'KEY_SENTINEL' not in payload
+    assert example('research_ok')['chunks'][0]['text'] not in payload
 
 
 def test_gateway_payload_usage_and_cache(client, settings, tmp_path, monkeypatch):

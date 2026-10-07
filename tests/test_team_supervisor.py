@@ -11,7 +11,7 @@ from agents import contracts
 from agents.decision import GatewayDecider
 from agents.state import Limits, VIEWS
 from agents.store import RunStore
-from agents.supervisor import Nodes, Supervisor
+from agents.supervisor import Nodes, Supervisor, summarize
 from test_team_contracts import COMMON, example, response
 
 
@@ -451,21 +451,40 @@ def test_optional_observability_hook_gets_only_metadata_and_cannot_break_the_run
     assert run(supervisor)["status"] == "completed"
     assert records
     allowed = {"run_id", "node", "request_id", "attempt", "step_count", "status",
-               "next_action", "reason_code", "error_code"}
+               "next_action", "reason_code", "error_code", "evidence_sufficient"}
     assert all(set(record) <= allowed for record in records)
     assert example("research_ok")["chunks"][0]["text"] not in json.dumps(records)
     if hook_fails:
         assert "telemetry_error" in (tmp_path / "events.jsonl").read_text()
 
 
+def test_summary_retains_the_assessment_scope_of_conflicting_gaps():
+    result = example("research_ok")
+    gap = "제공된 이번 검색 결과에는 InfiniGen의 mechanism 근거가 없다."
+    result["assessments"]["research_kivi"]["gaps"] = [gap]
+    original = deepcopy(result)
+
+    summary = summarize(result)
+
+    assert summary["gaps"] == ["[research_kivi] " + gap]
+    assert any(text.startswith("[InfiniGen / mechanism] ") for text in summary["findings"])
+    assert len(summary["findings"]) <= 8
+    assert all(len(text) <= 220 for text in summary["findings"])
+    assert all(len(text) <= 300 for text in summary["gaps"])
+    assert result == original
+
+
 def gateway_request():
     request = {field: example("supervisor_research")[field] for field in COMMON}
-    return {**request, "allowed_actions": ["market", "stop"], "summaries": {},
-            "attempts": {"research": 1}, "feedback": {},
-            "results": {"research": example("research_ok")}}
+    results = {"research": example("research_ok"), "market": example("market_insufficient")}
+    return {**request, "allowed_actions": ["market", "stop"],
+            "summaries": {view: summarize(result) for view, result in results.items()},
+            "attempts": {"research": 1, "market": 1},
+            "feedback": {"market": ["market-1의 적용 조건과 gap-market-1의 부족한 근거를 보완하세요."]},
+            "results": results}
 
 
-def test_gateway_decider_passes_current_evidence_and_published_schema_to_the_existing_gateway():
+def test_gateway_decider_passes_only_summaries_and_control_fields_with_the_published_schema():
     calls = []
 
     class FakeGateway:
@@ -474,14 +493,105 @@ def test_gateway_decider_passes_current_evidence_and_published_schema_to_the_exi
             return json.dumps(example("supervisor_research"))
 
     request = gateway_request()
+    original = deepcopy(request)
     result = GatewayDecider(FakeGateway())(request)
     assert isinstance(result, contracts.SupervisorDecision)
     assert len(calls) == 1
     purpose, instructions, content, schema = calls[0]
     assert request["request_id"] in purpose
     assert instructions.strip()
-    assert content == request
+    assert content == {**{field: request[field] for field in COMMON},
+                       "allowed_actions": request["allowed_actions"],
+                       "summaries": request["summaries"], "attempts": request["attempts"],
+                       "feedback": request["feedback"]}
+    assert request == original
     assert schema == contracts.SupervisorDecision.model_json_schema()
+
+
+def test_raw_evidence_growth_does_not_change_model_input_or_mutate_the_callback_request():
+    contents = []
+
+    class FakeGateway:
+        def generate(self, purpose, instructions, content, schema):
+            contents.append(content)
+            return json.dumps(example("supervisor_research"))
+
+    small = gateway_request()
+    large = deepcopy(small)
+    raw_text = "Fictional raw evidence that is absent from every summary. " * 10000
+    for result in large["results"].values():
+        result["chunks"][0]["text"] += raw_text
+        next(iter(result["sources"].values()))["title"] += raw_text
+    large.update(chunks=[{"text": raw_text}], sources={"raw-source": raw_text},
+                 extra_raw_evidence=raw_text)
+    assert len(json.dumps(large)) > len(json.dumps(small)) + 100000
+    original = deepcopy(large)
+    decider = GatewayDecider(FakeGateway())
+
+    decider(small)
+    decider(large)
+
+    assert large == original
+    assert contents[0] == contents[1]
+    transmitted = json.loads(contents[1])
+    assert transmitted["summaries"]["market"]["gaps"]
+    assert transmitted["summaries"]["research"]["findings"]
+    assert transmitted["feedback"] == small["feedback"]
+    assert set(transmitted) == {*COMMON, "allowed_actions", "summaries", "attempts", "feedback"}
+
+
+def test_gateway_decider_drives_the_real_graph_from_summaries_and_preserves_full_artifacts(tmp_path):
+    model_inputs, callback_requests = [], []
+
+    class SummaryGateway:
+        def generate(self, purpose, instructions, content, schema):
+            request = json.loads(content)
+            model_inputs.append(request)
+            summaries = request["summaries"]
+            incomplete = [view for view, summary in summaries.items() if summary["gaps"]]
+            missing = [view for view in VIEWS if view not in summaries]
+            action = (incomplete or missing or ["writer"])[0]
+            if incomplete:
+                assert request["feedback"][action]
+                feedback = summaries[action]["gaps"]
+                code = "evidence_gap"
+            else:
+                feedback = []
+                code = "evidence_ready" if action == "writer" else (
+                    "initial_research" if action == "research" else "missing_view")
+            result = response("supervisor_research", request)
+            result.update(next_action=action, evidence_sufficient=action == "writer",
+                          reason_code=code, feedback=feedback)
+            return json.dumps(result)
+
+    decider = GatewayDecider(SummaryGateway())
+
+    def record_request(request):
+        original = deepcopy(request)
+        result = decider(request)
+        assert request == original
+        callback_requests.append(original)
+        return result
+
+    def insufficient_once(request, payload):
+        return response("market_insufficient", request) if request["attempt"] == 1 else payload
+
+    supervisor, fake, _ = make_supervisor(
+        tmp_path, decider=record_request, overrides={"market": insufficient_once})
+    state = run(supervisor)
+
+    assert state["status"] == "completed"
+    assert len(fake.requests("market")) == 2
+    gap = example("market_insufficient")["assessments"]["market"]["gaps"][0]
+    assert gap in fake.requests("market")[1]["feedback"]
+    for model_input, callback_request in zip(model_inputs, callback_requests, strict=True):
+        assert set(model_input) == {*COMMON, "allowed_actions", "summaries", "attempts", "feedback"}
+        assert all(model_input[field] == callback_request[field] for field in model_input)
+    stored_results = {view: supervisor.store.get(ref) for view, ref in state["results"].items()}
+    assert stored_results == callback_requests[-1]["results"] == fake.requests("writer")[0]["results"]
+    for view, result in stored_results.items():
+        assert result["chunks"] == example(f"{view}_ok")["chunks"]
+        assert result["sources"] == example(f"{view}_ok")["sources"]
 
 
 @pytest.mark.parametrize("field", ["run_id", "request_id", "attempt", "context"])

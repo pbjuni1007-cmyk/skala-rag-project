@@ -12,12 +12,15 @@ class GatewayDecider:
         self.gateway = gateway
 
     def __call__(self, request):
+        model_input = {field: request[field] for field in (
+            *COMMON_FIELDS, "allowed_actions", "summaries", "attempts", "feedback",
+        )}
         # The local Gateway retains input limits, cost reservation and call receipts.
         # request_id changes on every decision, including after a resumed run.
         response = self.gateway.generate(
             f"supervisor_{request['request_id']}",
             PROMPT.read_text(),
-            json.dumps(request, ensure_ascii=False, allow_nan=False),
+            json.dumps(model_input, ensure_ascii=False, allow_nan=False),
             SupervisorDecision.model_json_schema(),
         )
         decision = SupervisorDecision.model_validate_json(response)

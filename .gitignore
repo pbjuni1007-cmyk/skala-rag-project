@@ -1,5 +1,11 @@
 # Only reviewed project files are publishable.
 *
+!/docs/integration-status.md
+!/docs/rag-legacy-guide.md
+!/docs/retrieval-metrics.md
+!/docs/supervisor-architecture.png
+!/docs/supervisor-architecture.svg
+!/eval/retrieval-readme-metrics.json
 !/assets/
 !/config/
 !/data/
@@ -179,6 +185,8 @@
 !/experiments/retrieval-regression-20260922/
 !/experiments/rewrite-20260922/
 !/rag/conflicts.py
+!/rag/evaluator.py
+!/rag/writer.py
 !/scripts/revalidate_retrieval.py
 !/scripts/evaluate_rewrite.py
 !/tests/test_conflicts.py
@@ -187,10 +195,12 @@
 !/eval/retrieval-baseline.json
 !/eval/rewrite-pairs.json
 !/docs/domain-validation-plan.md
+!/docs/report-markdown-sample.md
 !/docs/retrieval-regression.md
 !/experiments/retrieval-regression-20260922/candidate.json
 !/experiments/retrieval-regression-20260922/checked.json
 !/experiments/rewrite-20260922/results.json
+!/tests/test_report_evaluator.py
 
 # Agent collaboration contract and mock examples
 !/docs/agent-contract.md
@@ -210,3 +220,39 @@
 !/tests/test_team_supervisor.py
 !/tests/test_team_store.py
 !/docs/supervisor-graph.mmd
+
+# Issue #2 research agents
+!/agents/
+!/agents/__init__.py
+!/agents/researchers/
+!/agents/researchers/__init__.py
+!/agents/researchers/contract.py
+!/agents/researchers/result.py
+!/agents/researchers/prompts.py
+!/agents/researchers/maturity.py
+!/tests/test_research_contract.py
+!/tests/test_research_trace.py
+!/tests/test_research_status.py
+!/tests/test_research_balance.py
+!/tests/test_research_maturity.py
+!/agents/researchers/followup.py
+!/agents/researchers/agent.py
+!/tests/test_research_followup.py
+!/tests/test_research_agent.py
+!/tests/test_research_isolation.py
+!/tests/test_research_feedback.py
+!/scripts/export_research_samples.py
+!/tests/fixtures/research/
+!/tests/fixtures/research/README.md
+!/tests/fixtures/research/research.json
+!/tests/fixtures/research/market.json
+!/tests/fixtures/research/stakeholder.json
+!/tests/fixtures/research/domain.json
+!/tests/test_research_samples.py
+!/tests/test_research_supervisor_integration.py
+!/tests/test_agent_execution_integration.py
+!/tests/fixtures/research/main01_citations.json
+
+!/docs/evaluation-report.md
+!/docs/reference-check-main08.md
+!/docs/requirements-review.md

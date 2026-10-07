@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc"><title id="title">Supervisor Agent 구조</title><desc id="desc">Supervisor가 네 관점 조사, 보고서 작성, 품질 평가, 출력을 선택하고 각 역할의 결과를 받아 재작업 또는 종료를 결정한다.</desc><rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="50" y="44" text-anchor="start" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="34" font-weight="700" fill="#0f172a">Supervisor · 근거 판단과 재작업</text>
+<text x="50" y="91" text-anchor="start" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="22" font-weight="400" fill="#334155">현재 공백과 품질 판정에 따라 다음 역할을 선택합니다.</text>
+<line x1="580" y1="315" x2="255" y2="245" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="255.00,245.00 266.57,241.82 264.24,252.66" fill="#4f6f94"/>
+<polygon points="580.00,315.00 568.43,318.18 570.76,307.34" fill="#4f6f94"/>
+<line x1="700" y1="315" x2="700" y2="245" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="700.00,245.00 705.54,255.64 694.46,255.64" fill="#4f6f94"/>
+<polygon points="700.00,315.00 694.46,304.36 705.54,304.36" fill="#4f6f94"/>
+<line x1="820" y1="315" x2="1145" y2="245" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="1145.00,245.00 1135.76,252.66 1133.43,241.82" fill="#4f6f94"/>
+<polygon points="820.00,315.00 829.24,307.34 831.57,318.18" fill="#4f6f94"/>
+<line x1="580" y1="460" x2="205" y2="580" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="205.00,580.00 213.45,571.48 216.83,582.03" fill="#4f6f94"/>
+<polygon points="580.00,460.00 571.55,468.52 568.17,457.97" fill="#4f6f94"/>
+<line x1="660" y1="460" x2="535" y2="580" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="535.00,580.00 538.84,568.63 546.52,576.63" fill="#4f6f94"/>
+<polygon points="660.00,460.00 656.16,471.37 648.48,463.37" fill="#4f6f94"/>
+<line x1="740" y1="460" x2="865" y2="580" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="865.00,580.00 853.48,576.63 861.16,568.63" fill="#4f6f94"/>
+<polygon points="740.00,460.00 751.52,463.37 743.84,471.37" fill="#4f6f94"/>
+<line x1="820" y1="460" x2="1195" y2="580" stroke="#4f6f94" stroke-width="3"/>
+<polygon points="1195.00,580.00 1183.17,582.03 1186.55,571.48" fill="#4f6f94"/>
+<polygon points="820.00,460.00 831.83,457.97 828.45,468.52" fill="#4f6f94"/>
+<line x1="225" y1="388" x2="565" y2="388" stroke="#64748b" stroke-width="3"/>
+<polygon points="565.00,388.00 554.36,393.54 554.36,382.46" fill="#64748b"/>
+<line x1="835" y1="388" x2="1150" y2="388" stroke="#64748b" stroke-width="3"/>
+<polygon points="1150.00,388.00 1139.36,393.54 1139.36,382.46" fill="#64748b"/>
+<rect x="130" y="150" width="250" height="95" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="255.0" y="183.25" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Writer</text>
+<text x="255.0" y="217.45" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">4관점 ok · 충분성 승인</text>
+<rect x="575" y="150" width="250" height="95" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="700.0" y="183.25" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Evaluator</text>
+<text x="700.0" y="217.45" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">현재 보고서의 품질 평가</text>
+<rect x="1020" y="150" width="250" height="95" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1145.0" y="183.25" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Publisher</text>
+<text x="1145.0" y="217.45" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">4개 품질 기준 통과</text>
+<rect x="565" y="315" width="270" height="145" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="700.0" y="365.75" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#1e3a8a">Supervisor</text>
+<text x="700.0" y="417.95" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#1e3a8a">선택 · 보완 · 종료</text>
+<rect x="35" y="348" width="190" height="80" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="130.0" y="376.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">START</text>
+<text x="130.0" y="404.8" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">새 실행</text>
+<rect x="1150" y="348" width="210" height="80" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1255.0" y="376.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">END</text>
+<text x="1255.0" y="404.8" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">완료 · 중단 · 상한</text>
+<rect x="80" y="580" width="250" height="100" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="205.0" y="615.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Research</text>
+<text x="205.0" y="651.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">기술 원리·조건·성숙도</text>
+<rect x="410" y="580" width="250" height="100" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="535.0" y="615.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Market</text>
+<text x="535.0" y="651.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">효익·비용·적용 장벽</text>
+<rect x="740" y="580" width="250" height="100" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="865.0" y="615.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Stakeholder</text>
+<text x="865.0" y="651.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">수혜자·부담·상충</text>
+<rect x="1070" y="580" width="250" height="100" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1195.0" y="615.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Domain</text>
+<text x="1195.0" y="651.0" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="18" font-weight="400" fill="#0f172a">적용조건·실험·한계</text>
+<text x="700" y="730" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="22" font-weight="400" fill="#334155">↔  작업 요청과 결과 반환   ·   하위 역할 사이 직접 호출 없음</text>
+<text x="700" y="775" text-anchor="middle" dominant-baseline="middle" font-family="NanumGothic, sans-serif" font-size="20" font-weight="400" fill="#64748b">실제 선택 순서와 재작업은 실행별 trace에서 확인합니다.</text>
+</svg>

@@ -113,6 +113,20 @@ def test_lexical_setup_fallback_is_same_source_bounded_and_pairs_lengths():
     assert all(any(c is original for original in chunks) for c in result)
 
 
+def test_ablation_context_keeps_fixed_and_varied_conditions_together():
+    chunks = [chunk(0), chunk(1), chunk(2),
+              chunk(3, 'We fix the buffer length and vary the group size. Full original results.'),
+              chunk(4, 'input tokens output tokens batch size'),
+              chunk(5, 'input prompt length output length workload'),
+              chunk(6, 'input tokens output tokens experimental setup'),
+              chunk(7, 'We fix another setting and vary its value.', source='other')]
+    result = companion_candidates(Corpus(chunks), [chunks[0]])
+    assert result[0] is chunks[3]
+    assert chunks[7] not in result
+    assert sum(c in result for c in chunks[3:7]) == 3
+    assert result[0]['text'] == chunks[3]['text']
+
+
 def test_baseline_seeds_reach_neighbors_without_recursive_expansion():
     chunks = [chunk(0), chunk(1), chunk(2, 'Figure 1: exact caption'), chunk(3)]
     corpus = Corpus(chunks, [chunks[3]])

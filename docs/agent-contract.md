@@ -176,9 +176,11 @@ Markdown 순서는 `# SUMMARY`, 기술·시나리오 정보, `# 기술 성숙도
 
 `PublishRequest`는 공통 필드, `report_result: ReportResult`, `evaluation_result: EvaluationResult`를 받는다. 보고서·평가·요청의 `run_id`가 같고 평가의 `report_request_id`가 현재 보고서와 같아야 한다. `status=ok`, `passed=true`, 네 기준 통과, 보완 요청 없음이 출력 조건이다.
 
+통합 publisher는 실행 폴더의 `snapshot.json`이 가리키는 보고서·평가 원본을 RunStore의 해시로 검증하고, 요청의 두 결과가 그 원본과 완전히 같은지 확인한다. 요청 ID가 같아도 평가 후 내용을 바꾸면 `artifact_mismatch`다. 별도 JSON 게시 명령도 같은 저장 원본이 필요하다. 요청·응답 필드는 v1을 유지한다.
+
 `PublishResult`는 공통 필드와 `status: ok|failed`, `markdown_ref: ArtifactRef?`, `pdf_ref: ArtifactRef?`, `pdf_pages: int?`, `human_review_pending: bool`, `error: NodeError?`를 반환한다. `ArtifactRef`는 위 `{path, sha256}` 형식이다. 성공은 두 파일 참조, 1~10의 페이지 수, `human_review_pending=true`, `error=null`이어야 한다. 실패는 두 참조와 페이지 수를 `null`로 두고 오류를 반환한다. 중간 파일이 존재한다는 이유로 성공 처리하지 않는다.
 
-#4는 SUMMARY 반 페이지, REFERENCE, 총 10페이지 이하와 한글·표·인용 배치를 검사한다. 기존 renderer는 총 10페이지 상한을 막지 않으므로 새 출력 경계에 검사를 추가한다. 자동 `completed`와 사람의 내용·제출 검수 완료를 구분한다.
+#4는 SUMMARY 반 페이지, REFERENCE, 총 10페이지 이하와 한글·표·인용 배치를 검사한다. 통합 renderer는 실제 PDF 페이지 수가 10을 넘으면 게시하지 않는다. 자동 `completed`와 사람의 내용·제출 검수 완료를 구분한다.
 
 추적은 `run_id`, `request_id`, 역할, 시도수, 다음 작업, `reason_code`, 판정·오류 분류를 연결한다. 자연어 결정 이유와 보완 요청 전문은 로컬 기록에 보존한다. LangSmith에는 기존 원문 비전송 원칙을 유지하며 #4가 허용 목록에 분류 코드와 안전한 설명을 연결한다. 동적 판단은 분류 코드와 대응하는 로컬 이유로 확인한다. 키·원문·프롬프트·모델 답변을 추적에 넣지 않는다. 실제 모델·리전·workspace·비용은 실행 담당의 설정으로 관리하며 이 계약에서 임의의 예산을 새로 배정하지 않는다.
 
@@ -190,7 +192,7 @@ Markdown 순서는 `# SUMMARY`, 기술·시나리오 정보, `# 기술 성숙도
 
 필드 이름·필수 여부·enum·ID 규칙의 변경은 #1에 변경 이유와 입출력 예시를 남기고, 영향을 받는 #2~#4를 연결한다. 호환되지 않는 변경은 계약 버전을 올린다. 각 작업은 팀 `main`에서 분기하고 PR 대상은 `main`으로 한다. 기존 RAG 보존 브랜치는 변경하지 않는다. 전체 통합 뒤 ai-deslop을 진행하고 영향받은 검증을 다시 실행한다.
 
-## 교수님 가이드와 완료 확인
+## 실습 요구사항과 완료 확인
 
 이 계약은 아래 요구사항을 구현할 수 있는 연결 규칙이다. 실제 코드·실행·제출물까지 준비해야 실습을 완료할 수 있다.
 

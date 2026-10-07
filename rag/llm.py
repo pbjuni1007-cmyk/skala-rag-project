@@ -14,7 +14,11 @@ from rag.request_budget import PROTOCOL_MARGIN, InputBudgetExceeded, enforce_inp
 
 
 class APIError(RuntimeError):
-    pass
+    @property
+    def code(self):
+        # Existing Gateway failures explicitly retain a reservation when provider
+        # completion is unknown. Every Agent role must preserve that distinction.
+        return "uncertain_request" if "reservation retained" in str(self).lower() else "api_error"
 
 
 class Gateway:

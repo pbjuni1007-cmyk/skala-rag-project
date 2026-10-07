@@ -1,5 +1,8 @@
 from pathlib import Path
 from html import escape, unescape
+from tempfile import TemporaryDirectory
+from urllib.parse import unquote, urlsplit
+import hashlib
 import re
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -11,9 +14,25 @@ from pypdf import PdfReader
 
 from rag.budget import write_json
 from rag.conflicts import conflicts_for_joined, conflict_review_markdown
+from rag.tracing import span
 
 LABELS = {"source_fact": "출처 사실", "author_reported_result": "저자 보고 결과", "team_inference": "팀 추론",
           "scenario": "적용 가정", "unknown": "미확인"}
+MAX_SUBMISSION_PAGES = 10
+MARKDOWN_LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+
+
+def validate_pdf_layout(path, document, max_pages=MAX_SUBMISSION_PAGES):
+    """Check the generated PDF's physical pages and required chapters."""
+    reader = PdfReader(path)
+    pages = len(reader.pages)
+    if not pages or "SUMMARY" not in reader.pages[0].extract_text() or not any(
+            "REFERENCE" in page.extract_text() for page in reader.pages) or not document.rsplit(
+                "\n# ", 1)[-1].startswith("REFERENCE\n"):
+        raise ValueError("PDF chapter layout validation failed")
+    if pages > max_pages:
+        raise ValueError(f"PDF exceeds the {max_pages}-page submission limit: {pages} pages")
+    return pages
 
 
 def fonts(settings):
@@ -60,7 +79,7 @@ def filename(settings, kind):
     return f"RAG-{kind}_{campus_part}_{people}.pdf"
 
 
-def render_report(out, report, joined, sources, settings, config):
+def render_report(out, report, joined, sources, settings, config, markdown=None):
     """Complete only when both formats and their review sheets have been written."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -68,7 +87,7 @@ def render_report(out, report, joined, sources, settings, config):
     for name in ("document_validation.json", "pdf_validation.json"):
         write_json(out / name, pending)
     try:
-        return _render_report(out, report, joined, sources, settings, config)
+        return _render_report(out, report, joined, sources, settings, config, markdown)
     except Exception as exc:
         failure = {**pending, "render_status": "failed", "render_error": str(exc), "semantic_review": "pending"}
         for name in ("document_validation.json", "pdf_validation.json"):
@@ -76,13 +95,9 @@ def render_report(out, report, joined, sources, settings, config):
         raise
 
 
-def _render_report(out, report, joined, sources, settings, config):
-    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
-    import hashlib
-    out = Path(out)
-    out.mkdir(parents=True, exist_ok=True)
+def build_report_markdown(report, joined, sources, config):
+    """Build the stable Markdown body without writing files or creating a PDF."""
     claims, evidence = joined["claims"], joined["evidence"]
-    conflict_records = conflicts_for_joined(joined)
     used_claims = list(dict.fromkeys(report["summary_claim_ids"] + [c for section in report["sections"] for c in section["claim_ids"]]))
     used_evidence = list(dict.fromkeys(e for c in used_claims for e in claims[c]["evidence_ids"]))
     used_sources = sorted({evidence[e]["source_id"] for e in used_evidence})
@@ -104,28 +119,24 @@ def _render_report(out, report, joined, sources, settings, config):
 
     def claim_text(cid, table=False):
         c = claims[cid]
-        parts = [f"**{LABELS[c['kind']]} · {cid}**", c["text"] + " " + citations(c)]
+        parts = [f"**{LABELS[c['kind']]} | {cid}**", c["text"] + " " + citations(c)]
+        for label, key in (("조건", "conditions"), ("한계", "caveats")):
+            if c[key].strip():
+                parts.append(f"**{label}:** {c[key]}")
         if table:
-            parts.append(f"[조건·한계·원문](citation_review.md#{cid})")
-        else:
-            for label, key in (("조건", "conditions"), ("한계", "caveats")):
-                if c[key].strip():
-                    parts.append(f"**{label}:** {c[key]}")
+            parts.append(f"[조건, 한계, 원문](citation_review.md#{cid})")
         return "<br><br>".join(cell(x) for x in parts) if table else "\n\n".join(parts)
 
-    def technology_label(claim):
-        return "KIVI · InfiniGen" if claim["technology"] == "both" else claim["technology"]
-
-    summary = [f"**{technology_label(claims[c])}** · [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
+    summary = [f"**{_technology_label(claims[c])}** [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
                for c in report["summary_claim_ids"]]
     if len("\n".join(summary)) > 1200:
         raise ValueError("SUMMARY draft is too long; shorten before user PDF conversion")
     md = ["# SUMMARY", "", *[part for text in summary for part in (text, "")],
           "**대상 기술:** KIVI / InfiniGen  ", "**단일 도메인:** " + config["domain"], "",
           "**적용 가정:** " + config["scenario"], ""]
-    facets = {"adoption": "채택 동기·공개 신호", "alternatives": "대안·연동", "costs": "비용·유지 부담",
-              "user": "문서 검토자", "operator": "AI·인프라 운영자", "governance": "구매·보안·관리 담당자",
-              "fit": "적합 조건", "risks": "정확도·운영 위험", "evaluation": "확인할 실험"}
+    facets = {"adoption": "채택 동기, 공개 신호", "alternatives": "대안, 연동", "costs": "비용, 유지 부담",
+              "user": "문서 검토자", "operator": "AI, 인프라 운영자", "governance": "구매, 보안, 관리 담당자",
+              "fit": "적합 조건", "risks": "정확도, 운영 위험", "evaluation": "확인할 실험"}
     body_seen = set()
     for section in report["sections"]:
         title = section["title"]
@@ -149,7 +160,7 @@ def _render_report(out, report, joined, sources, settings, config):
                     md.extend([claim_text(cid), ""])
         else:
             for cid in ids:
-                md.extend([f"## {claims[cid]['technology']} · {cid}", "", claim_text(cid), ""])
+                md.extend([f"## {claims[cid]['technology']} | {cid}", "", claim_text(cid), ""])
         if title == "관점 간 상충과 한계":
             unresolved = [g for g in gap_records if decisions.get(g["id"], {}).get("status") != "resolved"]
             md.extend(["## 남은 근거 공백", ""])
@@ -162,7 +173,11 @@ def _render_report(out, report, joined, sources, settings, config):
             else:
                 md.extend(["종합 단계의 해소 판단과 근거를 공백 검수표에 정리했습니다.", ""])
             md.extend(["공백별 판단 근거와 후속 확인 항목: [공백 검수표](gap_review.md).", ""])
-            md.extend(["상충의 원문·관련 주장 후보·조건·해소 상태: [상충 검수표](conflict_review.md).", ""])
+            for conflict in conflicts_for_joined(joined):
+                md.extend([f"## 상충 {conflict['id']}", "", conflict["text"], "",
+                           f"**해소 상태:** {conflict['status']} | **검수자:** {conflict['reviewed_by'] or '미검수'}", "",
+                           "**판단 근거:** " + conflict["rationale"], ""])
+            md.extend(["상충의 원문, 관련 주장 후보, 조건, 해소 상태: [상충 검수표](conflict_review.md).", ""])
     md.extend(["# REFERENCE", ""])
     for sid in used_sources:
         source = sources[sid]
@@ -174,40 +189,92 @@ def _render_report(out, report, joined, sources, settings, config):
         md.extend([f"[{numbering[sid]}] {author} ({date}). **{source['title']}**. {venue}. "
                    f"조회 {source['accessed_at'][:10]}.  ", source["url"], ""])
     document = "\n".join(md)
-    path = out / filename(settings, "Output").replace(".pdf", ".md")
-    path.write_text(document)
-    (out / "report.md").write_text(document)
+    return document, {"used_claims": used_claims, "used_evidence": used_evidence,
+                     "used_sources": used_sources, "summary_characters": len("\n".join(summary)),
+                     "body_unique_claims": len(body_seen)}
+
+
+def _technology_label(claim):
+    return "KIVI / InfiniGen" if claim["technology"] == "both" else claim["technology"]
+
+
+def build_review_documents(report, joined, used_claims):
+    """Build supplemental review records without claiming human verification."""
+    claims, evidence = joined["claims"], joined["evidence"]
+    conflict_records = conflicts_for_joined(joined)
+    gap_records = joined.get("gap_records", [{"id": f"legacy-{i}", "perspective": "legacy", "text": gap}
+                                           for i, gap in enumerate(joined.get("gaps", []), 1)])
+    decisions = {d["gap_id"]: d for d in report.get("gap_decisions", [])}
 
     review_claims = list(dict.fromkeys(used_claims + [cid for d in decisions.values() for cid in d["claim_ids"]]
                         + [cid for r in conflict_records for cid in r["candidate_claim_ids"] + r["verified_claim_ids"]]))
-    review = ["# 인용 검수", "", "각 주장의 전체 본문·실험조건·한계를 원문과 대조하는 검수표입니다. 현재 의미 검수는 대기 중입니다.", ""]
+    review = ["# 인용 검수", "", "각 주장의 전체 본문, 실험조건, 한계를 원문과 대조하는 검수표입니다. 의미 검수는 대기 중입니다.", ""]
     for cid in review_claims:
         c = claims[cid]
-        review.extend(["## " + cid, "", f"**기술:** {technology_label(c)} · **주장 종류:** {LABELS[c['kind']]}", "",
+        review.extend(["## " + cid, "", f"**기술:** {_technology_label(c)} | **주장 종류:** {LABELS[c['kind']]}", "",
                        c["text"], "", "**조건:** " + c["conditions"], "",
                        "**한계:** " + c["caveats"], "", "판정: 미검수", ""])
         for eid in c["evidence_ids"]:
             ev = evidence[eid]
             review.extend([f"- {eid} | {ev['source_id']} | 물리 페이지 {ev.get('page')} | {ev['section']}", "",
                            "> " + ev["quote"], ""])
-    (out / "citation_review.md").write_text("\n".join(review))
     gap_review = ["# 근거 공백 검수", "", "원래 공백을 삭제하지 않고 종합 시점의 판단과 근거를 보존합니다. 해소 여부의 의미 검수는 사람에게 남깁니다.", ""]
     for gap in gap_records:
         decision = decisions.get(gap["id"], {"status": "unreviewed", "resolution": "이전 실행: 종합 공백 판정 없음", "claim_ids": []})
-        gap_review.extend([f"## {gap['id']} · {gap['perspective']}", "", "**원래 공백:** " + gap["text"], "",
+        gap_review.extend([f"## {gap['id']} | {gap['perspective']}", "", "**원래 공백:** " + gap["text"], "",
                            "**종합 판단:** " + decision["status"], "", "**판단 이유:** " + decision["resolution"], "",
                            "**근거 주장:** " + (", ".join(f"[{cid}](citation_review.md#{cid})" for cid in decision["claim_ids"]) or "없음"),
                            "", "**사람 검수:** 미검수", ""])
-    (out / "gap_review.md").write_text("\n".join(gap_review))
-    (out / "conflict_review.md").write_text(conflict_review_markdown(conflict_records, claims))
+    return {"citation_review.md": "\n".join(review), "gap_review.md": "\n".join(gap_review),
+            "conflict_review.md": conflict_review_markdown(conflict_records, claims)}
+
+
+def validate_document_links(documents):
+    """Every local link in the supported Markdown subset must resolve in the bundle."""
+    anchors = {name: {re.sub(r"[^\w -]", "", heading.lower()).replace(" ", "-")
+                      for heading in re.findall(r"^#{1,6} (.+)$", document, flags=re.MULTILINE)}
+               for name, document in documents.items()}
+    for name, document in documents.items():
+        for _, target in MARKDOWN_LINK.findall(document):
+            link = urlsplit(unescape(target))
+            if link.scheme in {"https", "http", "mailto"}:
+                continue
+            filename = unquote(link.path) or name
+            if (link.scheme or link.netloc or link.query or filename not in documents or
+                    (link.fragment and unquote(link.fragment) not in anchors[filename])):
+                raise ValueError(f"Unresolvable local document link: {target}")
+
+
+def _render_report(out, report, joined, sources, settings, config, markdown=None):
+    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    generated_markdown, context = build_report_markdown(report, joined, sources, config)
+    if markdown is not None and markdown != generated_markdown:
+        raise ValueError("Writer Markdown differs from the report and citation registry")
+    document = markdown if markdown is not None else generated_markdown
+    reviews = build_review_documents(report, joined, context["used_claims"])
+    validate_document_links({"report.md": document, **reviews})
+    path = out / filename(settings, "Output").replace(".pdf", ".md")
+    path.write_text(document, encoding="utf-8")
+    (out / "report.md").write_text(document, encoding="utf-8")
+    for name, text in reviews.items():
+        (out / name).write_text(text, encoding="utf-8")
+    used_claims = context["used_claims"]
+    used_evidence = context["used_evidence"]
+    used_sources = context["used_sources"]
+    gap_records = joined.get("gap_records", [{"id": f"legacy-{i}", "perspective": "legacy", "text": gap}
+                                           for i, gap in enumerate(joined.get("gaps", []), 1)])
+    decisions = {d["gap_id"]: d for d in report.get("gap_decisions", [])}
+    conflict_records = conflicts_for_joined(joined)
     write_json(out / "conflict_records.json", conflict_records)
     pdf_path, pdf_checks = _write_pdf(out, document, settings)
     pdf_checks.update(used_sources=used_sources, used_claims=used_claims, used_evidence=used_evidence)
     write_json(out / "pdf_validation.json", pdf_checks)
     write_json(out / "document_validation.json", {"format": ["markdown", "pdf"], "pdf_generated": True,
-        "summary_characters": len("\n".join(summary)), "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
+        "summary_characters": context["summary_characters"], "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
         "used_sources": used_sources, "used_claims": used_claims, "used_evidence": used_evidence,
-        "body_unique_claims": len(body_seen), "gap_count": len(gap_records),
+        "body_unique_claims": context["body_unique_claims"], "gap_count": len(gap_records),
         "conflict_count": len(conflict_records),
         "resolved_conflicts": sum(r["status"] == "resolved" for r in conflict_records),
         "resolved_gaps": sum(decisions.get(g["id"], {}).get("status") == "resolved" for g in gap_records),
@@ -219,7 +286,7 @@ def _render_report(out, report, joined, sources, settings, config):
 
 def _pdf_inline(text):
     """Translate the renderer's small Markdown subset without interpreting source HTML."""
-    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = MARKDOWN_LINK.sub(r"\1", text)
     text = unescape(text.replace("<br>", "\n"))
     text = escape(text)
     text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
@@ -227,7 +294,7 @@ def _pdf_inline(text):
     return text.replace("\n", "<br/>")
 
 
-def _write_pdf(out, document, settings):
+def _write_pdf(out, document, settings, *, include_review_note=True):
     """Render the exact Markdown body; never rewrite reports or review annexes."""
     import hashlib
     from tempfile import NamedTemporaryFile
@@ -285,8 +352,9 @@ def _write_pdf(out, document, settings):
     if summary_bottom > A4[1] / 2:
         raise ValueError("SUMMARY exceeds half of the physical page; revise the summary selection")
     # The PDF explains where its linked Markdown annexes live without adding a new chapter.
-    story.insert(len(summary_flowables), Paragraph(
-        "상세 조건·원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
+    if include_review_note:
+        story.insert(len(summary_flowables), Paragraph(
+            "원문과 검수 기록: 함께 제공된 citation_review.md / gap_review.md / conflict_review.md", st["small"]))
     path = out / filename(settings, "Output")
     with NamedTemporaryFile(dir=out, suffix=".pdf", delete=False) as handle:
         temporary = Path(handle.name)
@@ -294,11 +362,10 @@ def _write_pdf(out, document, settings):
         SimpleDocTemplate(str(temporary), pagesize=A4, leftMargin=48, rightMargin=48,
                           topMargin=42, bottomMargin=55, title="KV Cache 다관점 평가", author="SKALA team").build(
                               story, onFirstPage=footer, onLaterPages=footer)
-        reader = PdfReader(temporary)
-        if "SUMMARY" not in reader.pages[0].extract_text() or not any("REFERENCE" in page.extract_text() for page in reader.pages) or not document.rsplit("\n# ", 1)[-1].startswith("REFERENCE\n"):
-            raise ValueError("PDF chapter layout validation failed")
+        pages = validate_pdf_layout(temporary, document)
         checks = {"summary_height_pt": round(summary_height, 2), "summary_bottom_pt": round(summary_bottom, 2),
-                  "half_page_limit_pt": A4[1] / 2, "pdf_pages": len(reader.pages), "pdf_generated": True,
+                  "half_page_limit_pt": A4[1] / 2, "pdf_pages": pages, "max_pdf_pages": MAX_SUBMISSION_PAGES,
+                  "pdf_generated": True,
                   "pdf_sha256": hashlib.sha256(temporary.read_bytes()).hexdigest(),
                   "markdown_sha256": hashlib.sha256(document.encode()).hexdigest(),
                   "visual_review": "pending", "semantic_review": "pending"}
@@ -311,3 +378,121 @@ def _write_pdf(out, document, settings):
 def render_pdf_report(out, report, joined, sources, settings, config):
     """Compatibility entry point with the same dual-format contract."""
     return render_report(out, report, joined, sources, settings, config)
+
+
+def publish(request, out, settings):
+    """Publish an evaluated Agent report without making any model calls."""
+    with span("publish", role="publish", run_id=request.get("run_id"),
+              request_id=request.get("request_id"), attempt=request.get("attempt")) as trace:
+        result = _publish(request, out, settings)
+        trace["status"] = "completed" if result["status"] == "ok" else "failed"
+        if result["error"] is not None:
+            trace["error_code"] = result["error"]["code"]
+        return result
+
+
+def _publish(request, out, settings):
+    common = {key: request.get(key) for key in
+              ("contract_version", "run_id", "request_id", "attempt", "context")}
+
+    def failed(code, message):
+        return {**common, "status": "failed", "markdown_ref": None, "pdf_ref": None,
+                "pdf_pages": None, "human_review_pending": True,
+                "error": {"code": code, "message": message, "retryable": False}}
+
+    report = request.get("report_result")
+    evaluation = request.get("evaluation_result")
+    if (common["contract_version"] != "agent-contract-v1" or
+            not isinstance(common["run_id"], str) or not common["run_id"] or
+            not isinstance(common["request_id"], str) or not common["request_id"] or
+            type(common["attempt"]) is not int or common["attempt"] < 1 or
+            not isinstance(common["context"], dict) or
+            not isinstance(report, dict) or not isinstance(evaluation, dict)):
+        return failed("invalid_response", "Invalid publish request")
+    if any(item.get("contract_version") != common["contract_version"] or
+           item.get("run_id") != common["run_id"] or
+           item.get("context") != common["context"] for item in (report, evaluation)):
+        return failed("artifact_mismatch", "Report and evaluation belong to a different run")
+    report_id, evaluation_id = report.get("request_id"), evaluation.get("request_id")
+    if (not isinstance(report_id, str) or not report_id or
+            not isinstance(evaluation_id, str) or not evaluation_id or
+            len({common["request_id"], report_id, evaluation_id}) != 3 or
+            evaluation.get("report_request_id") != report_id):
+        return failed("artifact_mismatch", "Evaluation does not match the current report")
+    checks = evaluation.get("checks")
+    required_checks = {"groundedness", "neutrality", "bias_control", "coverage"}
+    if (report.get("status") != "ok" or report.get("error") is not None or
+            not isinstance(report.get("report"), dict) or
+            not isinstance(report.get("joined"), dict) or
+            not isinstance(report.get("chunks"), list) or
+            not isinstance(report.get("sources"), dict) or
+            evaluation.get("status") != "ok" or evaluation.get("error") is not None or
+            evaluation.get("passed") is not True or
+            not isinstance(checks, dict) or set(checks) != required_checks or
+            any(not isinstance(checks[key], dict) or checks[key].get("passed") is not True
+                for key in required_checks) or evaluation.get("repair_requests") != []):
+        return failed("invalid_response", "Report has not passed all four evaluation checks")
+    document = report.get("markdown")
+    chapters = [line[2:] for line in document.splitlines() if line.startswith("# ")] if isinstance(document, str) else []
+    if (chapters != ["SUMMARY", "기술 성숙도", "시장성", "이해관계자",
+                     "도메인 적용", "관점 간 상충과 한계", "REFERENCE"] or
+            "**대상 기술:**" not in document):
+        return failed("invalid_response", "Report Markdown does not follow the required chapter order")
+    try:
+        from agents.contracts import PublishRequest
+
+        validated = PublishRequest.model_validate(request)
+        canonical, context = build_report_markdown(
+            report["report"], report["joined"], report["sources"], common["context"])
+        if document != canonical:
+            return failed("artifact_mismatch", "Writer Markdown differs from the report and citation registry")
+        reviews = build_review_documents(report["report"], report["joined"], context["used_claims"])
+        validate_document_links({"report.md": document, **reviews})
+    except (KeyError, TypeError, ValueError):
+        return failed("invalid_response", "Report data or local document links are invalid")
+
+    out = Path(out)
+    try:
+        import json
+        from agents.store import RunStore
+
+        snapshot = out / "snapshot.json"
+        if snapshot.stat().st_size > 64 * 1024:
+            raise ValueError("Oversized checkpoint")
+        store = RunStore(out)
+        state = store.load(json.loads(snapshot.read_text(encoding="utf-8"))["identity"])
+        if state["run_id"] != common["run_id"] or state["context"] != common["context"]:
+            raise ValueError("Different execution")
+        # A request ID alone cannot prove which body was evaluated. Both payloads
+        # must equal the current, hash-verified artifacts saved by the Supervisor.
+        for field, value in (("report", validated.report_result), ("evaluation", validated.evaluation_result)):
+            if store.get(state[field]) != value.model_dump(mode="json"):
+                raise ValueError("Evaluated artifact changed")
+    except (OSError, KeyError, TypeError, ValueError):
+        return failed("artifact_mismatch", "Publication requires this run's saved, evaluated report and verdict")
+    destination = out / "report" / hashlib.sha256(common["request_id"].encode()).hexdigest()[:16]
+    if destination.exists():
+        return failed("artifact_mismatch", "Publish request already has output")
+    try:
+        out.mkdir(parents=True, exist_ok=True)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with TemporaryDirectory(dir=out, prefix=".publish-") as temporary:
+            staging = Path(temporary) / "payload"
+            staging.mkdir()
+            pdf, checks = _write_pdf(staging, document, settings)
+            markdown = staging / pdf.name.replace(".pdf", ".md")
+            markdown.write_text(document, encoding="utf-8")
+            for name, text in reviews.items():
+                (staging / name).write_text(text, encoding="utf-8")
+            pdf_name, markdown_name = pdf.name, markdown.name
+            pdf_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
+            markdown_hash = hashlib.sha256(markdown.read_bytes()).hexdigest()
+            staging.rename(destination)
+        return {**common, "status": "ok",
+                "markdown_ref": {"path": (destination / markdown_name).relative_to(out).as_posix(),
+                                 "sha256": markdown_hash},
+                "pdf_ref": {"path": (destination / pdf_name).relative_to(out).as_posix(),
+                            "sha256": pdf_hash},
+                "pdf_pages": checks["pdf_pages"], "human_review_pending": True, "error": None}
+    except Exception:
+        return failed("render_error", "Report output could not be created")

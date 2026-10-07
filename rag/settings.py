@@ -67,8 +67,8 @@ class Settings:
         self.number("USD_TO_KRW")
         if self.number("BUDGET_COST_MULTIPLIER", 1.10) < 1.10:
             raise ValueError("Keep the approved 10% exchange/fee buffer")
-        if self.integer("LLM_MAX_INPUT_TOKENS", 24000) > 24000:
-            raise ValueError("This pricing contract limits input to 24,000 tokens")
+        if self.integer("LLM_MAX_INPUT_TOKENS", 24000) > 40000:
+            raise ValueError("This pricing contract limits input to 40,000 tokens")
         if self.integer("LLM_MAX_OUTPUT_TOKENS", 8000) > 128000:
             raise ValueError("Model output limit exceeded")
         if not 0 <= int(self.get("OPENAI_MAX_RETRIES", "2")) <= 2:
@@ -80,9 +80,11 @@ class Settings:
         if self.get("LLM_REASONING_PROFILE", "balanced") == "fixed":
             return fallback
         parts = purpose.lower().split("_")
+        if parts[0] == "supervisor":
+            return "medium"
         if any(part in {"repair", "query", "queries", "rewrite"} for part in parts) or purpose.startswith("retrieval_review"):
             return "low"
-        if purpose == "synthesis_report" or purpose.startswith("synthesis_gaps_"):
+        if purpose in {"synthesis_report", "report_quality_judge"} or purpose.startswith("synthesis_gaps_"):
             return "max"
         if parts[0] in {"research", "market", "stakeholder", "domain", "perspective", "facet"}:
             return "medium"
@@ -98,5 +100,5 @@ class Settings:
                 "RAG_MAX_CONCURRENCY": str(self.integer("RAG_MAX_CONCURRENCY", 3)),
                 "effective_reasoning_efforts": {purpose: self.reasoning_effort(purpose) for purpose in
                     ("research_queries", "rewrite", "retrieval_review", "research", "market", "stakeholder",
-                     "domain", "market_reassessment_facet_costs", "synthesis_report_repair",
-                     "synthesis_report", "synthesis_gaps_0", "unknown")}}
+                     "domain", "supervisor", "market_reassessment_facet_costs", "synthesis_report_repair",
+                     "synthesis_report", "report_quality_judge", "synthesis_gaps_0", "unknown")}}

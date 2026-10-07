@@ -1,0 +1,553 @@
+{
+  "recorded_at": "2026-10-07T09:29:25.599253+00:00",
+  "method": "Reaggregate stored top-5 rankings with scripts/benchmark_embeddings.py metrics; unused legacy page-keyword proxy inputs are empty. Relevant iff one chunk contains one complete registered evidence span on matching source/page. No new model/retrieval call.",
+  "limitations": [
+    "Known questions; selection and already-opened holdout combined. Not independent generalization evidence.",
+    "Ground-truth literal spans remain human_review_pending.",
+    "Retrieval metrics do not measure generated answer accuracy or completed Agent runs."
+  ],
+  "dataset_sha256": "ccc50193422eb087fcbc0474ea107c2086df8ab63054b02c4c590216a6d364e8",
+  "index_hash": "d0dfc6b526c9acae7d1499fadf604af60ddd1a9d7a716f0f061cc8cfe17cb503",
+  "embedding": {
+    "model": "intfloat/multilingual-e5-small",
+    "revision": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    "dimension": 384,
+    "max_tokens": 512,
+    "normalized": true,
+    "prefixes": [
+      "query: ",
+      "passage: "
+    ]
+  },
+  "k": 5,
+  "measurements": {
+    "baseline": {
+      "source": "eval/retrieval-baseline.json",
+      "file_sha256": "9172ea1937a846cf490b13158414f891d898052b8bc9d526afadd35d0633bf31",
+      "measured_at": "2026-09-22T05:23:29.912604+00:00",
+      "fingerprint": "55e1625be9f64549efe88e1717b76b66641d3cb1e16a5f047d1115d1d11c9110",
+      "languages": {
+        "en": {
+          "questions": 24,
+          "hits": 21,
+          "hit_rate_at_5": 0.875,
+          "mrr_at_5": 0.6194444444444445,
+          "rows": [
+            {
+              "id": "K1",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "K2",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K3",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "K4",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I1",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "I2",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I3",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I4",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "K5",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "K6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K7",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "K8",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "I7",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.2
+            },
+            {
+              "id": "I8",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H1",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H2",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H3",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H4",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H6",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H7",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H8",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            }
+          ]
+        },
+        "ko": {
+          "questions": 24,
+          "hits": 15,
+          "hit_rate_at_5": 0.625,
+          "mrr_at_5": 0.4458333333333333,
+          "rows": [
+            {
+              "id": "K1",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K2",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K3",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K4",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I1",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.2
+            },
+            {
+              "id": "I2",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I3",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I4",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "K5",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "K6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K7",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K8",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "I5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "I7",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "I8",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "H1",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H2",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H3",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H4",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "H5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "H6",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H7",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H8",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            }
+          ]
+        }
+      }
+    },
+    "live": {
+      "source": "outputs/team-integration/runtime/retrieval-regression-live.json",
+      "file_sha256": "c9d2aa27079ef02c9c8420715550a0bd101b2c55b76f0e980042aa36059ca255",
+      "measured_at": "2026-10-07T07:55:38.624329+00:00",
+      "fingerprint": "d1d7b3e0c668c80b547c2ecd94c7dc708cb5c5e3e1c2936d69f7351bb702d572",
+      "languages": {
+        "en": {
+          "questions": 24,
+          "hits": 21,
+          "hit_rate_at_5": 0.875,
+          "mrr_at_5": 0.6194444444444445,
+          "rows": [
+            {
+              "id": "K1",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "K2",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K3",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "K4",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I1",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "I2",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I3",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I4",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "K5",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "K6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K7",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "K8",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "I7",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.2
+            },
+            {
+              "id": "I8",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H1",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H2",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H3",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H4",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H6",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H7",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H8",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            }
+          ]
+        },
+        "ko": {
+          "questions": 24,
+          "hits": 15,
+          "hit_rate_at_5": 0.625,
+          "mrr_at_5": 0.4458333333333333,
+          "rows": [
+            {
+              "id": "K1",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K2",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K3",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K4",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I1",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.2
+            },
+            {
+              "id": "I2",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I3",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "I4",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "K5",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "K6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K7",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "K8",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "I5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "I6",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "I7",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "I8",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "H1",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H2",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H3",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.5
+            },
+            {
+              "id": "H4",
+              "hit_at_5": 0,
+              "mrr_at_5": 0
+            },
+            {
+              "id": "H5",
+              "hit_at_5": 1,
+              "mrr_at_5": 0.3333333333333333
+            },
+            {
+              "id": "H6",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H7",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            },
+            {
+              "id": "H8",
+              "hit_at_5": 1,
+              "mrr_at_5": 1.0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

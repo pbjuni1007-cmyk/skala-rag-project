@@ -1,0 +1,49 @@
+{
+  "provenance": {
+    "run_id": "agent-20261007-main-05",
+    "invalid_response_sha256": "9e0bcc5c2b3a9ded2c2d957adf588e5c4115601c8d985f22e931e539cd250cb3",
+    "repair_response_sha256": "4b1d9eda45007c130d33ceaf258c5e1f7d3c76a7df4c5db3e03a3949585f20ef"
+  },
+  "wrongly_bound": {
+    "chunk_id": "kivi:p6:t0",
+    "quote": "the residual key cache and value cache are kept in full precision."
+  },
+  "supporting_chunk_id": "kivi:p2:t500",
+  "expanded_patch": {
+    "patches": [
+      {
+        "target_id": "claims:1:reference:2",
+        "chunk_id": "kivi:p2:t500",
+        "quote": "We only apply group-wise quanti- zation to the grouped key cache and value cache, while the residual key cache and value cache are kept in full precision."
+      }
+    ]
+  },
+  "chunks": [
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 2,
+      "text": "our key idea is to split key cache into two parts. The first part is the grouped key cache, which contains several groups of tokens and each group has a certain number of tokens. The second part is the residual key cache, which does not have a suffi- cient number of tokens to form a complete group. Similarly, we split value cache into the grouped and residual parts to maintain the accuracy. We only apply group-wise quanti- zation to the grouped key cache and value cache, while the residual key cache and value cache are kept in full precision. The grouped and residual parts can be combined using tiled matrix multiplication when computing attention scores. Our contributions are summarized as follows: • Extensive analysis regarding the outlier patterns and quantization error of KV cache in commonly- used LLMs. Our observations suggest that key cache should be quantized per-channel and value cache should be quantized per-token. We also explain in depth why these caches require different quantization approaches. • A new plug-and-play 2bit KV cache quantization algorithm without any fine-tuning, KIVI, with hardware-friendly implementation. We conduct an extensive evaluation for KIVI with Llama, Mistral, and Falcon on popular generation tasks. KIVI can efficiently compress KV cache to",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache per-token quantization per-channel quantization Figure 1: Definition of per-token and per-channel ",
+      "id": "kivi:p2:t500",
+      "token_start": 500,
+      "char_start": 2041,
+      "char_end": 3339,
+      "captions": []
+    },
+    {
+      "source_id": "kivi",
+      "technology": "KIVI",
+      "page": 6,
+      "text": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache value tensors are added to XKr and XVr in full precision, KIVI maintains a full precision KV cache sliding window for the local relevant tokens. This window size is expected to be R 2 for key cache, and R for value cache. Later in the experiment section, we show that this full precision sliding window is crucial for obtaining desirable perfor- mance on hard tasks, such as GSM8K. System Support. We provide a hardware-friendly imple- mentation for running KIVI on GPUs. To minimize the overhead, we have fused the dequantization process with matrix multiplication, e.g., Q_MatMul in Figure 3, using CUDA. We also implement the group-wise quantization ker- nel in Triton. Our method is fully compatible with weight- only quantization. 4. Experiments 4.1. Settings Models. We evaluate KIVI using three popular model families: Llama/Llama-2 (Touvron et al., 2023a;b), Fal- con (Penedo et al., 2023) and Mistral (Jiang et al., 2023). Llama and Mistral model is based on multi-head attention, while Falcon is based on multi-query attention (Shazeer, 2019). We use",
+      "section": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache value tensors are added to XKr and XVr in full precision, KIVI maintains a full precision KV cache",
+      "id": "kivi:p6:t0",
+      "token_start": 0,
+      "char_start": 0,
+      "char_end": 1122,
+      "captions": [
+        "Figure 3, using CUDA"
+      ]
+    }
+  ]
+}

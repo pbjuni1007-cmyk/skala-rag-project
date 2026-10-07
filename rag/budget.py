@@ -32,17 +32,62 @@ class Budget:
         with self.path.with_suffix(".lock").open("a+") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             data = json.loads(self.path.read_text()) if self.path.exists() else {"schema": 1, "entries": []}
+            if getattr(self, "expected_ledger_id", None) and data.get("ledger_id") != self.expected_ledger_id:
+                raise ValueError("Budget ledger was removed or replaced; inspection required")
             if data.get("schema") != 1 or not isinstance(data.get("entries"), list):
                 raise ValueError("Invalid budget ledger; never reset it automatically")
             for entry in data["entries"]:
                 for key in ("reserved_krw", "charged_estimate_krw"):
                     if key in entry and (not isinstance(entry[key], (int, float)) or not math.isfinite(entry[key]) or entry[key] < 0):
                         raise ValueError("Invalid ledger amount; inspection required")
+            history_path = getattr(self, "history_path", None)
+            if history_path is not None and history_path.exists():
+                self._validate_history(data, json.loads(history_path.read_text()))
             try:
                 yield data
                 write_json(self.path, data)
+                # Persist after the ledger, but before a reserved call can be sent.
+                # A crash between writes can leave a shorter history, never an
+                # anchor for a request that was not reserved in the ledger.
+                if history_path is not None:
+                    write_json(history_path, data)
             finally:
                 fcntl.flock(lock, fcntl.LOCK_UN)
+
+    def bind_identity(self, expected=None):
+        """Give an existing cumulative ledger a stable identity without resetting it."""
+        path = str(self.path.resolve())
+        if expected is not None:
+            if expected.get("path") != path or not expected.get("ledger_id"):
+                raise ValueError("Resume rejected: budget ledger identity changed")
+            self.expected_ledger_id = expected["ledger_id"]
+        with self.locked() as data:
+            ledger_id = data.setdefault("ledger_id", uuid.uuid4().hex)
+            if not isinstance(ledger_id, str) or not ledger_id:
+                raise ValueError("Invalid budget ledger identity")
+        self.expected_ledger_id = ledger_id
+        return {"path": path, "ledger_id": ledger_id}
+
+    @staticmethod
+    def _validate_history(current, previous):
+        by_id = {entry["id"]: entry for entry in current["entries"]}
+        if (current.get("ledger_id") != previous.get("ledger_id") or
+                len(by_id) != len(current["entries"])):
+            raise ValueError("Budget ledger history identity changed")
+        mutable = {"state", "usage", "response_id", "charged_estimate_krw"}
+        for entry in previous["entries"]:
+            value = by_id.get(entry["id"])
+            if value is None or any(value.get(key) != item for key, item in entry.items() if key not in mutable):
+                raise ValueError("Budget ledger history was removed or changed")
+            if entry["state"] != "reserved" and value != entry:
+                raise ValueError("Budget ledger settled history changed")
+
+    def bind_history(self, path, *, resume=False):
+        self.history_path = Path(path)
+        if resume and not self.history_path.is_file():
+            raise ValueError("Resume rejected: budget ledger history is missing")
+        with self.locked():
+            pass
 
     def cost(self, input_tokens, output_tokens):
         # Charge every input token at the higher cache-write price ($0.25).

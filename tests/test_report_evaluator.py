@@ -1,11 +1,11 @@
 from copy import deepcopy
 import json
 
+from agents.contracts import EvaluationRequest, ReportResult
 from rag.evaluator import CRITERIA, evaluate_report
 from rag.evidence import collect_evidence
 from rag.render import build_report_markdown
-from rag.schemas import EvaluationRequest, ReportResult
-from rag.writer import write_report
+from rag.writer import draft_report
 from test_pipeline_improvements import report_fixture
 from test_pipeline_improvements import chunks as report_chunks
 
@@ -39,7 +39,9 @@ def refreshed_joined(joined, report):
     synthesis, evidence = collect_evidence({"synthesis": {"claims": report["synthesis_claims"]}}, report_chunks())
     return {**joined, "claims": {**source_claims, **synthesis},
             "evidence": {key: value for key, value in joined["evidence"].items()
-                         if key in source_evidence_ids} | evidence}
+                         if key in source_evidence_ids} | evidence,
+            "assessments": {name: {key: assessment[key] for key in ("status", "claims", "conflicts", "gaps")}
+                            for name, assessment in joined["assessments"].items()}}
 
 
 def evaluation_request(joined, report, attempt=1, markdown=None):
@@ -60,7 +62,8 @@ def evaluation_request(joined, report, attempt=1, markdown=None):
         "contract_version": "agent-contract-v1", "run_id": "test-run", "request_id": "test-run:writer:1",
         "attempt": 1, "context": context, "status": "ok", "markdown": generated if markdown is None else markdown,
         "report": report, "joined": joined,
-        "chunks": [chunk for chunk in report_chunks() if chunk["id"] in used_chunk_ids],
+        "chunks": [{**chunk, "section": chunk.get("section")}
+                   for chunk in report_chunks() if chunk["id"] in used_chunk_ids],
         "sources": sources, "error": None,
     })
     return EvaluationRequest.model_validate({
@@ -185,7 +188,7 @@ def test_writer_receives_supervisor_feedback_without_owning_the_retry_route(tmp_
         return parsed
 
     revision_requests = ["도메인 적용의 한계 조건을 명시하세요."]
-    result = write_report(structured, joined, report_chunks(), revision_requests, report)
+    result = draft_report(structured, joined, report_chunks(), revision_requests, report)
 
     assert result["sections"] == report["sections"]
     assert seen[0][0] == "synthesis_report"
@@ -270,3 +273,44 @@ def test_graph_writer_and_evaluator_emit_the_shared_contract(tmp_path):
     assert evaluation_state["run_status"] == "validated"
     saved_result = json.loads((tmp_path / "quality_evaluation.json").read_text())
     assert set(saved_result["checks"]) == set(CRITERIA)
+
+
+def test_writer_callback_consumes_supervisor_request_and_returns_validated_report_result(tmp_path):
+    pipeline, joined, _, report = report_fixture(tmp_path)
+    request = pipeline._write_request(
+        {"joined": joined, "run_config": {"run_id": "supervisor-test"}}, joined, 1)
+
+    def structured(purpose, schema, instructions, content, check):
+        if purpose == "synthesis_report":
+            value = {key: item for key, item in report.items() if key != "gap_decisions"}
+        else:
+            value = {"gap_decisions": [
+                {"gap_id": gap["id"], "status": "unresolved", "resolution": "추가 근거가 필요합니다.", "claim_ids": []}
+                for gap in content["gap_records"]
+            ]}
+        parsed = schema.model_validate(value).model_dump()
+        errors = check(parsed)
+        assert not errors, errors
+        return parsed
+
+    pipeline.structured = structured
+    result = pipeline.write_report_node(request.model_dump(mode="json"))
+    assert result["status"] == "ok", result.get("error")
+    validated = ReportResult.model_validate(result)
+
+    assert validated.status == "ok"
+    assert validated.run_id == "supervisor-test"
+    assert validated.request_id == request.request_id
+    assert result["markdown"].startswith("# SUMMARY") and "# REFERENCE" in result["markdown"]
+    assert set(result["joined"]["assessments"]) == {
+        "research_kivi", "research_infinigen", "market", "stakeholder", "domain"}
+
+    pipeline.structured = structured_with(judge_result())
+    evaluation = EvaluationRequest.model_validate({
+        "contract_version": request.contract_version, "run_id": request.run_id,
+        "request_id": "supervisor-test:evaluator:1", "attempt": 1,
+        "context": request.context.model_dump(mode="json"), "report_result": result,
+    })
+    verdict = pipeline.evaluate_report_node(evaluation.model_dump(mode="json"))
+    assert verdict["status"] == "ok" and verdict["passed"] is True
+    assert verdict["report_request_id"] == result["request_id"]

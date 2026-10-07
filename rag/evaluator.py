@@ -9,8 +9,8 @@ from rag.corpus import normalized
 from rag.evidence import report_errors, validate_assessment
 from rag.llm import APIError
 from rag.request_budget import InputBudgetExceeded
-from rag.schemas import (EvaluationRequest, EvaluationResult, NodeError, QualityCheck,
-                         QualityFinding, QualityJudgeDraft, RepairRequest, Report)
+from agents.contracts import Check, EvaluationRequest, EvaluationResult, NodeError, RepairRequest
+from rag.schemas import QualityFinding, QualityJudgeDraft, Report
 
 
 CRITERIA = ("groundedness", "neutrality", "bias_control", "coverage")
@@ -271,9 +271,10 @@ def _validate_report_artifact(report_result):
     from rag.render import build_report_markdown
 
     report = report_result.report.model_dump()
-    joined = report_result.joined
-    sources = report_result.sources
-    chunks = report_result.chunks
+    joined = report_result.joined.model_dump(mode="json")
+    sources = {source_id: source.model_dump(mode="json")
+               for source_id, source in report_result.sources.items()}
+    chunks = [chunk.model_dump(mode="json") for chunk in report_result.chunks]
     try:
         joined_claims = joined["claims"]
         for index, synthesis in enumerate(report["synthesis_claims"], 1):
@@ -353,7 +354,7 @@ def _repair_requests(problems, joined):
                 continue
             seen.add(key)
             output.append(RepairRequest(target=role, reason=reason, claim_ids=role_claim_ids,
-                                        gap_ids=gap_ids).model_dump())
+                                        gap_ids=gap_ids).model_dump(mode="json"))
     return output
 
 
@@ -363,7 +364,7 @@ def _evaluation_failure(request, code, message):
         attempt=request.attempt, context=request.context, report_request_id=request.report_result.request_id,
         status="failed", method="hybrid", passed=False, checks={}, repair_requests=[],
         error=NodeError(code=code, message=message, retryable=False),
-    ).model_dump()
+    ).model_dump(mode="json")
 
 
 def evaluate_report(structured, request):
@@ -373,8 +374,11 @@ def evaluate_report(structured, request):
     try:
         _validate_report_artifact(report_result)
         report = report_result.report.model_dump()
-        joined = report_result.joined
-        details = _evaluate_details(structured, report, joined, report_result.chunks, report_result.sources)
+        joined = report_result.joined.model_dump(mode="json")
+        chunks = [chunk.model_dump(mode="json") for chunk in report_result.chunks]
+        sources = {source_id: source.model_dump(mode="json")
+                   for source_id, source in report_result.sources.items()}
+        details = _evaluate_details(structured, report, joined, chunks, sources)
     except ArtifactMismatchError:
         return _evaluation_failure(request, "artifact_mismatch",
                                   "Report Markdown, structure, or cited source artifacts do not match")
@@ -407,13 +411,13 @@ def evaluate_report(structured, request):
             reasons.extend(code_check["errors"])
             for error in code_check["errors"]:
                 claim_ids.extend(cid for cid in _used_claim_ids(report) if error.startswith(f"{cid}:"))
-        checks[criterion] = QualityCheck(
+        checks[criterion] = Check(
             passed=passed, reason=" ".join(dict.fromkeys(reason for reason in reasons if reason)),
             claim_ids=list(dict.fromkeys(claim_ids)),
             gap_ids=list(dict.fromkeys(gap_id for finding in criterion_findings
                                        for request_item in _repair_requests([finding], joined)
                                        for gap_id in request_item["gap_ids"])),
-        ).model_dump()
+        ).model_dump(mode="json")
 
     passed = all(check["passed"] for check in checks.values())
     if not passed and not repair_requests:
@@ -422,11 +426,11 @@ def evaluate_report(structured, request):
             target="writer", reason="보완이 필요한 기준: " + ", ".join(failed_criteria),
             claim_ids=list(dict.fromkeys(cid for name in failed_criteria for cid in checks[name]["claim_ids"])),
             gap_ids=list(dict.fromkeys(gid for name in failed_criteria for gid in checks[name]["gap_ids"])),
-        ).model_dump()]
+        ).model_dump(mode="json")]
     repair_requests.sort(key=lambda item: item["target"] == "writer")
     return EvaluationResult(
         contract_version=request.contract_version, run_id=request.run_id, request_id=request.request_id,
         attempt=request.attempt, context=request.context, report_request_id=report_result.request_id,
         status="ok", method="hybrid", passed=passed, checks=checks,
         repair_requests=repair_requests, error=None,
-    ).model_dump()
+    ).model_dump(mode="json")

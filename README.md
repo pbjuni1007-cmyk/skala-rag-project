@@ -179,6 +179,8 @@ Evaluator는 코드 검사와 별도 LLM Judge를 결합한 Hybrid 방식을 사
 
 Evaluator 결과는 공통 계약의 `EvaluationResult` 형태로 저장합니다. `status=ok`는 평가 실행 완료를, `passed`는 네 기준 모두 통과 여부를 나타냅니다. 평가 실행 오류는 `status=failed`, 빈 `checks`, 오류 정보를 반환하고, 품질 미달은 `status=ok`, `passed=false`와 대상 역할, claim ID, gap ID가 담긴 `repair_requests`를 반환합니다. 재작업 경로와 종료 상한은 Supervisor 소유입니다. 요청·응답 필드와 책임 경계는 [공통 에이전트 계약](docs/agent-contract.md) 및 [모의 인계 예시](docs/agent-contract-examples.json)를 따릅니다.
 
+Supervisor에 연결할 노드 콜백은 `Pipeline.write_report_node(request)`와 `Pipeline.evaluate_report_node(request)`입니다. 첫 함수는 공통 `WriteRequest`를 받아 `ReportResult`를, 두 번째는 `EvaluationRequest`를 받아 `EvaluationResult`를 반환합니다. 기존 CLI 그래프는 현재 RAG 실행 경로로 유지하며, 실제 PDF 생성과 페이지 검수는 출력 담당 경계에 남깁니다.
+
 기술 조사는 논문을 **벡터 검색**합니다. 후속 세 관점도 관점별 질의로 고정된 공식 웹 자료를 **어휘 검색**하고 공통 논문 근거와 함께 사용합니다. 부족한 이유를 바탕으로 질의를 한 번 수정하는 검색·재평가 절차가 있습니다. 실제 사내 문서를 검색하거나 RFP를 검토하는 서비스는 이 보고서 생성기의 구현 범위에 포함되지 않습니다.
 
 ## Directory Structure

@@ -2,10 +2,16 @@
 
 from copy import deepcopy
 
+from agents.contracts import NodeError, ReportResult, WriteRequest, evidence_registry
+from rag.budget import BudgetExceeded
 from rag.corpus import normalized
-from rag.evidence import collect_evidence, report_errors, validate_assessment
+from rag.conflicts import build_conflict_records, conflict_record_errors
+from rag.evidence import (collect_evidence, gap_decision_errors, report_errors,
+                          validate_assessment)
+from rag.llm import APIError
 from rag.payloads import synthesis_payload
-from rag.schemas import ReportDraft
+from rag.request_budget import InputBudgetExceeded
+from rag.schemas import GapDecisions, Report, ReportDraft
 
 
 WRITER_INSTRUCTIONS = (
@@ -37,7 +43,7 @@ def source_claims(joined):
             "evidence": {key: value for key, value in joined["evidence"].items() if key in evidence_ids}}
 
 
-def write_report(structured, joined, chunks, revision_requests=None, previous_report=None):
+def draft_report(structured, joined, chunks, revision_requests=None, previous_report=None):
     """Create the report draft; evaluation and retry routing belong to separate nodes."""
     joined = source_claims(joined)
     compact = [{key: claim[key] for key in (
@@ -69,3 +75,121 @@ def write_report(structured, joined, chunks, revision_requests=None, previous_re
             "근거 인용과 조건을 보존하라. 반영할 근거가 없으면 새 사실을 만들지 말고 해당 claim을 제한하거나 미확인으로 표현하라."
         )
     return structured("synthesis_report", ReportDraft, instructions, payload, check_report)
+
+
+def review_gap_batch(structured, joined, source_metadata, index, batch):
+    compact = [{key: claim[key] for key in ("id", "kind", "text", "conditions", "caveats")}
+               for claim in joined["claims"].values()]
+    return structured(f"synthesis_gaps_{index}", GapDecisions,
+        "종합 역할의 근거 공백 재판정만 수행하라. 제공된 gap_records 각 ID를 정확히 한 번 판정하라. "
+        "resolved는 공백 전체가 기존 주장으로 해소됐을 때만 사용하고 근거 claim_ids를 연결하라. "
+        "unknown 주장만으로 해소하지 마라. 부분 해소, 채택, 비용 등 미확인 정보는 unresolved로 유지하라. "
+        "각 resolution은 확인 범위와 남은 한계를 간결히 적고 새 사실이나 출처를 만들지 마라.",
+        {"gap_records": batch, "source_metadata": source_metadata, "claims": compact},
+        lambda value: gap_decision_errors(value["gap_decisions"], batch, joined["claims"]))["gap_decisions"]
+
+
+class WriterArtifactMismatch(ValueError):
+    """Input registries contain conflicting identifiers or report evidence."""
+
+
+def _merge_results(request):
+    assessments, chunk_map, source_objects = {}, {}, {}
+    for result in request.results.values():
+        for name, assessment in result.assessments.items():
+            assessments[name] = assessment.model_dump(mode="json")
+        for chunk in result.chunks:
+            value = chunk.model_dump(mode="json")
+            previous = chunk_map.get(chunk.id)
+            previous_value = previous.model_dump(mode="json") if previous else None
+            if previous_value is not None and previous_value != value:
+                fields = sorted(key for key in set(value) | set(previous_value)
+                                if value.get(key) != previous_value.get(key))
+                raise WriterArtifactMismatch("Research views returned conflicting source chunk fields: "
+                                             + ", ".join(fields))
+            chunk_map[chunk.id] = chunk
+        for source_id, source in result.sources.items():
+            value = source.model_dump(mode="json")
+            if source_id in source_objects and source_objects[source_id].model_dump(mode="json") != value:
+                raise WriterArtifactMismatch("Research views returned conflicting source metadata")
+            source_objects[source_id] = source
+    chunks = evidence_registry(list(chunk_map.values()), source_objects)
+    sources = {source_id: source.model_dump(mode="json") for source_id, source in source_objects.items()}
+    claims, evidence = collect_evidence(assessments, chunks)
+    joined = {
+        "claims": claims, "evidence": evidence, "assessments": assessments,
+        "conflicts": [item for assessment in assessments.values() for item in assessment["conflicts"]],
+        "gaps": [item for assessment in assessments.values() for item in assessment["gaps"]],
+        "gap_records": [{"id": f"gap-{name}-{index}", "perspective": name, "text": gap}
+                        for name, assessment in assessments.items()
+                        for index, gap in enumerate(assessment["gaps"], 1)],
+    }
+    joined["conflict_records"] = build_conflict_records(assessments, claims)
+    errors = conflict_record_errors(joined["conflict_records"], claims, assessments)
+    if errors:
+        raise WriterArtifactMismatch("Conflict provenance validation failed")
+    return joined, chunks, sources
+
+
+def _node_error(exc):
+    if isinstance(exc, APIError):
+        code = "api_error"
+    elif isinstance(exc, BudgetExceeded):
+        code = "budget_exceeded"
+    elif isinstance(exc, InputBudgetExceeded):
+        code = "input_budget_exceeded"
+    elif isinstance(exc, WriterArtifactMismatch):
+        code = "artifact_mismatch"
+    else:
+        code = "invalid_response"
+    return NodeError(code=code, message=f"Writer failed: {type(exc).__name__}", retryable=False)
+
+
+def write_report(request, structured):
+    """Generator node contract: WriteRequest to a source-linked ReportResult."""
+    request = WriteRequest.model_validate(request)
+    try:
+        joined, chunks, sources = _merge_results(request)
+        previous = request.previous_report.report.model_dump(mode="json") if request.previous_report else None
+        draft = draft_report(structured, joined, chunks, request.feedback, previous)
+        gap_records = joined["gap_records"]
+        if request.previous_report:
+            decisions = [decision.model_dump(mode="json")
+                         for decision in request.previous_report.report.gap_decisions]
+        else:
+            decisions = []
+            for index in range(0, len(gap_records), 5):
+                decisions.extend(review_gap_batch(structured, joined, sources, index // 5,
+                                                  gap_records[index:index + 5]))
+        report = Report.model_validate({**draft, "gap_decisions": decisions}).model_dump(mode="json")
+        synthesis, synthesis_evidence = collect_evidence(
+            {"synthesis": {"claims": report["synthesis_claims"]}}, chunks)
+        joined = {**joined, "claims": {**joined["claims"], **synthesis},
+                  "evidence": {**joined["evidence"], **synthesis_evidence}}
+        errors = report_errors(report, joined["claims"], chunks, joined["gap_records"])
+        if errors:
+            raise ValueError("Report contract validation failed: " + "; ".join(errors))
+
+        from rag.render import build_report_markdown
+        markdown, context = build_report_markdown(report, joined, sources, request.context.model_dump(mode="json"))
+        used_chunk_ids = {joined["evidence"][evidence_id]["chunk_id"]
+                          for claim_id in context["used_claims"]
+                          for evidence_id in joined["claims"][claim_id]["evidence_ids"]}
+        chunk_by_id = {chunk["id"]: chunk for chunk in chunks}
+        if used_chunk_ids - set(chunk_by_id):
+            raise WriterArtifactMismatch("Report references a chunk outside its research results")
+        used_sources = {source_id: sources[source_id] for source_id in context["used_sources"]}
+        result = ReportResult.model_validate({
+            **{key: getattr(request, key) for key in ("contract_version", "run_id", "request_id", "attempt", "context")},
+            "status": "ok", "markdown": markdown, "report": report, "joined": joined,
+            "chunks": [chunk_by_id[chunk_id] for chunk_id in sorted(used_chunk_ids)],
+            "sources": used_sources, "error": None,
+        })
+        return result.model_dump(mode="json")
+    except (APIError, BudgetExceeded, InputBudgetExceeded, ValueError, KeyError) as exc:
+        failure = ReportResult.model_validate({
+            **{key: getattr(request, key) for key in ("contract_version", "run_id", "request_id", "attempt", "context")},
+            "status": "failed", "markdown": None, "report": None, "joined": None,
+            "chunks": [], "sources": {}, "error": _node_error(exc),
+        })
+        return failure.model_dump(mode="json")

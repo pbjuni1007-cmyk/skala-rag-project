@@ -11,19 +11,19 @@ import traceback
 from langgraph.graph import StateGraph, START, END
 from pydantic import ValidationError
 
+from agents.contracts import (EvaluationRequest, EvaluationResult, NodeError, ReportResult,
+                              ResearchResult, WriteRequest)
 from rag.budget import write_json, BudgetExceeded
 from rag.context import build_research_context, assessment_evidence
 from rag.evidence import (validate_assessment, collect_evidence, validate_retrieval_review,
-                          validate_perspective, gap_decision_errors, CORE_FACETS)
+                          validate_perspective, gap_decision_errors, report_errors, CORE_FACETS)
 from rag.evaluator import ArtifactMismatchError, evaluate_report as evaluate_report_quality
 from rag.llm import APIError
 from rag.request_budget import InputBudgetExceeded, STRUCTURED_REPAIR_HEADROOM, deduplicate_chunks
 from rag.reassessment import reassess_facets
 from rag.repair import REPAIR_INSTRUCTIONS, restore_sufficient, plan_repairs, apply_patch, restore_verbatim_references
-from rag.schemas import (Assessment, Queries, Report, State, RetrievalReview, GapDecisions,
-                         PerspectiveQueries, ResearchResult, WriteRequest, ReportResult,
-                         EvaluationRequest, NodeError)
-from rag.writer import source_claims, write_report
+from rag.schemas import Assessment, Queries, Report, State, RetrievalReview, GapDecisions, PerspectiveQueries
+from rag.writer import draft_report, review_gap_batch, source_claims
 
 BASE = """당신은 공개 근거를 보존하는 한국어 KV Cache 기술 평가 연구자다.
 사용자가 지정한 단일 도메인: 기업의 IT 사업 문서 검토를 지원하는 Agentic AI.
@@ -209,8 +209,21 @@ class Pipeline:
         return result
 
     def _contract_context(self):
-        return {"technologies": self.config["technologies"], "domain": self.config["domain"],
+        return {"technologies": ["KIVI", "InfiniGen"], "domain": self.config["domain"],
                 "scenario": self.config["scenario"]}
+
+    @staticmethod
+    def _contract_chunk(chunk):
+        return {**chunk, "page": chunk.get("page"), "section": chunk.get("section")}
+
+    @staticmethod
+    def _contract_source(source):
+        return {**source, "version": source.get("version") or "unknown",
+                "date": source.get("date") or "unknown"}
+
+    @staticmethod
+    def _contract_assessment(assessment):
+        return {key: assessment[key] for key in ("status", "claims", "conflicts", "gaps") if key in assessment}
 
     def _contract_envelope(self, role, attempt, state=None):
         run_config = (state or {}).get("run_config", {})
@@ -229,16 +242,15 @@ class Pipeline:
                                    for technology in self.config["technologies"]}
             else:
                 assessment_rows = {view: joined["assessments"][view]}
-            assessment_rows = {name: {key: assessment[key] for key in ("status", "claims", "conflicts", "gaps")
-                                      if key in assessment}
+            assessment_rows = {name: self._contract_assessment(assessment)
                                for name, assessment in assessment_rows.items()}
             referenced_chunk_ids = {reference["chunk_id"]
                                     for assessment in assessment_rows.values()
                                     for claim in assessment.get("claims", [])
                                     for reference in claim.get("references", [])}
-            chunks = [by_chunk[cid] for cid in sorted(referenced_chunk_ids) if cid in by_chunk]
+            chunks = [self._contract_chunk(by_chunk[cid]) for cid in sorted(referenced_chunk_ids) if cid in by_chunk]
             source_ids = {chunk.get("source_id") for chunk in chunks}
-            sources = {source_id: self.corpus.sources[source_id] for source_id in source_ids
+            sources = {source_id: self._contract_source(self.corpus.sources[source_id]) for source_id in source_ids
                        if source_id in self.corpus.sources}
             statuses = [assessment.get("status", "failed") for assessment in assessment_rows.values()]
             status = "ok" if all(item == "ok" for item in statuses) else "insufficient"
@@ -250,10 +262,10 @@ class Pipeline:
             result_payloads[view] = ResearchResult(
                 **self._contract_envelope(view, result_attempt, state), view=view, status=status,
                 assessments=assessment_rows, chunks=chunks, sources=sources, error=None,
-            ).model_dump()
+            ).model_dump(mode="json")
         previous = state.get("report_result")
         if previous and previous.get("status") == "ok":
-            previous = ReportResult.model_validate(previous).model_dump()
+            previous = ReportResult.model_validate(previous).model_dump(mode="json")
         else:
             previous = None
         feedback = []
@@ -272,17 +284,24 @@ class Pipeline:
         from rag.render import build_report_markdown
 
         envelope = self._contract_envelope("writer", attempt, state)
-        markdown, context = build_report_markdown(report, joined, self.corpus.sources, self._contract_context())
+        contract_sources = {source_id: self._contract_source(self.corpus.sources[source_id])
+                            for source_id in {item["source_id"] for item in joined["evidence"].values()}}
+        markdown, context = build_report_markdown(report, joined, contract_sources, self._contract_context())
         used_chunk_ids = {joined["evidence"][evidence_id]["chunk_id"]
                           for claim_id in context["used_claims"]
                           for evidence_id in joined["claims"][claim_id]["evidence_ids"]}
         chunk_by_id = {chunk["id"]: chunk for chunk in self.all_chunks}
         if used_chunk_ids - set(chunk_by_id):
             raise ArtifactMismatchError("Writer output references a chunk outside the source registry")
-        sources = {source_id: self.corpus.sources[source_id] for source_id in context["used_sources"]}
-        result = ReportResult(**envelope, status="ok", markdown=markdown, report=report,
-                              joined=joined, chunks=[chunk_by_id[cid] for cid in sorted(used_chunk_ids)],
-                              sources=sources, error=None).model_dump()
+        sources = {source_id: contract_sources[source_id] for source_id in context["used_sources"]}
+        contract_joined = {**joined, "assessments": {
+            name: self._contract_assessment(assessment)
+            for name, assessment in joined["assessments"].items()
+        }}
+        result = ReportResult.model_validate({**envelope, "status": "ok", "markdown": markdown,
+            "report": report, "joined": contract_joined,
+            "chunks": [self._contract_chunk(chunk_by_id[cid]) for cid in sorted(used_chunk_ids)],
+            "sources": sources, "error": None}).model_dump(mode="json")
         (self.out / "report.md").write_text(markdown)
         write_json(self.out / "report_result.json", result)
         return result
@@ -299,7 +318,16 @@ class Pipeline:
             code = "input_budget_exceeded"
         else:
             code = "invalid_response"
-        return NodeError(code=code, message=f"Node failed: {type(exc).__name__}", retryable=False).model_dump()
+        return NodeError(code=code, message=f"Node failed: {type(exc).__name__}", retryable=False).model_dump(mode="json")
+
+    def write_report_node(self, request):
+        """Supervisor callback: accept a WriteRequest and return a ReportResult."""
+        from rag.writer import write_report
+        return write_report(request, self.structured)
+
+    def evaluate_report_node(self, request):
+        """Supervisor callback: accept an EvaluationRequest and return an EvaluationResult."""
+        return evaluate_report_quality(self.structured, request)
 
     def research_technology(self, tech, tech_queries):
         queries_log, hits_log, diagnostics = [], {}, []
@@ -541,16 +569,7 @@ class Pipeline:
         writer_request = None
 
         def review_gaps(index, batch):
-            compact = [{key: claim[key] for key in ("id", "kind", "text", "conditions", "caveats")}
-                       for claim in joined["claims"].values()]
-            result = self.structured(f"synthesis_gaps_{index}", GapDecisions,
-                "종합 역할의 근거 공백 재판정만 수행하라. 제공된 gap_records 각 ID를 정확히 한 번 판정하라. "
-                "resolved는 공백 전체가 기존 주장으로 해소됐을 때만 사용하고 근거 claim_ids를 연결하라. "
-                "unknown 주장만으로 해소하지 마라. 부분 해소, 채택, 비용 등 미확인 정보는 unresolved로 유지하라. "
-                "각 resolution은 확인 범위와 남은 한계를 간결히 적고 새 사실이나 출처를 만들지 마라.",
-                {"gap_records": batch, "source_metadata": self.metadata(), "claims": compact},
-                lambda value: gap_decision_errors(value["gap_decisions"], batch, joined["claims"]))
-            return result["gap_decisions"]
+            return review_gap_batch(self.structured, joined, self.metadata(), index, batch)
 
         try:
             writer_request = self._write_request(state, joined, attempt)
@@ -560,7 +579,7 @@ class Pipeline:
                                if writer_request.previous_report else state.get("report"))
 
             def build_draft():
-                return write_report(self.structured, joined, self.all_chunks,
+                return draft_report(self.structured, joined, self.all_chunks,
                                     revision_requests=revision_requests, previous_report=previous_report)
 
             if revision_requests and previous_report:
@@ -579,6 +598,9 @@ class Pipeline:
             synthesis, evidence = collect_evidence({"synthesis": {"claims": report["synthesis_claims"]}}, self.all_chunks)
             claims = {**joined["claims"], **synthesis}
             joined = {**joined, "claims": claims, "evidence": {**joined["evidence"], **evidence}}
+            errors = report_errors(report, claims, self.all_chunks, joined.get("gap_records", []))
+            if errors:
+                raise ValueError("Final report validation failed: " + "; ".join(errors))
             write_json(self.out / "claims.json", claims)
             write_json(self.out / "evidence.json", joined["evidence"])
             write_json(self.out / "report_sections.json", report)
@@ -590,7 +612,7 @@ class Pipeline:
         except (ValueError, APIError, BudgetExceeded, KeyError) as exc:
             envelope = self._contract_envelope("writer", attempt, state)
             failure = ReportResult(**envelope, status="failed", markdown=None, report=None, joined=None,
-                                   chunks=[], sources={}, error=self._node_error(exc)).model_dump()
+                                   chunks=[], sources={}, error=self._node_error(exc)).model_dump(mode="json")
             write_json(self.out / "report_result.json", failure)
             self.save_node("report_writer", failure)
             return {"report": None, "report_result": failure, "markdown": None,
@@ -620,11 +642,10 @@ class Pipeline:
         except (ValueError, APIError, BudgetExceeded, InputBudgetExceeded, KeyError, TypeError) as exc:
             report_result = ReportResult.model_validate(state["report_result"])
             envelope = self._contract_envelope("evaluator", attempt, state)
-            from rag.schemas import EvaluationResult
             failure = EvaluationResult(
                 **envelope, report_request_id=report_result.request_id, status="failed", method="hybrid",
                 passed=False, checks={}, repair_requests=[], error=self._node_error(exc),
-            ).model_dump()
+            ).model_dump(mode="json")
             write_json(self.out / "quality_evaluation.json", failure)
             self.save_node("quality_evaluator", failure)
             return {"evaluation_result": failure,
@@ -636,7 +657,8 @@ class Pipeline:
     def render(self, state):
         from rag.render import render_report
         try:
-            result = render_report(self.out, state["report"], state["joined"], self.corpus.sources,
+            sources = state.get("report_result", {}).get("sources", self.corpus.sources)
+            result = render_report(self.out, state["report"], state["joined"], sources,
                                    self.settings, self.config, markdown=state.get("markdown"))
             # Human semantic and submission review is deliberately not auto-approved.
             return {"output_paths": result, "run_status": "human_review_pending"}

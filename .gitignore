@@ -202,4 +202,5 @@
 !/agents/researchers/
 !/agents/researchers/__init__.py
 !/agents/researchers/contract.py
+!/agents/researchers/result.py
 !/tests/test_research_contract.py

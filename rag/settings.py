@@ -67,8 +67,8 @@ class Settings:
         self.number("USD_TO_KRW")
         if self.number("BUDGET_COST_MULTIPLIER", 1.10) < 1.10:
             raise ValueError("Keep the approved 10% exchange/fee buffer")
-        if self.integer("LLM_MAX_INPUT_TOKENS", 24000) > 24000:
-            raise ValueError("This pricing contract limits input to 24,000 tokens")
+        if self.integer("LLM_MAX_INPUT_TOKENS", 24000) > 40000:
+            raise ValueError("This pricing contract limits input to 40,000 tokens")
         if self.integer("LLM_MAX_OUTPUT_TOKENS", 8000) > 128000:
             raise ValueError("Model output limit exceeded")
         if not 0 <= int(self.get("OPENAI_MAX_RETRIES", "2")) <= 2:

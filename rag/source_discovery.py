@@ -210,6 +210,10 @@ class Discovery:
                 raw_path.parent.mkdir(parents=True, exist_ok=True)
                 raw_path.write_bytes(raw)
                 write_json(path, snapshot)
+            if urlsplit(snapshot['final_url']).path.lower().endswith('.md'):
+                heading = re.search(r'^#\s+([^\n]+)', snapshot['text'], re.M)
+                if heading:
+                    snapshot['title'] = heading.group(1).strip()
             self.sources[ident] = {k: v for k, v in snapshot.items() if k != 'text'}
             self.sources[ident].update(type='external_web', expanded=True, local_path=str(path),
                 raw_path=str(raw_path), version=snapshot['text_sha256'], date='unknown')

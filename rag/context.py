@@ -1,9 +1,9 @@
 """Bounded full-chunk experiment context; no paper-specific facts or page rules."""
 import re
 
-CONTEXT_POLICY = 'full-chunk-caption-setup-neighbors-v2'
+CONTEXT_POLICY = 'full-chunk-caption-setup-neighbors-v3'
 CAPTION = re.compile(r'\b(?:Figure|Table)\s+\d+\s*[:.]', re.I)
-STRONG_SETUP = re.compile(r'\b(?:experimental setup|input prompt length|output length|input tokens|output tokens|batch size|wall.clock|workloads?)\b', re.I)
+STRONG_SETUP = re.compile(r'\b(?:experimental setup|input prompt length|output length|input tokens|output tokens|batch size|wall.clock|workloads?|we fix|vary)\b', re.I)
 SETUP = re.compile(r'\b(?:experimental setup|we use|we evaluate|hardware|batch size|wall.clock|input tokens|output tokens|workloads?|data ?sets?|input prompt length|output length)\b', re.I)
 
 
@@ -51,11 +51,12 @@ def companion_candidates(corpus, seeds):
 
     def setup_key(c):
         terms = {m.lower() for m in STRONG_SETUP.findall(c['text'])}
+        fixed_and_varied = {'we fix', 'vary'} <= terms
         paired_lengths = bool(terms & {'input tokens', 'input prompt length'}) and bool(terms & {'output tokens', 'output length'})
-        return (-int(paired_lengths), -len(terms), c['source_id'], c['page'], c.get('char_start', 0))
+        return (-int(fixed_and_varied), -int(paired_lengths), -len(terms), c['source_id'], c['page'], c.get('char_start', 0))
 
     # At most three same-source full chunks, ranked by distinct setting fields.
-    # A paired input/output length is stronger than repeated generic mentions.
+    # Keep fixed/varied variables together; paired lengths outrank generic mentions.
     fallback = []
     for source in sorted({c['source_id'] for c in seeds}):
         matches = [c for c in by_source.get(source, []) if len(set(STRONG_SETUP.findall(c['text']))) >= 2]
@@ -69,7 +70,9 @@ def companion_candidates(corpus, seeds):
             paired.append(captions[i])
         if i < len(setups):
             paired.append(setups[i])
-    return _unique(paired + ordered)
+    ablations = [c for c in setups if {'we fix', 'vary'} <=
+                 {m.lower() for m in STRONG_SETUP.findall(c['text'])}]
+    return _unique(ablations + paired + ordered)
 
 
 def _pack(corpus, required, companions, ranked, budget, companion_budget):
@@ -102,17 +105,17 @@ def build_research_context(corpus, ranked, technology, config):
     # Start from the legacy 6500/2800 selection before bounded replacement.
     baseline = _pack(corpus, [], corpus.adjacent_candidates(seeds), seeds, budget, reserve)
     companions = companion_candidates(corpus, _unique(seeds + baseline))
-    # Up to two cross-page-only choices can yield to a caption/setup pair.
+    # Up to three cross-page-only choices can yield to full experiment conditions.
     # Ranked hits keep their original order and full source text.
     ranked_ids = {c['id'] for c in seeds}
-    additions = [c for c in companions if c['id'] not in {b['id'] for b in baseline}][:2]
+    additions = [c for c in companions if c['id'] not in {b['id'] for b in baseline}][:3]
     retained = list(baseline)
     needed = sum(corpus.evidence_tokens(c['text']) for c in additions)
     removed = 0
     for c in reversed(baseline):
         if sum(corpus.evidence_tokens(b['text']) for b in retained) + needed <= budget:
             break
-        if c['id'] not in ranked_ids and removed < 2:
+        if c['id'] not in ranked_ids and removed < 3:
             retained.remove(c)
             removed += 1
     return _pack(corpus, retained, companions, [], budget, budget)

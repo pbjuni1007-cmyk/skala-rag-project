@@ -76,6 +76,30 @@ def test_oversize_and_redirect_results_are_not_saved(tmp_path):
     assert not sources
 
 
+def test_markdown_reference_title_comes_from_source_on_fetch_and_cache(tmp_path):
+    raw = b'# More results on LongBench\n\nOriginal benchmark table.'
+    _, sources = collect(tmp_path, lambda url, *a: (raw, url), total=1)
+    source = next(iter(sources.values()))
+    assert source['title'] == 'More results on LongBench'
+    path = Path(source['local_path'])
+    legacy = json.loads(path.read_text())
+    legacy['title'] = legacy['url']
+    path.write_text(json.dumps(legacy))
+    before = path.read_bytes()
+    _, cached = collect(tmp_path, lambda *a: pytest.fail('cache must avoid network'), total=1)
+    result = next(iter(cached.values()))
+    assert result['title'] == source['title']
+    assert result['raw_sha256'] == result['text_sha256'] == sha(raw)
+    assert result['accessed_at'] == source['accessed_at']
+    assert path.read_bytes() == before
+
+
+def test_markdown_without_heading_keeps_url_title(tmp_path):
+    _, sources = collect(tmp_path, lambda url, *a: (b'No heading in this source.', url), total=1)
+    source = next(iter(sources.values()))
+    assert source['title'] == source['url']
+
+
 def test_global_limit_and_frozen_identity(tmp_path):
     _, sources = collect(tmp_path, lambda url, *a: (b'evidence', url), total=2)
     assert len(sources) == 2

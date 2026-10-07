@@ -178,6 +178,28 @@ LangGraph가 선행 조사, 세 관점의 병렬 평가, 합류와 종료를 제
 
 기술 조사는 논문을 **벡터 검색**합니다. 후속 세 관점도 관점별 질의로 고정된 공식 웹 자료를 **어휘 검색**하고 공통 논문 근거와 함께 사용합니다. 부족한 이유를 바탕으로 질의를 한 번 수정하는 검색·재평가 절차가 있습니다. 실제 사내 문서를 검색하거나 RFP를 검토하는 서비스는 이 보고서 생성기의 구현 범위에 포함되지 않습니다.
 
+### 조사 에이전트 (#2)
+
+[협업 계약](docs/agent-contract.md)과 [요청·응답 예시](docs/agent-contract-examples.json)에 맞춰 `ResearchAgent(pipeline).research(request)`가 요청 하나의 관점만 처리합니다. `research`는 `research_kivi`·`research_infinigen`, 후속 `market`·`stakeholder`·`domain`은 자기 관점 키의 Assessment를 반환합니다. 결과 상태는 `ok`, 근거 공백을 보존하는 `insufficient`, 실행 실패인 `failed`입니다. 실패 코드는 `retrieval_error`, `invalid_response`, `api_error`, `budget_exceeded`, `input_budget_exceeded`, `uncertain_request`, `artifact_mismatch`, `render_error`로 제한합니다.
+
+최초 기술 조사는 질의 계획 1회 후 두 기술을 최대 2개 작업자로 병렬 검색합니다. 기술마다 검색은 최대 2라운드입니다. 첫 라운드의 불충분한 검색 검토나 구조 검증 실패에 대해 질의를 한 번 고쳐 재검색하며, 각 라운드에는 검색 검토가 한 번, 검토가 충분하면 Assessment 시도가 최대 한 번 있습니다. 따라서 기술별 최대 2회까지 평가를 시도할 수 있습니다. `feedback`과 `previous_result`가 있으면 대상 기술마다 네 facet의 질의를 다시 작성한 뒤 같은 검색 한도를 적용합니다. 이전 결과에서 `ok`가 아닌 기술만 재검색하고, 두 기술이 모두 `ok`면 둘 다 다시 조사하며 대상이 아닌 기술의 기존 평가·인용 청크는 보존합니다. 이전 결과가 `failed`면 새 질의 계획으로 시작하되 feedback을 반영합니다.
+
+최초 후속 조사는 관점별 Assessment를 한 번 시도하고, 미확인 facet이 남으면 질의 재작성·재검색·재평가를 최대 1회 수행합니다. 이전 결과와 feedback을 받은 경우 기존 논문 인용 근거가 유지되면 1~3개 facet의 검색 질의를 다시 만들고 한 번 재평가하며 나머지 facet의 주장은 보존합니다. 질의별 웹 결과는 최대 6개입니다. 기존 논문 근거가 달라졌으면 전체 후속 조사를 다시 수행하고, 이전 결과가 `failed`면 feedback을 넣은 최초 조사로 진행합니다. 구조화 호출은 한 차례의 수정 라운드를 허용하며 독립 수정 단위는 최대 8개입니다.
+
+논문은 기술별 네 facet(`mechanism`, `limitation`, `conditions`, `maturity`)을 `top_k=5`로 E5 벡터 검색하고, facet마다 검색 질의를 하나씩 사용합니다. 문맥은 6,500 E5 토큰이며 이웃 페이지·표·실험 설정 보완에 최대 2,800 토큰을 배정합니다. 후속 관점은 고정 웹 스냅샷을 어휘 검색해 관점 질의와 사용자 질문 질의에서 각각 최대 8개 후보를 모으고 2,000 토큰으로 제한합니다. 기술 조사에서 인용한 근거도 6,500/2,800 토큰 정책으로 전달합니다. 최초 후속 조사에서 facet 재검색은 확장 스냅샷만 대상으로 하고, feedback 재조사는 전체 스냅샷에서 질의별 최대 6개를 가져옵니다. 보강 문맥은 최대 2,000 E5 토큰입니다. 설정의 전체 설명은 위 [자료·검색 실험](#자료와-검색-실험)과 [검색 회귀 검증](docs/retrieval-regression.md)을 참고하세요.
+
+임베딩 설정은 `intfloat/multilingual-e5-small`, revision `614241f622f53c4eeff9890bdc4f31cfecc418b3`, CPU, 정규화한 384차원 벡터, `query:`·`passage:` 접두사입니다. 청크는 300토큰에 50토큰이 겹칩니다. 질의와 청크는 인코더 한도를 넘으면 자르지 않고 실패 처리합니다. 자료 풀은 논문 2편(KIVI 15페이지, InfiniGen 18페이지; 총 33페이지, 상한 200)과 등록 웹 출처 4개입니다. 허용된 경로에서 깊이 1, 출처별 최대 3개·전체 최대 6개를 확장하며, 원문 해시가 확인된 사본을 고정해 검색합니다. 생성 중 실시간 웹 검색이나 내부 문서 검색은 하지 않습니다.
+
+두 기술에는 같은 질문 구조와 facet을 적용하고, `limitation`·비용·위험 등 반대 근거와 부담도 이익과 함께 찾습니다. 반대 근거를 못 찾은 경우에는 `검색 범위에서 반대 근거 미확인`으로 적고 부재를 단정하지 않습니다. `balance_findings`는 모든 관점의 주장 caveat를 확인하고, 기술 조사 `limitation`, 시장성 `costs`, 도메인 `risks`를 반대 근거 facet으로 점검합니다. 이해관계자에는 지정된 단일 반대 facet이 없습니다. 필요한 caveat나 반대 facet이 빠지면 gap을 추가하고 상태를 `insufficient`로 바꿉니다. `balance.json`과 검색 로그에는 관점·기술별 distinct source 수, 최다 출처 인용 비중, 재조사 대상·질의와 검색 결과 ID를 기록합니다. `source_fact`와 `author_reported_result`는 인용 청크로 뒷받침되는 사실에만 사용합니다. 업무 적용 판단은 `team_inference` 또는 `scenario`, 검색 범위에서 확인되지 않은 내용은 `unknown`으로 표시합니다.
+
+결과와 로컬 로그는 요청별 `outputs/<실행ID>/research/<관점>/<request_id>/` 아래에 저장합니다. `result.json`은 매 요청에 기록하고 실패 결과에는 `error.json`도 남깁니다. 기술 조사는 `retrieval/research.json`과 요청 디렉터리의 `balance.json`, 후속 관점은 `retrieval/<관점>.json`과 `retrieval/balance.json`에 검색·균형 진단을 기록합니다.
+
+[ResearchResult 예시](tests/fixtures/research/README.md)는 저장된 레거시 실행 `20260922T053015-c4b5d5`에서 변환한 자료이며 새 에이전트의 실시간 실행 결과가 아닙니다. 계약·인용·검색 흐름 테스트는 다음 명령으로 실행합니다.
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider tests/test_research_*.py
+```
+
 ## Directory Structure
 
 ```text
@@ -200,6 +222,7 @@ LangGraph가 선행 조사, 세 관점의 병렬 평가, 합류와 종료를 제
 | 경로 | 책임 |
 | --- | --- |
 | `app.py`, `rag/graph.py`, `rag/schemas.py` | 실행 진입점, 역할별 그래프, 공유 State와 구조화 응답 |
+| `agents/researchers/` | 계약형 조사 요청 처리와 기술 성숙도·시장성·이해관계자·도메인 Assessment 생성 |
 | `rag/corpus.py`, `rag/source_discovery.py` | 원문 수집·청킹·임베딩·검색·출처 관리 |
 | `rag/llm.py`, `rag/budget.py`, `rag/request_budget.py`, `rag/repair.py` | API 호출·입력 한도·비용·제한된 오류 수정 |
 | `rag/evidence.py`, `rag/render.py` | 주장·인용·보고서 구조 검증과 Markdown·PDF 작성 |

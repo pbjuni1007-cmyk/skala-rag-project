@@ -216,3 +216,4 @@
 !/tests/test_research_agent.py
 !/tests/test_research_isolation.py
 !/tests/test_research_feedback.py
+!/scripts/export_research_samples.py

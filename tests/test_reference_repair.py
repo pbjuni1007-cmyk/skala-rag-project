@@ -255,6 +255,7 @@ def test_ambiguous_rebind_keeps_bounded_model_selection(tmp_path, main05_citatio
     source_chunks = deepcopy(data['chunks'])
     alternative = deepcopy(next(c for c in source_chunks if c['id'] == data['supporting_chunk_id']))
     alternative['id'] += ':overlap'
+    alternative['page'] += 1  # The same sentence at a genuinely different location.
     source_chunks.append(alternative)
     value = citation_assessment(data['wrongly_bound'])
     patch = {'patches': [{'target_id': 'claims:0:reference:0', 'chunk_id': alternative['id'],
@@ -265,6 +266,97 @@ def test_ambiguous_rebind_keeps_bounded_model_selection(tmp_path, main05_citatio
     assert fixed['claims'][0]['references'][0] == {
         'chunk_id': alternative['id'], 'quote': data['wrongly_bound']['quote']}
     assert len(p.gateway.calls) == 2
+
+
+@pytest.fixture
+def main07_citations():
+    return json.loads((Path(__file__).parent / 'fixtures/research/main07_citations.json').read_text())
+
+
+@pytest.mark.parametrize('case_index', [0, 1, 2])
+def test_main07_recovers_source_location_and_case_without_model_repair(tmp_path, main07_citations, case_index):
+    data = main07_citations
+    case = data['cases'][case_index]
+    value = citation_assessment(case['reference'])
+    value['claims'][0]['technology'] = case['technology']
+    before = deepcopy(value)
+    source_chunks = data['chunks']
+    p = pipeline(tmp_path, [value])
+    fixed = p.structured('stakeholder', Assessment, 'test', {'chunks': source_chunks},
+                         lambda answer: validate_assessment(answer, source_chunks, case['technology']))
+    expected = deepcopy(value)
+    supporting = next(c for c in source_chunks if c['id'] == case['expected_chunk_id'])
+    expected['claims'][0]['references'][0] = {'chunk_id': supporting['id'],
+        'quote': source_verbatim_quote(case['reference']['quote'], supporting['text'])}
+    assert fixed == expected and value == before
+    assert not validate_assessment(fixed, source_chunks, case['technology'])
+    assert len(p.gateway.calls) == 1
+
+
+def test_sentence_initial_case_restores_only_a_unique_sentence_start():
+    quote = 'we use the same settings for this experiment.'
+    actual = 'We use the same settings for this experiment.'
+    assert source_verbatim_quote(quote, 'Earlier result. ' + actual) == actual
+    assert source_verbatim_quote(quote, actual + ' ' + actual) == quote
+    assert source_verbatim_quote(quote, 'The label says ' + actual) == quote
+
+
+def test_overlapping_repeated_quote_keeps_rebind_ambiguous():
+    quote = 'test test test'
+    value = citation_assessment({'chunk_id': 'wrong', 'quote': quote})
+    source_chunks = [{'id': ident, 'source_id': 'kivi', 'technology': 'KIVI',
+                      'page': 1, 'char_start': 0, 'char_end': len(text), 'text': text}
+                     for ident, text in [('wrong', 'unrelated source text'),
+                                         ('short', quote), ('long', quote + ' test')]]
+    unit, = plan_repairs(value, validate_assessment(value, source_chunks, 'KIVI'), {}, source_chunks)
+    assert unit.kind == 'reference' and len(unit.content['chunks']) == 2
+
+
+def test_overlapping_pdf_wrap_matches_do_not_select_one_source_span():
+    quote = 'testing testing testing'
+    source = 'test-\ning test-\ning test-\ning test-\ning'
+    assert source_verbatim_quote(quote, source) == quote
+
+
+@pytest.mark.parametrize('source', ['We use 30 tokens.', 'WE use 20 tokens.',
+    'We Use 20 tokens.', 'We use 20 tokens!', 'They use 20 tokens.'])
+def test_initial_case_restoration_does_not_change_numbers_words_or_other_case(source):
+    quote = 'we use 20 tokens.'
+    assert source_verbatim_quote(quote, source) == quote
+
+
+@pytest.mark.parametrize('difference', ['source_id', 'page', 'char_start', 'missing_offset', 'repeated'])
+def test_overlap_rebind_requires_one_verified_absolute_source_span(main07_citations, difference):
+    data = main07_citations
+    case = data['cases'][1]
+    value = citation_assessment(case['reference'])
+    source_chunks = deepcopy(data['chunks'])
+    other = next(c for c in source_chunks if c['id'] == 'kivi:p7:t750')
+    if difference == 'missing_offset':
+        other.pop('char_start')
+    elif difference == 'repeated':
+        other['text'] += ' ' + case['reference']['quote']
+        other['char_end'] = other['char_start'] + len(other['text'])
+    elif difference == 'source_id':
+        other['source_id'] = 'different-version'
+    else:
+        other[difference] += 1
+        if difference == 'char_start':
+            other['char_end'] += 1
+    unit, = plan_repairs(value, validate_assessment(value, source_chunks, 'KIVI'), {}, source_chunks)
+    assert unit.kind == 'reference' and len(unit.content['chunks']) == 2
+
+
+def test_main07_expanded_quote_is_still_rejected_after_overlap_resolution(main07_citations):
+    data = main07_citations
+    case = data['cases'][1]
+    value = citation_assessment(case['reference'])
+    unit, = plan_repairs(value, validate_assessment(value, data['chunks'], 'KIVI'), {}, data['chunks'])
+    expanded = ('From Table 5, we observe that group sizes 32 and 64 yield similar results, whereas '
+                + case['reference']['quote'])
+    with pytest.raises(ValueError, match='preserve the original quotation'):
+        apply_patch(value, unit, {'patches': [{'target_id': unit.target_id,
+            'chunk_id': case['expected_chunk_id'], 'quote': expanded}]})
 
 
 def test_unique_rebind_preserves_other_correction_and_final_validation(tmp_path, main05_citations):

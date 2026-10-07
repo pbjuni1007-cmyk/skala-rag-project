@@ -138,6 +138,10 @@ def plan_repairs(value, errors, content, source_chunks):
                                 and len(normalized(ref['quote'])) >= 12
                                 and normalized(source_verbatim_quote(ref['quote'], c['text']))
                                 in normalized(c['text'])]
+                    if len(relevant) > 1:
+                        spans = [source_quote_span(ref['quote'], c) for c in relevant]
+                        if spans[0] is not None and all(span == spans[0] for span in spans):
+                            relevant = [min(relevant, key=lambda c: (c['char_start'], c['id']))]
                 if ref['chunk_id'] not in lookup or relevant:
                     units.append(RepairUnit('reference', target, ReferencePatches,
                         {'target_id': target, 'claim': deepcopy(claim), 'reference': deepcopy(ref),
@@ -179,10 +183,10 @@ def plan_repairs(value, errors, content, source_chunks):
 
 
 def source_verbatim_quote(quote, source):
-    """Restore only PDF word-wrap hyphens through one unique source span.
+    """Restore PDF wrapping or lowercase sentence initials to a unique source span.
 
     The saved quotation is the original source substring, never a rewritten
-    source. Other wording, numbers and punctuation cannot be repaired here.
+    source. Other wording, numbers, case and punctuation cannot be repaired here.
     """
     if normalized(quote) in normalized(source):
         return quote
@@ -195,8 +199,37 @@ def source_verbatim_quote(quote, source):
             pattern.append(r'-\s*')
         else:
             pattern.append(r'\s+' if char.isspace() else re.escape(char))
-    matches = list(re.finditer(''.join(pattern), source)) if text else []
-    return matches[0].group() if len(matches) == 1 else quote
+    # Look ahead so overlapping repetitions also make the location ambiguous.
+    matches = list(re.finditer('(?=(' + ''.join(pattern) + '))', source)) if text else []
+    if not matches and len(text) > 1 and 'a' <= text[0] <= 'z' and 'a' <= text[1] <= 'z':
+        # Only restore a capital at a source sentence boundary, never case-fold
+        # an acronym, an internal letter or the rest of the quotation.
+        sentence_pattern = re.escape(text[0].upper()) + ''.join(pattern[1:])
+        matches = [m for m in re.finditer('(?=(' + sentence_pattern + '))', source)
+                   if not source[:m.start(1)].strip() or source[:m.start(1)].rstrip().endswith(('.', '!', '?'))]
+    return matches[0].group(1) if len(matches) == 1 else quote
+
+
+def source_quote_span(quote, chunk):
+    """Identify a unique physical span within the supplied frozen PDF source.
+
+    Missing offsets, repeated text and different locations remain ambiguous.
+    A source ID belongs to one version in the frozen source registry.
+    """
+    start, end, page = chunk.get('char_start'), chunk.get('char_end'), chunk.get('page')
+    if (not chunk.get('source_id') or type(page) is not int or page < 1
+            or type(start) is not int or type(end) is not int or start < 0
+            or end - start != len(chunk['text'])):
+        return None
+    verbatim = normalized(source_verbatim_quote(quote, chunk['text']))
+    if not verbatim:
+        return None
+    pattern = r'\s+'.join(re.escape(word) for word in verbatim.split())
+    matches = list(re.finditer('(?=(' + pattern + '))', chunk['text']))
+    if len(matches) != 1:
+        return None
+    match = matches[0]
+    return (chunk['source_id'], page, start + match.start(1), start + match.end(1))
 
 
 def restore_verbatim_references(value, source_chunks):

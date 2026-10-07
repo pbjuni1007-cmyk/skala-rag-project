@@ -1,0 +1,44 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	supervisor(supervisor)
+	research(research)
+	market(market)
+	stakeholder(stakeholder)
+	domain(domain)
+	writer(writer)
+	evaluator(evaluator)
+	publish(publish)
+	__end__([<p>__end__</p>]):::last
+	__start__ -. &nbsp;stop&nbsp; .-> __end__;
+	__start__ -.-> domain;
+	__start__ -.-> evaluator;
+	__start__ -.-> market;
+	__start__ -.-> publish;
+	__start__ -.-> research;
+	__start__ -.-> stakeholder;
+	__start__ -.-> supervisor;
+	__start__ -.-> writer;
+	domain --> supervisor;
+	evaluator --> supervisor;
+	market --> supervisor;
+	publish --> supervisor;
+	research --> supervisor;
+	stakeholder --> supervisor;
+	supervisor -. &nbsp;stop&nbsp; .-> __end__;
+	supervisor -.-> domain;
+	supervisor -.-> evaluator;
+	supervisor -.-> market;
+	supervisor -.-> publish;
+	supervisor -.-> research;
+	supervisor -.-> stakeholder;
+	supervisor -.-> writer;
+	writer --> supervisor;
+	supervisor -.-> supervisor;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

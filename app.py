@@ -57,7 +57,8 @@ def main():
         state = json.loads((args.render / "state.json").read_text())
         if not state.get("validation_result", {}).get("passed"):
             raise ValueError("Cannot render a run that has not passed citation validation")
-        result = render_report(args.render, state["report"], state["joined"], state["source_registry"], settings, state["run_config"]["config"])
+        result = render_report(args.render, state["report"], state["joined"], state["source_registry"],
+                               settings, state["run_config"]["config"], markdown=state.get("markdown"))
         print(json.dumps(result, ensure_ascii=False))
         return 0
     from rag.corpus import Corpus

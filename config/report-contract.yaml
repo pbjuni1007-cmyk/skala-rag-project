@@ -1,4 +1,4 @@
-version: 3
+version: 4
 purpose: Compare KIVI and InfiniGen for enterprise IT document review
 technologies: [KIVI, InfiniGen]
 roles: [research, market, stakeholder, domain, writer, quality_evaluator]
@@ -12,9 +12,9 @@ report:
   evidence: verbatim_source_quotes_with_page_or_web_section
   evaluation:
     method: hybrid
-    criteria: [groundedness, neutrality, bias_control, perspective_coverage]
+    criteria: [groundedness, neutrality, bias_control, coverage]
     code_checks: [report_schema, citation_id_mapping, quotation_exists, perspective_placement]
-    llm_judge_checks: [semantic_support, neutrality, source_bias, perspective_coverage]
+    llm_judge_checks: [semantic_support, neutrality, source_bias, coverage]
     failed_status: revision_requested
     feedback_state_key: report_revision_requests
     judge_is_independent_model: false

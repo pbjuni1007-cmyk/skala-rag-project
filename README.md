@@ -81,10 +81,14 @@ flowchart LR
  J --> Y[Writer]
  Y --> V[품질 Evaluator]
  V -->|통과| O[Markdown, PDF, 검수표]
- V -->|보완 필요| F[quality_evaluation와 report_revision_requests]
+ V -->|보완 필요| F[evaluation_result와 report_revision_requests]
 ```
 
-LangGraph가 선행 조사, 세 후속 관점의 병렬 평가, Writer, Evaluator와 종료를 제어합니다. 기술 조사는 두 기술을 최대 2개, 후속 평가는 최대 3개 동시 호출로 처리합니다. 각 역할은 질문, 입력, 응답 구조, 검증 규칙을 따로 사용하고 모델 호출과 예산 관리는 공유합니다. 품질 미달이면 현재 실행을 통과 처리하지 않고 `quality_evaluation`과 `report_revision_requests`를 State에 남깁니다. Supervisor는 이 요청을 Writer에 전달하고 수정 보고서를 Evaluator에 다시 제출할 수 있습니다. Evaluator 자체는 재작업 경로를 소유하지 않습니다.
+LangGraph가 선행 조사, 세 후속 관점의 병렬 평가, Writer, Evaluator와 종료를 제어합니다. 기술 조사는 두 기술을 최대 2개, 후속 평가는 최대 3개 동시 호출로 처리합니다. 각 역할은 질문, 입력, 응답 구조, 검증 규칙을 따로 사용하고 모델 호출과 예산 관리는 공유합니다. Writer는 네 관점과 근거를 사용해 SUMMARY, 본문, REFERENCE가 있는 Markdown을 만듭니다. Markdown은 `ReportResult.markdown`에 저장되고 PDF 변환에도 같은 본문을 전달합니다. Writer의 생성 성공은 품질 통과를 뜻하지 않습니다.
+
+Evaluator는 코드 검사와 별도 LLM Judge를 결합한 Hybrid 방식을 사용합니다. 코드 검사는 보고서 스키마, 주장과 인용 ID의 연결, 원문 인용 존재, 관점 배치를 확인합니다. Judge는 제공된 주장과 연결된 검색 청크 및 출처를 읽고 Groundedness, Neutrality, Bias Control, Coverage를 각각 판정합니다. 코드 검사만으로 의미적 뒷받침을 확인했다고 보지 않으며, 출처 집중도만으로 편향을 확정하지 않습니다. Judge는 Writer와 같은 모델 설정을 공유하므로 독립적인 모델 검증이 아니고, 제공된 검색 자료의 완전성을 보증하지 않습니다. 사람의 최종 근거 검수와 PDF 페이지 검수도 대체하지 않습니다.
+
+Evaluator 결과는 공통 계약의 `EvaluationResult` 형태로 저장합니다. `status=ok`는 평가 실행 완료를, `passed`는 네 기준 모두 통과 여부를 나타냅니다. 평가 실행 오류는 `status=failed`, 빈 `checks`, 오류 정보를 반환하고, 품질 미달은 `status=ok`, `passed=false`와 대상 역할, claim ID, gap ID가 담긴 `repair_requests`를 반환합니다. 재작업 경로와 종료 상한은 Supervisor 소유입니다. 요청·응답 필드와 책임 경계는 [공통 에이전트 계약](docs/agent-contract.md) 및 [모의 인계 예시](docs/agent-contract-examples.json)를 따릅니다.
 
 기술 조사는 논문을 **벡터 검색**합니다. 후속 세 관점도 관점별 질의로 고정된 공식 웹 자료를 **어휘 검색**하고 공통 논문 근거와 함께 사용합니다. 부족한 이유를 바탕으로 질의를 한 번 수정하는 검색·재평가 절차가 있습니다. 실제 사내 문서를 검색하거나 RFP를 검토하는 서비스는 이 보고서 생성기의 구현 범위에 포함되지 않습니다.
 
@@ -142,7 +146,7 @@ uv run python app.py --resume outputs/<실행ID> # 동일 코드·입력의 완�
 
 코드를 수정한 뒤에는 `--reuse-calls outputs/<실행ID>`를 사용할 수 있습니다. 자료·검색 정책·모델·설정·의존성·공개 보고서 명세가 같아야 하며, 정확히 같은 요청의 정상 완료 응답만 재사용합니다. 변경된 요청은 새로 생성하고 현재 검증을 다시 거칩니다. 조건이 달라졌으면 복구 옵션 없이 새로 실행합니다.
 
-결과는 `outputs/<실행ID>/`의 `report.md`, `quality_evaluation.json`, `citation_review.md`, `gap_review.md`에 저장됩니다. 주장, 인용, 출처, 실행 설정도 JSON으로 보존합니다. Judge 미달 보고서는 PDF로 출력하지 않고, `quality_evaluation.json`과 `state.json`에 구체적인 `report_revision_requests`를 남깁니다. `human_review_pending`은 Hybrid 품질 평가와 문서 생성을 마치고 사람의 인용 의미 검수와 PDF 페이지 검수를 기다리는 상태입니다. 일반 실행과 `--render`는 같은 보고서 내용으로 `.md`와 `.pdf`를 함께 생성합니다. PDF는 `RAG-Output_<캠퍼스>_<반>_<팀원>.pdf`이며 제출 정보가 없으면 `RAG-Output_review.pdf`로 저장합니다. `--render`는 추가 GPT 호출 없이 저장된 통과 결과를 다시 출력합니다. PDF 생성에 실패하면 실행은 `incomplete`로 종료됩니다. 팀은 생성된 PDF의 의미와 페이지 배치를 검수합니다. 저장 루트는 `RAG_OUTPUT_DIR`로 바꿀 수 있습니다.
+결과는 `outputs/<실행ID>/`의 `report.md`, `report_result.json`, `quality_evaluation.json`, `citation_review.md`, `gap_review.md`에 저장됩니다. 주장, 인용, 출처, 실행 설정도 JSON으로 보존합니다. 품질 미달 보고서는 PDF로 출력하지 않고 `quality_evaluation.json`과 `state.json`에 구체적인 `repair_requests`를 남깁니다. `human_review_pending`은 Hybrid 품질 평가와 문서 생성을 마치고 사람의 인용 의미 검수와 PDF 페이지 검수를 기다리는 상태입니다. 일반 실행과 `--render`는 Writer가 만든 Markdown 본문을 PDF 변환에 그대로 전달합니다. PDF는 `RAG-Output_<캠퍼스>_<반>_<팀원>.pdf`이며 제출 정보가 없으면 `RAG-Output_review.pdf`로 저장합니다. `--render`는 추가 GPT 호출 없이 저장된 통과 결과를 다시 출력합니다. PDF 생성에 실패하면 실행은 `incomplete`로 종료됩니다. 팀은 생성된 PDF의 의미와 페이지 배치를 검수합니다. 저장 루트는 `RAG_OUTPUT_DIR`로 바꿀 수 있습니다.
 
 `reports/latest/`는 검토·편집한 공유용 사본으로, 새 실행 때 자동 갱신되지 않습니다. 새 결과를 공유할 때는 해당 실행의 보고서와 두 검수표를 함께 검토해 옮기고 `run.json`의 실행 ID와 파일 해시를 갱신합니다. 실행 원본은 `outputs/<실행ID>/`에 보존합니다.
 

@@ -60,7 +60,7 @@ def filename(settings, kind):
     return f"RAG-{kind}_{campus_part}_{people}.pdf"
 
 
-def render_report(out, report, joined, sources, settings, config):
+def render_report(out, report, joined, sources, settings, config, markdown=None):
     """Complete only when both formats and their review sheets have been written."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -68,7 +68,7 @@ def render_report(out, report, joined, sources, settings, config):
     for name in ("document_validation.json", "pdf_validation.json"):
         write_json(out / name, pending)
     try:
-        return _render_report(out, report, joined, sources, settings, config)
+        return _render_report(out, report, joined, sources, settings, config, markdown)
     except Exception as exc:
         failure = {**pending, "render_status": "failed", "render_error": str(exc), "semantic_review": "pending"}
         for name in ("document_validation.json", "pdf_validation.json"):
@@ -76,13 +76,9 @@ def render_report(out, report, joined, sources, settings, config):
         raise
 
 
-def _render_report(out, report, joined, sources, settings, config):
-    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
-    import hashlib
-    out = Path(out)
-    out.mkdir(parents=True, exist_ok=True)
+def build_report_markdown(report, joined, sources, config):
+    """Build the stable Markdown body without writing files or creating a PDF."""
     claims, evidence = joined["claims"], joined["evidence"]
-    conflict_records = conflicts_for_joined(joined)
     used_claims = list(dict.fromkeys(report["summary_claim_ids"] + [c for section in report["sections"] for c in section["claim_ids"]]))
     used_evidence = list(dict.fromkeys(e for c in used_claims for e in claims[c]["evidence_ids"]))
     used_sources = sorted({evidence[e]["source_id"] for e in used_evidence})
@@ -113,10 +109,7 @@ def _render_report(out, report, joined, sources, settings, config):
                     parts.append(f"**{label}:** {c[key]}")
         return "<br><br>".join(cell(x) for x in parts) if table else "\n\n".join(parts)
 
-    def technology_label(claim):
-        return "KIVI / InfiniGen" if claim["technology"] == "both" else claim["technology"]
-
-    summary = [f"**{technology_label(claims[c])}** [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
+    summary = [f"**{_technology_label(claims[c])}** [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
                for c in report["summary_claim_ids"]]
     if len("\n".join(summary)) > 1200:
         raise ValueError("SUMMARY draft is too long; shorten before user PDF conversion")
@@ -174,16 +167,42 @@ def _render_report(out, report, joined, sources, settings, config):
         md.extend([f"[{numbering[sid]}] {author} ({date}). **{source['title']}**. {venue}. "
                    f"조회 {source['accessed_at'][:10]}.  ", source["url"], ""])
     document = "\n".join(md)
+    return document, {"used_claims": used_claims, "used_evidence": used_evidence,
+                     "used_sources": used_sources, "summary_characters": len("\n".join(summary)),
+                     "body_unique_claims": len(body_seen)}
+
+
+def _technology_label(claim):
+    return "KIVI / InfiniGen" if claim["technology"] == "both" else claim["technology"]
+
+
+def _render_report(out, report, joined, sources, settings, config, markdown=None):
+    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
+    import hashlib
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    claims, evidence = joined["claims"], joined["evidence"]
+    conflict_records = conflicts_for_joined(joined)
+    generated_markdown, context = build_report_markdown(report, joined, sources, config)
+    if markdown is not None and markdown != generated_markdown:
+        raise ValueError("Writer Markdown differs from the report and citation registry")
+    document = markdown if markdown is not None else generated_markdown
     path = out / filename(settings, "Output").replace(".pdf", ".md")
     path.write_text(document)
     (out / "report.md").write_text(document)
+    used_claims = context["used_claims"]
+    used_evidence = context["used_evidence"]
+    used_sources = context["used_sources"]
+    gap_records = joined.get("gap_records", [{"id": f"legacy-{i}", "perspective": "legacy", "text": gap}
+                                           for i, gap in enumerate(joined.get("gaps", []), 1)])
+    decisions = {d["gap_id"]: d for d in report.get("gap_decisions", [])}
 
     review_claims = list(dict.fromkeys(used_claims + [cid for d in decisions.values() for cid in d["claim_ids"]]
                         + [cid for r in conflict_records for cid in r["candidate_claim_ids"] + r["verified_claim_ids"]]))
     review = ["# 인용 검수", "", "각 주장의 전체 본문, 실험조건, 한계를 원문과 대조하는 검수표입니다. 의미 검수는 대기 중입니다.", ""]
     for cid in review_claims:
         c = claims[cid]
-        review.extend(["## " + cid, "", f"**기술:** {technology_label(c)} | **주장 종류:** {LABELS[c['kind']]}", "",
+        review.extend(["## " + cid, "", f"**기술:** {_technology_label(c)} | **주장 종류:** {LABELS[c['kind']]}", "",
                        c["text"], "", "**조건:** " + c["conditions"], "",
                        "**한계:** " + c["caveats"], "", "판정: 미검수", ""])
         for eid in c["evidence_ids"]:
@@ -205,9 +224,9 @@ def _render_report(out, report, joined, sources, settings, config):
     pdf_checks.update(used_sources=used_sources, used_claims=used_claims, used_evidence=used_evidence)
     write_json(out / "pdf_validation.json", pdf_checks)
     write_json(out / "document_validation.json", {"format": ["markdown", "pdf"], "pdf_generated": True,
-        "summary_characters": len("\n".join(summary)), "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
+        "summary_characters": context["summary_characters"], "pdf_half_page": "passed", "pdf_pages": pdf_checks["pdf_pages"],
         "used_sources": used_sources, "used_claims": used_claims, "used_evidence": used_evidence,
-        "body_unique_claims": len(body_seen), "gap_count": len(gap_records),
+        "body_unique_claims": context["body_unique_claims"], "gap_count": len(gap_records),
         "conflict_count": len(conflict_records),
         "resolved_conflicts": sum(r["status"] == "resolved" for r in conflict_records),
         "resolved_gaps": sum(decisions.get(g["id"], {}).get("status") == "resolved" for g in gap_records),

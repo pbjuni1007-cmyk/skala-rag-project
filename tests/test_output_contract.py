@@ -13,10 +13,10 @@ def test_public_report_contract_records_writer_and_hybrid_judge_boundary():
     contract = yaml.safe_load((Path(__file__).resolve().parents[1] / "config/report-contract.yaml").read_text())
     evaluation = contract["report"]["evaluation"]
 
-    assert contract["version"] == 3
+    assert contract["version"] == 4
     assert {"writer", "quality_evaluator"} <= set(contract["roles"])
     assert evaluation["method"] == "hybrid"
-    assert set(evaluation["criteria"]) == {"groundedness", "neutrality", "bias_control", "perspective_coverage"}
+    assert set(evaluation["criteria"]) == {"groundedness", "neutrality", "bias_control", "coverage"}
     assert evaluation["feedback_state_key"] == "report_revision_requests"
     assert evaluation["judge_is_independent_model"] is False
 

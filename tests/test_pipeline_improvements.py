@@ -58,7 +58,12 @@ class FakeGateway:
 
 
 def pipeline(tmp_path, responses=()):
-    corpus = SimpleNamespace(chunks=chunks(), sources={}, searches=[], web_queries=[])
+    corpus = SimpleNamespace(chunks=chunks(), sources={
+        tech: {"type": "paper_pool", "authors": "가상 테스트 작성자", "title": f"{tech} 테스트 자료",
+               "url": f"https://example.invalid/{tech}", "version": "mock-v1", "date": "2026",
+               "accessed_at": "2026-10-07T00:00:00Z"}
+        for tech in TECHS
+    }, searches=[], web_queries=[])
 
     def search(query, technology, top_k):
         corpus.searches.append((query, technology, top_k))

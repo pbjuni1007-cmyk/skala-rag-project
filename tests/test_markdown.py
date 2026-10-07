@@ -2,7 +2,7 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import pytest
-from rag.render import render_report
+from rag.render import build_report_markdown, render_report
 from test_render import report_fixture
 
 
@@ -21,6 +21,26 @@ def test_submission_writes_markdown_and_pdf_from_same_body(tmp_path, report_fixt
     assert checks["pdf_generated"] is True
     assert checks["semantic_review"] == "pending"
     assert "Quoted source evidence" in Path(paths["citation_review"]).read_text()
+
+
+def test_pdf_renderer_uses_the_writer_markdown_body_verbatim(tmp_path, report_fixture):
+    report, joined, sources, settings, config = report_fixture
+    markdown, _ = build_report_markdown(report, joined, sources, config)
+    paths = render_report(tmp_path, report, joined, sources, settings, config, markdown=markdown)
+
+    assert Path(paths["markdown"]).read_text() == markdown
+    assert (tmp_path / "report.md").read_text() == markdown
+    assert Path(paths["pdf"]).is_file()
+
+
+def test_pdf_renderer_rejects_markdown_that_disagrees_with_the_report(tmp_path, report_fixture):
+    report, joined, sources, settings, config = report_fixture
+
+    with pytest.raises(ValueError, match="differs from the report"):
+        render_report(tmp_path, report, joined, sources, settings, config, markdown="# SUMMARY\nchanged")
+
+    checks = json.loads((tmp_path / "document_validation.json").read_text())
+    assert checks["render_status"] == "failed"
 
 
 def test_submission_metadata_uses_md_extension(tmp_path, report_fixture):

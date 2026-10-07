@@ -2,8 +2,6 @@
 
 **KV Cache 다관점 평가 에이전트 — KIVI·InfiniGen 비교**
 
-Agent 협업의 입력·출력과 연결 규칙: [계약 v1](docs/agent-contract.md) · [가상 응답 예시](docs/agent-contract-examples.json). 역할과 완료 기준은 이슈 #1~#4를 따른다.
-
 ## Overview
 
 기업 IT 사업 문서 검토를 지원하는 Agentic AI를 적용 시나리오로 삼아 **KIVI와 InfiniGen의 선택 조건을 비교하는 보고서 생성기**입니다. KIVI는 KV 캐시를 양자화해 저장량을 줄이고, InfiniGen은 CPU의 KV 중 필요한 항목을 GPU로 가져옵니다. 논문과 공식 자료를 검색해 기술 성숙도·시장성·이해관계자·도메인 적용을 평가합니다.

@@ -196,6 +196,21 @@
 !/docs/agent-contract.md
 !/docs/agent-contract-examples.json
 
+# Issue #1: reviewed coordination implementation and offline checks
+!/agents/
+!/agents/__init__.py
+!/agents/contracts.py
+!/agents/state.py
+!/agents/store.py
+!/agents/supervisor.py
+!/agents/decision.py
+!/prompts/
+!/prompts/supervisor.txt
+!/tests/test_team_contracts.py
+!/tests/test_team_supervisor.py
+!/tests/test_team_store.py
+!/docs/supervisor-graph.mmd
+
 # Issue #2 research agents
 !/agents/
 !/agents/__init__.py

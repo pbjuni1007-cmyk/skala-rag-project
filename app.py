@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import re
 import sys
 import uuid
 import yaml
@@ -45,12 +46,29 @@ def main():
     parser.add_argument("--config", default="config/run.yaml")
     parser.add_argument("--prepare", action="store_true", help="Download sources and build local embeddings, no GPT calls")
     parser.add_argument("--render", type=Path, help="Rewrite Markdown and PDF from a saved, validated run, no GPT calls")
+    parser.add_argument("--agent-publish-request", type=Path,
+                        help="Publish one Agent contract request from JSON, no GPT calls")
     parser.add_argument("--refresh-web", action="store_true")
     recovery = parser.add_mutually_exclusive_group()
     recovery.add_argument("--reuse-calls", type=Path, help="Rerun current graph; reuse only exact successful requests when non-code inputs match")
     recovery.add_argument("--resume", type=Path, help="Reuse exact-input successful calls from a compatible saved run")
     args = parser.parse_args()
     settings = Settings.load()
+    if args.agent_publish_request:
+        if args.prepare or args.render or args.refresh_web or args.reuse_calls or args.resume:
+            parser.error("--agent-publish-request cannot be combined with other execution modes")
+        request = json.loads(args.agent_publish_request.read_text(encoding="utf-8"))
+        run_id = request.get("run_id") if isinstance(request, dict) else None
+        if not isinstance(run_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,79}", run_id):
+            raise ValueError("Agent run_id must be a safe output directory name")
+        from rag.render import publish
+        out = Path(settings.get("RAG_OUTPUT_DIR", "outputs")) / run_id
+        with trace_run(settings, run_id) as trace:
+            result = publish(request, out, settings)
+            trace["status"] = "completed" if result["status"] == "ok" else "failed"
+        write_json(out / "publish_result.json", result)
+        print(json.dumps({"run": str(out), "publish_result": result}, ensure_ascii=False))
+        return 0 if result["status"] == "ok" else 2
     config = yaml.safe_load(Path(args.config).read_text())
     if args.render:
         from rag.render import render_report

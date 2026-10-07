@@ -1,5 +1,7 @@
 from pathlib import Path
 from html import escape, unescape
+from tempfile import TemporaryDirectory
+import hashlib
 import re
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -11,9 +13,24 @@ from pypdf import PdfReader
 
 from rag.budget import write_json
 from rag.conflicts import conflicts_for_joined, conflict_review_markdown
+from rag.tracing import span
 
 LABELS = {"source_fact": "출처 사실", "author_reported_result": "저자 보고 결과", "team_inference": "팀 추론",
           "scenario": "적용 가정", "unknown": "미확인"}
+MAX_SUBMISSION_PAGES = 10
+
+
+def validate_pdf_layout(path, document, max_pages=MAX_SUBMISSION_PAGES):
+    """Check the generated PDF's physical pages and required chapters."""
+    reader = PdfReader(path)
+    pages = len(reader.pages)
+    if not pages or "SUMMARY" not in reader.pages[0].extract_text() or not any(
+            "REFERENCE" in page.extract_text() for page in reader.pages) or not document.rsplit(
+                "\n# ", 1)[-1].startswith("REFERENCE\n"):
+        raise ValueError("PDF chapter layout validation failed")
+    if pages > max_pages:
+        raise ValueError(f"PDF exceeds the {max_pages}-page submission limit: {pages} pages")
+    return pages
 
 
 def fonts(settings):
@@ -246,7 +263,7 @@ def _pdf_inline(text):
     return text.replace("\n", "<br/>")
 
 
-def _write_pdf(out, document, settings):
+def _write_pdf(out, document, settings, *, include_review_note=True):
     """Render the exact Markdown body; never rewrite reports or review annexes."""
     import hashlib
     from tempfile import NamedTemporaryFile
@@ -304,8 +321,9 @@ def _write_pdf(out, document, settings):
     if summary_bottom > A4[1] / 2:
         raise ValueError("SUMMARY exceeds half of the physical page; revise the summary selection")
     # The PDF explains where its linked Markdown annexes live without adding a new chapter.
-    story.insert(len(summary_flowables), Paragraph(
-        "상세 조건과 원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
+    if include_review_note:
+        story.insert(len(summary_flowables), Paragraph(
+            "상세 조건과 원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
     path = out / filename(settings, "Output")
     with NamedTemporaryFile(dir=out, suffix=".pdf", delete=False) as handle:
         temporary = Path(handle.name)
@@ -313,11 +331,10 @@ def _write_pdf(out, document, settings):
         SimpleDocTemplate(str(temporary), pagesize=A4, leftMargin=48, rightMargin=48,
                           topMargin=42, bottomMargin=55, title="KV Cache 다관점 평가", author="SKALA team").build(
                               story, onFirstPage=footer, onLaterPages=footer)
-        reader = PdfReader(temporary)
-        if "SUMMARY" not in reader.pages[0].extract_text() or not any("REFERENCE" in page.extract_text() for page in reader.pages) or not document.rsplit("\n# ", 1)[-1].startswith("REFERENCE\n"):
-            raise ValueError("PDF chapter layout validation failed")
+        pages = validate_pdf_layout(temporary, document)
         checks = {"summary_height_pt": round(summary_height, 2), "summary_bottom_pt": round(summary_bottom, 2),
-                  "half_page_limit_pt": A4[1] / 2, "pdf_pages": len(reader.pages), "pdf_generated": True,
+                  "half_page_limit_pt": A4[1] / 2, "pdf_pages": pages, "max_pdf_pages": MAX_SUBMISSION_PAGES,
+                  "pdf_generated": True,
                   "pdf_sha256": hashlib.sha256(temporary.read_bytes()).hexdigest(),
                   "markdown_sha256": hashlib.sha256(document.encode()).hexdigest(),
                   "visual_review": "pending", "semantic_review": "pending"}
@@ -330,3 +347,89 @@ def _write_pdf(out, document, settings):
 def render_pdf_report(out, report, joined, sources, settings, config):
     """Compatibility entry point with the same dual-format contract."""
     return render_report(out, report, joined, sources, settings, config)
+
+
+def publish(request, out, settings):
+    """Publish an evaluated Agent report without making any model calls."""
+    with span("publish", role="publish", run_id=request.get("run_id"),
+              request_id=request.get("request_id"), attempt=request.get("attempt")) as trace:
+        result = _publish(request, out, settings)
+        trace["status"] = "completed" if result["status"] == "ok" else "failed"
+        if result["error"] is not None:
+            trace["error_code"] = result["error"]["code"]
+        return result
+
+
+def _publish(request, out, settings):
+    common = {key: request.get(key) for key in
+              ("contract_version", "run_id", "request_id", "attempt", "context")}
+
+    def failed(code, message):
+        return {**common, "status": "failed", "markdown_ref": None, "pdf_ref": None,
+                "pdf_pages": None, "human_review_pending": True,
+                "error": {"code": code, "message": message, "retryable": False}}
+
+    report = request.get("report_result")
+    evaluation = request.get("evaluation_result")
+    if (common["contract_version"] != "agent-contract-v1" or
+            not isinstance(common["run_id"], str) or not common["run_id"] or
+            not isinstance(common["request_id"], str) or not common["request_id"] or
+            type(common["attempt"]) is not int or common["attempt"] < 1 or
+            not isinstance(common["context"], dict) or
+            not isinstance(report, dict) or not isinstance(evaluation, dict)):
+        return failed("invalid_response", "Invalid publish request")
+    if any(item.get("contract_version") != common["contract_version"] or
+           item.get("run_id") != common["run_id"] or
+           item.get("context") != common["context"] for item in (report, evaluation)):
+        return failed("artifact_mismatch", "Report and evaluation belong to a different run")
+    report_id, evaluation_id = report.get("request_id"), evaluation.get("request_id")
+    if (not isinstance(report_id, str) or not report_id or
+            not isinstance(evaluation_id, str) or not evaluation_id or
+            len({common["request_id"], report_id, evaluation_id}) != 3 or
+            evaluation.get("report_request_id") != report_id):
+        return failed("artifact_mismatch", "Evaluation does not match the current report")
+    checks = evaluation.get("checks")
+    required_checks = {"groundedness", "neutrality", "bias_control", "coverage"}
+    if (report.get("status") != "ok" or report.get("error") is not None or
+            not isinstance(report.get("report"), dict) or
+            not isinstance(report.get("joined"), dict) or
+            not isinstance(report.get("chunks"), list) or
+            not isinstance(report.get("sources"), dict) or
+            evaluation.get("status") != "ok" or evaluation.get("error") is not None or
+            evaluation.get("passed") is not True or
+            not isinstance(checks, dict) or set(checks) != required_checks or
+            any(not isinstance(checks[key], dict) or checks[key].get("passed") is not True
+                for key in required_checks) or evaluation.get("repair_requests") != []):
+        return failed("invalid_response", "Report has not passed all four evaluation checks")
+    document = report.get("markdown")
+    chapters = [line[2:] for line in document.splitlines() if line.startswith("# ")] if isinstance(document, str) else []
+    if (chapters != ["SUMMARY", "기술 성숙도", "시장성", "이해관계자",
+                     "도메인 적용", "관점 간 상충과 한계", "REFERENCE"] or
+            "**대상 기술:**" not in document):
+        return failed("invalid_response", "Report Markdown does not follow the required chapter order")
+
+    out = Path(out)
+    destination = out / "report" / hashlib.sha256(common["request_id"].encode()).hexdigest()[:16]
+    if destination.exists():
+        return failed("artifact_mismatch", "Publish request already has output")
+    try:
+        out.mkdir(parents=True, exist_ok=True)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with TemporaryDirectory(dir=out, prefix=".publish-") as temporary:
+            staging = Path(temporary) / "payload"
+            staging.mkdir()
+            pdf, checks = _write_pdf(staging, document, settings, include_review_note=False)
+            markdown = staging / pdf.name.replace(".pdf", ".md")
+            markdown.write_text(document, encoding="utf-8")
+            pdf_name, markdown_name = pdf.name, markdown.name
+            pdf_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
+            markdown_hash = hashlib.sha256(markdown.read_bytes()).hexdigest()
+            staging.rename(destination)
+        return {**common, "status": "ok",
+                "markdown_ref": {"path": (destination / markdown_name).relative_to(out).as_posix(),
+                                 "sha256": markdown_hash},
+                "pdf_ref": {"path": (destination / pdf_name).relative_to(out).as_posix(),
+                            "sha256": pdf_hash},
+                "pdf_pages": checks["pdf_pages"], "human_review_pending": True, "error": None}
+    except Exception:
+        return failed("render_error", "Report output could not be created")

@@ -1,4 +1,5 @@
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 
@@ -6,8 +7,9 @@ from pypdf import PdfReader
 import pytest
 from reportlab.lib.pagesizes import A4
 
+import app
 from rag.evidence import validate_assessment
-from rag.render import filename, render_report
+from rag.render import _write_pdf, filename, publish, render_report
 from rag.schemas import Reference
 from rag.settings import Settings
 
@@ -88,6 +90,92 @@ def test_summary_over_half_a_page_is_rejected_before_pdf_creation(tmp_path, repo
         render_report(tmp_path, report, joined, sources, settings, config)
     assert not list(tmp_path.glob("*.pdf"))
     assert json.loads((tmp_path / "pdf_validation.json").read_text())["pdf_generated"] is False
+
+
+def test_pdf_over_ten_pages_is_not_published(tmp_path, report_fixture):
+    settings = report_fixture[3]
+    document = ("# SUMMARY\n짧은 요약\n**대상 기술:** KIVI\n# DETAILS\n"
+                + ("검토할 본문입니다.\n\n" * 500) + "# REFERENCE\n출처\n")
+    with pytest.raises(ValueError, match="10-page submission limit"):
+        _write_pdf(tmp_path, document, settings)
+    assert not list(tmp_path.glob("*.pdf"))
+
+
+@pytest.fixture
+def agent_publish_request():
+    examples = Path(__file__).resolve().parents[1] / "docs/agent-contract-examples.json"
+    return json.loads(examples.read_text(encoding="utf-8"))["examples"]["publish_request"]["payload"]
+
+
+def test_publish_uses_contract_example_and_keeps_markdown_exact(tmp_path, report_fixture, agent_publish_request):
+    result = publish(agent_publish_request, tmp_path, report_fixture[3])
+    assert result["status"] == "ok" and result["error"] is None
+    assert result["contract_version"] == "agent-contract-v1"
+    assert result["request_id"] == agent_publish_request["request_id"]
+    assert result["human_review_pending"] is True
+    assert 1 <= result["pdf_pages"] <= 10
+    markdown = tmp_path / result["markdown_ref"]["path"]
+    pdf = tmp_path / result["pdf_ref"]["path"]
+    assert markdown.read_text(encoding="utf-8") == agent_publish_request["report_result"]["markdown"]
+    assert hashlib.sha256(markdown.read_bytes()).hexdigest() == result["markdown_ref"]["sha256"]
+    assert hashlib.sha256(pdf.read_bytes()).hexdigest() == result["pdf_ref"]["sha256"]
+    assert len(PdfReader(pdf).pages) == result["pdf_pages"]
+    assert publish(agent_publish_request, tmp_path, report_fixture[3])["error"]["code"] == "artifact_mismatch"
+
+
+@pytest.mark.parametrize("change,code", [
+    (lambda r: r["evaluation_result"].update(report_request_id="older-report"), "artifact_mismatch"),
+    (lambda r: r["evaluation_result"].update(run_id="other-run"), "artifact_mismatch"),
+    (lambda r: r["evaluation_result"]["checks"]["coverage"].update(passed=False), "invalid_response"),
+    (lambda r: r["evaluation_result"].update(passed=False), "invalid_response"),
+    (lambda r: r["report_result"].update(status="failed"), "invalid_response"),
+])
+def test_publish_rejects_stale_or_failed_evaluation(tmp_path, report_fixture, agent_publish_request, change, code):
+    request = deepcopy(agent_publish_request)
+    change(request)
+    result = publish(request, tmp_path, report_fixture[3])
+    assert result["status"] == "failed" and result["error"]["code"] == code
+    assert result["markdown_ref"] is result["pdf_ref"] is result["pdf_pages"] is None
+    assert not list(tmp_path.rglob("*.pdf"))
+
+
+def test_publish_rejects_pdf_over_ten_pages_without_artifacts(tmp_path, report_fixture, agent_publish_request):
+    request = deepcopy(agent_publish_request)
+    request["report_result"]["markdown"] = request["report_result"]["markdown"].replace(
+        "# REFERENCE", ("긴 본문입니다.\n\n" * 500) + "# REFERENCE")
+    result = publish(request, tmp_path, report_fixture[3])
+    assert result["status"] == "failed" and result["error"]["code"] == "render_error"
+    assert result["markdown_ref"] is result["pdf_ref"] is result["pdf_pages"] is None
+    assert not list(tmp_path.rglob("*.pdf"))
+
+
+def test_agent_publish_entrypoint_runs_contract_example_without_model(tmp_path, monkeypatch,
+                                                                    agent_publish_request, capsys):
+    request_path = tmp_path / "request.json"
+    request_path.write_text(json.dumps(agent_publish_request, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setenv("RAG_OUTPUT_DIR", str(tmp_path / "outputs"))
+    monkeypatch.setenv("LANGSMITH_TRACING", "false")
+    monkeypatch.setattr(app.sys, "argv", ["app.py", "--agent-publish-request", str(request_path)])
+    assert app.main() == 0
+    printed = json.loads(capsys.readouterr().out)
+    out = tmp_path / "outputs" / agent_publish_request["run_id"]
+    saved = json.loads((out / "publish_result.json").read_text(encoding="utf-8"))
+    assert printed == {"run": str(out), "publish_result": saved}
+    assert saved["status"] == "ok"
+    assert (out / saved["markdown_ref"]["path"]).is_file()
+    assert (out / saved["pdf_ref"]["path"]).is_file()
+
+
+def test_agent_publish_entrypoint_rejects_unsafe_run_id(tmp_path, monkeypatch, agent_publish_request):
+    request = deepcopy(agent_publish_request)
+    request["run_id"] = "../outside"
+    request_path = tmp_path / "request.json"
+    request_path.write_text(json.dumps(request), encoding="utf-8")
+    monkeypatch.setenv("RAG_OUTPUT_DIR", str(tmp_path / "outputs"))
+    monkeypatch.setattr(app.sys, "argv", ["app.py", "--agent-publish-request", str(request_path)])
+    with pytest.raises(ValueError, match="safe output directory"):
+        app.main()
+    assert not (tmp_path / "outputs").exists()
 
 
 @pytest.mark.parametrize("quote", ["", "too short", "This quotation is absent from the actual source."])

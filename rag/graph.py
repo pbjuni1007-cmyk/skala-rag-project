@@ -16,13 +16,13 @@ from agents.contracts import (EvaluationRequest, EvaluationResult, NodeError, Re
 from rag.budget import write_json, BudgetExceeded
 from rag.context import build_research_context, assessment_evidence
 from rag.evidence import (validate_assessment, collect_evidence, validate_retrieval_review,
-                          validate_perspective, gap_decision_errors, report_errors, CORE_FACETS)
+                          validate_perspective, report_errors, CORE_FACETS)
 from rag.evaluator import ArtifactMismatchError, evaluate_report as evaluate_report_quality
 from rag.llm import APIError
 from rag.request_budget import InputBudgetExceeded, STRUCTURED_REPAIR_HEADROOM, deduplicate_chunks
 from rag.reassessment import reassess_facets
 from rag.repair import REPAIR_INSTRUCTIONS, restore_sufficient, plan_repairs, apply_patch, restore_verbatim_references
-from rag.schemas import Assessment, Queries, Report, State, RetrievalReview, GapDecisions, PerspectiveQueries
+from rag.schemas import Assessment, Queries, Report, State, RetrievalReview, PerspectiveQueries
 from rag.writer import draft_report, review_gap_batch, source_claims
 
 BASE = """당신은 공개 근거를 보존하는 한국어 KV Cache 기술 평가 연구자다.

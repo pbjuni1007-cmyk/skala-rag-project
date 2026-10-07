@@ -1,7 +1,6 @@
 """Deterministic integration tests for the ResearchAgent boundary."""
 
 import json
-from pathlib import Path
 
 import pytest
 

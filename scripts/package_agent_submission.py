@@ -83,7 +83,11 @@ def package_submission(*, run_dir, traces, git_url, campus, class_name, contribu
                                                      for index in range(1, len(files) + 1)]:
         raise ValueError("Trace PNG files must be numbered from tracing-1.png")
     for path in files:
-        if not path.is_file() or path.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
+        signature = b""
+        if path.is_file():
+            with path.open("rb") as stream:
+                signature = stream.read(8)
+        if signature != b"\x89PNG\r\n\x1a\n":
             raise ValueError("Trace evidence must be PNG files")
 
     output_dir = Path(output_dir)

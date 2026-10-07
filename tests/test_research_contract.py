@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from agents.researchers.contract import (
-    ResearchRequest,
     ResearchResult,
     parse_request,
     required_assessment_keys,

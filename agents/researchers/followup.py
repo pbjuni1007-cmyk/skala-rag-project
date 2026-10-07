@@ -5,9 +5,6 @@ from __future__ import annotations
 from collections.abc import Mapping
 from copy import deepcopy
 import json
-from typing import Any
-
-from pydantic import BaseModel
 
 from rag.budget import write_json
 from rag.context import assessment_evidence
@@ -21,14 +18,7 @@ from agents.researchers.prompts import (
     PERSPECTIVE_REASSESSMENT_PROMPT,
     PERSPECTIVE_REWRITE_PROMPT,
 )
-
-
-def _as_dict(value: Mapping[str, Any] | BaseModel) -> dict[str, Any]:
-    if isinstance(value, BaseModel):
-        return value.model_dump(mode="python")
-    if isinstance(value, Mapping):
-        return deepcopy(dict(value))
-    raise TypeError(f"Expected a mapping or Pydantic model, got {type(value).__name__}")
+from agents.researchers.result import _as_dict
 
 
 def _get(value, key):
@@ -480,12 +470,7 @@ def run_followup(pipeline, request):
             ]
 
             def check_reassessment(value):
-                errors = validate_perspective(value, model_chunks, view)
-                if (value["status"] == "insufficient" or
-                        any(claim["kind"] == "unknown" for claim in value["claims"])) and not any(
-                    gap.strip() for gap in value["gaps"]
-                ):
-                    errors.append("Insufficient or unknown claims require non-empty gaps")
+                errors = _perspective_check(model_chunks, view)(value)
                 reassessed_preserved = [
                     claim for claim in value["claims"] if claim["facet"] not in missing
                 ]

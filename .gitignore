@@ -1,5 +1,11 @@
 # Only reviewed project files are publishable.
 *
+!/docs/integration-status.md
+!/docs/rag-legacy-guide.md
+!/docs/retrieval-metrics.md
+!/docs/supervisor-architecture.png
+!/docs/supervisor-architecture.svg
+!/eval/retrieval-readme-metrics.json
 !/assets/
 !/config/
 !/data/

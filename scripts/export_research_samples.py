@@ -30,7 +30,6 @@ RESEARCH_NODES = {
     "research_infinigen": "research_infinigen",
 }
 ASSESSMENT_FIELDS = ("status", "claims", "conflicts", "gaps")
-QUERY_SCORE_FIELDS = {"score"}
 
 
 def _load_json(path: Path) -> Any:
@@ -82,13 +81,7 @@ def _insert_chunk(lookup: dict[str, dict[str, Any]], chunk: Mapping[str, Any]) -
         current_contract = contract_chunk(current).model_dump(mode="json")
         # Scores depend on the query that found a chunk; compare every persisted
         # contract/collection field, including hashes and offsets, as content identity.
-        previous_identity = {
-            key: value for key, value in previous_contract.items() if key not in QUERY_SCORE_FIELDS
-        }
-        current_identity = {
-            key: value for key, value in current_contract.items() if key not in QUERY_SCORE_FIELDS
-        }
-        if previous_identity != current_identity:
+        if previous_contract != current_contract:
             raise ValueError(f"Conflicting duplicate source chunk: {chunk_id}")
         return
     lookup[chunk_id] = current

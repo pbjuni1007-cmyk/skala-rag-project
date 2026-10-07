@@ -5,6 +5,9 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from itertools import zip_longest
+import json
+from pathlib import Path
+import re
 
 from rag.budget import write_json
 from rag.context import build_research_context
@@ -85,6 +88,36 @@ def _merge_chunks(lookup, chunks):
         if existing is not None and existing != chunk:
             raise ValueError(f"Conflicting duplicate source chunk: {chunk_id}")
         lookup[chunk_id] = deepcopy(chunk)
+
+
+def _plain(value):
+    if hasattr(value, "model_dump"):
+        return value.model_dump(mode="python")
+    return deepcopy(value)
+
+
+def _previous_queries(pipeline, previous_result, technology):
+    """Load the prior run's technology queries when its local log is available."""
+    previous_id = _get(previous_result, "request_id")
+    safe_id = re.sub(r"[^A-Za-z0-9._-]", "_", previous_id)
+    if safe_id in {"", ".", ".."}:
+        safe_id = "_"
+    path = Path(pipeline.out).parent / safe_id / "retrieval" / "research.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError):
+        return []
+    queries = payload.get("technology_queries", {}).get(technology, [])
+    return deepcopy(queries) if isinstance(queries, list) else []
+
+
+def _preserved_chunk_ids(assessments):
+    return {
+        reference["chunk_id"]
+        for assessment in assessments.values()
+        for claim in _plain(assessment).get("claims", [])
+        for reference in claim.get("references", [])
+    }
 
 
 def _balance(technology, assessment, chunks):
@@ -273,29 +306,81 @@ def run_maturity(pipeline, request):
         "technologies": {},
         "technology_queries": {},
         "balance_diagnostics": {},
+        "feedback_targets": [],
+        "feedback_rewrites": {},
     }
     try:
-        query_plan = pipeline.structured(
-            "research_queries",
-            Queries,
-            RESEARCH_PLAN_PROMPT,
-            {
-                "domain": domain,
-                "scenario": scenario,
-                "technologies": technologies,
-                "questions": questions,
-            },
-            _plan_check,
+        previous_result = (
+            request.get("previous_result")
+            if isinstance(request, dict)
+            else getattr(request, "previous_result", None)
         )
-        run_log["query_plan"] = query_plan
+        previous_assessments = {}
+        feedback_mode = bool(feedback) and previous_result is not None and _get(
+            previous_result, "status"
+        ) != "failed"
 
-        per_technology = {
-            technology: [
-                query for query in query_plan["queries"]
-                if query["technology"] == technology
+        if feedback_mode:
+            previous_assessments = _get(previous_result, "assessments")
+            targets = [
+                technology for technology in technologies
+                if _get(previous_assessments[f"research_{technology.lower()}"], "status") != "ok"
             ]
-            for technology in technologies
-        }
+            if not targets:
+                targets = list(technologies)
+            run_log["feedback_targets"] = list(targets)
+            per_technology = {}
+            for technology in targets:
+                previous_assessment = _plain(
+                    previous_assessments[f"research_{technology.lower()}"]
+                )
+                previous_queries = _previous_queries(pipeline, previous_result, technology)
+                rewritten = pipeline.structured(
+                    f"rewrite_{technology.lower()}_feedback",
+                    Queries,
+                    RETRIEVAL_REWRITE_PROMPT + (
+                        "\nSupervisor feedback와 질문을 검색어에 반영하되, 이전 Assessment의 부족한 근거를 "
+                        "보완하라. 네 facet과 대상 기술은 그대로 유지하라."
+                    ),
+                    {
+                        "technology": technology,
+                        "questions": questions,
+                        "feedback": feedback,
+                        "previous_assessment": previous_assessment,
+                        "previous_queries": previous_queries,
+                    },
+                    lambda result, tech=technology: _rewrite_check(result, tech),
+                )
+                per_technology[technology] = rewritten["queries"]
+                run_log["feedback_rewrites"][technology] = {
+                    "previous_queries": previous_queries,
+                    "queries": deepcopy(rewritten["queries"]),
+                }
+        else:
+            query_plan = pipeline.structured(
+                "research_queries",
+                Queries,
+                RESEARCH_PLAN_PROMPT,
+                {
+                    "domain": domain,
+                    "scenario": scenario,
+                    "technologies": technologies,
+                    "questions": questions,
+                    "feedback": feedback,
+                },
+                _plan_check,
+            )
+            run_log["query_plan"] = query_plan
+
+            per_technology = {
+                technology: [
+                    query for query in query_plan["queries"]
+                    if query["technology"] == technology
+                ]
+                for technology in technologies
+            }
+            targets = list(technologies)
+
         workers = min(2, max(1, pipeline.settings.integer("RAG_MAX_CONCURRENCY", 1)))
         outcomes = {}
         failures = {}
@@ -309,7 +394,7 @@ def run_maturity(pipeline, request):
                     per_technology[technology],
                     feedback,
                 ): technology
-                for technology in technologies
+                for technology in targets
             }
             for future in as_completed(futures):
                 technology = futures[future]
@@ -335,13 +420,35 @@ def run_maturity(pipeline, request):
                     )
 
         # Futures are all drained before choosing an error; use contract technology order.
-        for technology in technologies:
+        for technology in targets:
             if technology in failures:
                 raise failures[technology]
 
         assessments = {}
         chunk_lookup = {}
+        preserved_technologies = set(technologies) - set(targets)
+        if preserved_technologies:
+            for technology in technologies:
+                if technology not in preserved_technologies:
+                    continue
+                key = f"research_{technology.lower()}"
+                assessments[key] = deepcopy(previous_assessments[key])
+                run_log["technology_queries"].setdefault(technology, [])
+
+            preserved_ids = _preserved_chunk_ids({
+                f"research_{technology.lower()}": previous_assessments[
+                    f"research_{technology.lower()}"
+                ]
+                for technology in preserved_technologies
+            })
+            for previous_chunk in _get(previous_result, "chunks"):
+                chunk = _plain(previous_chunk)
+                if chunk["id"] in preserved_ids:
+                    _merge_chunks(chunk_lookup, [chunk])
+
         for technology in technologies:
+            if technology not in targets:
+                continue
             assessment, chunks, technology_queries = outcomes[technology]
             query_log.extend(technology_queries)
             key = f"research_{technology.lower()}"

@@ -133,7 +133,7 @@ def _merge_results(request):
 
 def _node_error(exc):
     if isinstance(exc, APIError):
-        code = "api_error"
+        code = exc.code
     elif isinstance(exc, BudgetExceeded):
         code = "budget_exceeded"
     elif isinstance(exc, InputBudgetExceeded):

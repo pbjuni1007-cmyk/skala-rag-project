@@ -54,6 +54,9 @@ def _as_dict(value: Mapping[str, Any] | BaseModel) -> dict[str, Any]:
 def contract_chunk(chunk: Mapping[str, Any] | BaseModel) -> Chunk:
     """Convert a corpus chunk without changing source text or collection metadata."""
     payload = _as_dict(chunk)
+    # Query-dependent ranking belongs to retrieval diagnostics, not immutable
+    # evidence shared across views. Keep all source/location/hash metadata.
+    payload.pop("score", None)
     if payload.get("page") is None:
         payload["page"] = None
     else:
@@ -224,7 +227,7 @@ def node_error(exc: Exception, stage: str) -> NodeError:
     elif isinstance(exc, BudgetExceeded):
         code = "budget_exceeded"
     elif isinstance(exc, APIError):
-        code = "uncertain_request" if "reservation retained" in str(exc).lower() else "api_error"
+        code = exc.code
     elif isinstance(exc, (StructuredValidationError, ValidationError, json.JSONDecodeError)):
         code = "invalid_response"
     elif isinstance(exc, ArtifactMismatch):

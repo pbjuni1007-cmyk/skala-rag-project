@@ -384,7 +384,7 @@ def evaluate_report(structured, request):
                                   "Report Markdown, structure, or cited source artifacts do not match")
     except Exception as exc:
         if isinstance(exc, APIError):
-            code, message = "api_error", "Quality Judge request failed"
+            code, message = exc.code, "Quality Judge request failed"
         elif isinstance(exc, BudgetExceeded):
             code, message = "budget_exceeded", "Quality evaluation exceeded its call budget"
         elif isinstance(exc, InputBudgetExceeded):

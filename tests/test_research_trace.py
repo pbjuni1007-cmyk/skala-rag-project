@@ -127,7 +127,8 @@ def test_contract_chunk_converts_paper_and_web_locations_without_changing_text()
     assert paper_chunk.model_dump()["char_start"] == 40
     assert paper_chunk.model_dump()["char_end"] == 68
     assert paper_chunk.model_dump()["token_start"] == 80
-    assert paper_chunk.model_dump()["score"] == 0.75
+    assert "score" not in paper_chunk.model_dump()
+    assert pdf["score"] == 0.75
     assert web_chunk.page is None
     assert web_chunk.section == web["section"]
     assert web_chunk.text == web["text"]

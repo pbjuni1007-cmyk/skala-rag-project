@@ -38,10 +38,10 @@ def _get(value, key):
 
 
 def _stable_chunk(chunk):
-    """Ignore the query-dependent retrieval score when checking artifact identity."""
-    payload = _as_dict(chunk)
-    payload.pop("score", None)
-    return payload
+    """Compare evidence in the same shape exposed by the result boundary."""
+    from agents.researchers.result import contract_chunk
+
+    return contract_chunk(chunk).model_dump(mode="python")
 
 
 def _merge_chunks(target, candidates, artifact_mismatch):
@@ -156,7 +156,7 @@ def run_followup(pipeline, request):
     # Keep graph imports local so the Supervisor can import this runner without a cycle.
     from rag.graph import BASE, StructuredValidationError, token_context
 
-    from agents.researchers.result import ArtifactMismatch, RetrievalFailure, balance_findings, contract_chunk
+    from agents.researchers.result import ArtifactMismatch, RetrievalFailure, balance_findings
 
     view = _get(request, "view")
     if view not in PERSPECTIVE_FACETS:
@@ -200,7 +200,7 @@ def run_followup(pipeline, request):
             research_payload = _as_dict(research_chunk)
             chunk_id = research_payload["id"]
             corpus_chunk = corpus_by_id.get(chunk_id)
-            if corpus_chunk is None or _stable_chunk(contract_chunk(corpus_chunk)) != _stable_chunk(research_payload):
+            if corpus_chunk is None or _stable_chunk(corpus_chunk) != _stable_chunk(research_payload):
                 raise ArtifactMismatch("Research context chunk does not match the corpus artifact")
             run_log["research_chunk_ids"].append(chunk_id)
 

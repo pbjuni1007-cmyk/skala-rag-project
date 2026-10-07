@@ -1,6 +1,7 @@
 from pathlib import Path
 from html import escape, unescape
 from tempfile import TemporaryDirectory
+from urllib.parse import unquote, urlsplit
 import hashlib
 import re
 from reportlab.lib import colors
@@ -18,6 +19,7 @@ from rag.tracing import span
 LABELS = {"source_fact": "출처 사실", "author_reported_result": "저자 보고 결과", "team_inference": "팀 추론",
           "scenario": "적용 가정", "unknown": "미확인"}
 MAX_SUBMISSION_PAGES = 10
+MARKDOWN_LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
 def validate_pdf_layout(path, document, max_pages=MAX_SUBMISSION_PAGES):
@@ -118,12 +120,11 @@ def build_report_markdown(report, joined, sources, config):
     def claim_text(cid, table=False):
         c = claims[cid]
         parts = [f"**{LABELS[c['kind']]} | {cid}**", c["text"] + " " + citations(c)]
+        for label, key in (("조건", "conditions"), ("한계", "caveats")):
+            if c[key].strip():
+                parts.append(f"**{label}:** {c[key]}")
         if table:
             parts.append(f"[조건, 한계, 원문](citation_review.md#{cid})")
-        else:
-            for label, key in (("조건", "conditions"), ("한계", "caveats")):
-                if c[key].strip():
-                    parts.append(f"**{label}:** {c[key]}")
         return "<br><br>".join(cell(x) for x in parts) if table else "\n\n".join(parts)
 
     summary = [f"**{_technology_label(claims[c])}** [{LABELS[claims[c]['kind']]}] {claims[c]['text']} {citations(claims[c])}"
@@ -172,6 +173,10 @@ def build_report_markdown(report, joined, sources, config):
             else:
                 md.extend(["종합 단계의 해소 판단과 근거를 공백 검수표에 정리했습니다.", ""])
             md.extend(["공백별 판단 근거와 후속 확인 항목: [공백 검수표](gap_review.md).", ""])
+            for conflict in conflicts_for_joined(joined):
+                md.extend([f"## 상충 {conflict['id']}", "", conflict["text"], "",
+                           f"**해소 상태:** {conflict['status']} | **검수자:** {conflict['reviewed_by'] or '미검수'}", "",
+                           "**판단 근거:** " + conflict["rationale"], ""])
             md.extend(["상충의 원문, 관련 주장 후보, 조건, 해소 상태: [상충 검수표](conflict_review.md).", ""])
     md.extend(["# REFERENCE", ""])
     for sid in used_sources:
@@ -193,23 +198,10 @@ def _technology_label(claim):
     return "KIVI / InfiniGen" if claim["technology"] == "both" else claim["technology"]
 
 
-def _render_report(out, report, joined, sources, settings, config, markdown=None):
-    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
-    import hashlib
-    out = Path(out)
-    out.mkdir(parents=True, exist_ok=True)
+def build_review_documents(report, joined, used_claims):
+    """Build supplemental review records without claiming human verification."""
     claims, evidence = joined["claims"], joined["evidence"]
     conflict_records = conflicts_for_joined(joined)
-    generated_markdown, context = build_report_markdown(report, joined, sources, config)
-    if markdown is not None and markdown != generated_markdown:
-        raise ValueError("Writer Markdown differs from the report and citation registry")
-    document = markdown if markdown is not None else generated_markdown
-    path = out / filename(settings, "Output").replace(".pdf", ".md")
-    path.write_text(document)
-    (out / "report.md").write_text(document)
-    used_claims = context["used_claims"]
-    used_evidence = context["used_evidence"]
-    used_sources = context["used_sources"]
     gap_records = joined.get("gap_records", [{"id": f"legacy-{i}", "perspective": "legacy", "text": gap}
                                            for i, gap in enumerate(joined.get("gaps", []), 1)])
     decisions = {d["gap_id"]: d for d in report.get("gap_decisions", [])}
@@ -226,7 +218,6 @@ def _render_report(out, report, joined, sources, settings, config, markdown=None
             ev = evidence[eid]
             review.extend([f"- {eid} | {ev['source_id']} | 물리 페이지 {ev.get('page')} | {ev['section']}", "",
                            "> " + ev["quote"], ""])
-    (out / "citation_review.md").write_text("\n".join(review))
     gap_review = ["# 근거 공백 검수", "", "원래 공백을 삭제하지 않고 종합 시점의 판단과 근거를 보존합니다. 해소 여부의 의미 검수는 사람에게 남깁니다.", ""]
     for gap in gap_records:
         decision = decisions.get(gap["id"], {"status": "unreviewed", "resolution": "이전 실행: 종합 공백 판정 없음", "claim_ids": []})
@@ -234,8 +225,48 @@ def _render_report(out, report, joined, sources, settings, config, markdown=None
                            "**종합 판단:** " + decision["status"], "", "**판단 이유:** " + decision["resolution"], "",
                            "**근거 주장:** " + (", ".join(f"[{cid}](citation_review.md#{cid})" for cid in decision["claim_ids"]) or "없음"),
                            "", "**사람 검수:** 미검수", ""])
-    (out / "gap_review.md").write_text("\n".join(gap_review))
-    (out / "conflict_review.md").write_text(conflict_review_markdown(conflict_records, claims))
+    return {"citation_review.md": "\n".join(review), "gap_review.md": "\n".join(gap_review),
+            "conflict_review.md": conflict_review_markdown(conflict_records, claims)}
+
+
+def validate_document_links(documents):
+    """Every local link in the supported Markdown subset must resolve in the bundle."""
+    anchors = {name: {re.sub(r"[^\w -]", "", heading.lower()).replace(" ", "-")
+                      for heading in re.findall(r"^#{1,6} (.+)$", document, flags=re.MULTILINE)}
+               for name, document in documents.items()}
+    for name, document in documents.items():
+        for _, target in MARKDOWN_LINK.findall(document):
+            link = urlsplit(unescape(target))
+            if link.scheme in {"https", "http", "mailto"}:
+                continue
+            filename = unquote(link.path) or name
+            if (link.scheme or link.netloc or link.query or filename not in documents or
+                    (link.fragment and unquote(link.fragment) not in anchors[filename])):
+                raise ValueError(f"Unresolvable local document link: {target}")
+
+
+def _render_report(out, report, joined, sources, settings, config, markdown=None):
+    """Write matching Markdown/PDF reports and complete Markdown review sheets."""
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    generated_markdown, context = build_report_markdown(report, joined, sources, config)
+    if markdown is not None and markdown != generated_markdown:
+        raise ValueError("Writer Markdown differs from the report and citation registry")
+    document = markdown if markdown is not None else generated_markdown
+    reviews = build_review_documents(report, joined, context["used_claims"])
+    validate_document_links({"report.md": document, **reviews})
+    path = out / filename(settings, "Output").replace(".pdf", ".md")
+    path.write_text(document, encoding="utf-8")
+    (out / "report.md").write_text(document, encoding="utf-8")
+    for name, text in reviews.items():
+        (out / name).write_text(text, encoding="utf-8")
+    used_claims = context["used_claims"]
+    used_evidence = context["used_evidence"]
+    used_sources = context["used_sources"]
+    gap_records = joined.get("gap_records", [{"id": f"legacy-{i}", "perspective": "legacy", "text": gap}
+                                           for i, gap in enumerate(joined.get("gaps", []), 1)])
+    decisions = {d["gap_id"]: d for d in report.get("gap_decisions", [])}
+    conflict_records = conflicts_for_joined(joined)
     write_json(out / "conflict_records.json", conflict_records)
     pdf_path, pdf_checks = _write_pdf(out, document, settings)
     pdf_checks.update(used_sources=used_sources, used_claims=used_claims, used_evidence=used_evidence)
@@ -255,7 +286,7 @@ def _render_report(out, report, joined, sources, settings, config, markdown=None
 
 def _pdf_inline(text):
     """Translate the renderer's small Markdown subset without interpreting source HTML."""
-    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = MARKDOWN_LINK.sub(r"\1", text)
     text = unescape(text.replace("<br>", "\n"))
     text = escape(text)
     text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
@@ -323,7 +354,7 @@ def _write_pdf(out, document, settings, *, include_review_note=True):
     # The PDF explains where its linked Markdown annexes live without adding a new chapter.
     if include_review_note:
         story.insert(len(summary_flowables), Paragraph(
-            "상세 조건과 원문: 같은 실행 폴더의 citation_review.md / 공백 판단: gap_review.md", st["small"]))
+            "원문과 검수 기록: 함께 제공된 citation_review.md / gap_review.md / conflict_review.md", st["small"]))
     path = out / filename(settings, "Output")
     with NamedTemporaryFile(dir=out, suffix=".pdf", delete=False) as handle:
         temporary = Path(handle.name)
@@ -407,8 +438,38 @@ def _publish(request, out, settings):
                      "도메인 적용", "관점 간 상충과 한계", "REFERENCE"] or
             "**대상 기술:**" not in document):
         return failed("invalid_response", "Report Markdown does not follow the required chapter order")
+    try:
+        from agents.contracts import PublishRequest
+
+        validated = PublishRequest.model_validate(request)
+        canonical, context = build_report_markdown(
+            report["report"], report["joined"], report["sources"], common["context"])
+        if document != canonical:
+            return failed("artifact_mismatch", "Writer Markdown differs from the report and citation registry")
+        reviews = build_review_documents(report["report"], report["joined"], context["used_claims"])
+        validate_document_links({"report.md": document, **reviews})
+    except (KeyError, TypeError, ValueError):
+        return failed("invalid_response", "Report data or local document links are invalid")
 
     out = Path(out)
+    try:
+        import json
+        from agents.store import RunStore
+
+        snapshot = out / "snapshot.json"
+        if snapshot.stat().st_size > 64 * 1024:
+            raise ValueError("Oversized checkpoint")
+        store = RunStore(out)
+        state = store.load(json.loads(snapshot.read_text(encoding="utf-8"))["identity"])
+        if state["run_id"] != common["run_id"] or state["context"] != common["context"]:
+            raise ValueError("Different execution")
+        # A request ID alone cannot prove which body was evaluated. Both payloads
+        # must equal the current, hash-verified artifacts saved by the Supervisor.
+        for field, value in (("report", validated.report_result), ("evaluation", validated.evaluation_result)):
+            if store.get(state[field]) != value.model_dump(mode="json"):
+                raise ValueError("Evaluated artifact changed")
+    except (OSError, KeyError, TypeError, ValueError):
+        return failed("artifact_mismatch", "Publication requires this run's saved, evaluated report and verdict")
     destination = out / "report" / hashlib.sha256(common["request_id"].encode()).hexdigest()[:16]
     if destination.exists():
         return failed("artifact_mismatch", "Publish request already has output")
@@ -418,9 +479,11 @@ def _publish(request, out, settings):
         with TemporaryDirectory(dir=out, prefix=".publish-") as temporary:
             staging = Path(temporary) / "payload"
             staging.mkdir()
-            pdf, checks = _write_pdf(staging, document, settings, include_review_note=False)
+            pdf, checks = _write_pdf(staging, document, settings)
             markdown = staging / pdf.name.replace(".pdf", ".md")
             markdown.write_text(document, encoding="utf-8")
+            for name, text in reviews.items():
+                (staging / name).write_text(text, encoding="utf-8")
             pdf_name, markdown_name = pdf.name, markdown.name
             pdf_hash = hashlib.sha256(pdf.read_bytes()).hexdigest()
             markdown_hash = hashlib.sha256(markdown.read_bytes()).hexdigest()

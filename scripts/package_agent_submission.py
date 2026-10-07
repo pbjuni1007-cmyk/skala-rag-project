@@ -8,9 +8,9 @@ from tempfile import NamedTemporaryFile
 from urllib.parse import urlparse
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from pypdf import PdfReader
-
 from agents.store import RunStore
+from rag.render import (build_report_markdown, build_review_documents, validate_document_links,
+                        validate_pdf_layout)
 
 
 def _label(value):
@@ -58,12 +58,22 @@ def package_submission(*, run_dir, traces, git_url, campus, class_name, contribu
     pdf = store.verify(result["pdf_ref"])
     if markdown.decode("utf-8") != report["markdown"]:
         raise ValueError("Published Markdown differs from the evaluated report")
+    canonical, context = build_report_markdown(
+        report["report"], report["joined"], report["sources"], report["context"])
+    if report["markdown"] != canonical:
+        raise ValueError("Published Markdown differs from the structured report")
+    reviews = build_review_documents(report["report"], report["joined"], context["used_claims"])
+    validate_document_links({"report.md": canonical, **reviews})
+    published_dir = Path(result["markdown_ref"]["path"]).parent
+    for name, content in reviews.items():
+        try:
+            store.verify({"path": (published_dir / name).as_posix(),
+                          "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest()})
+        except FileNotFoundError as exc:
+            raise ValueError(f"Review document is missing: {name}") from exc
     pdf_path = run_dir / result["pdf_ref"]["path"]
-    reader = PdfReader(pdf_path)
-    pages = len(reader.pages)
-    if (not 1 <= pages == result.get("pdf_pages") <= 10 or
-            "SUMMARY" not in reader.pages[0].extract_text() or
-            "REFERENCE" not in reader.pages[-1].extract_text()):
+    pages = validate_pdf_layout(pdf_path, canonical)
+    if pages != result.get("pdf_pages"):
         raise ValueError("Final PDF fails page or chapter checks")
 
     files = [Path(path) for path in traces]
@@ -86,6 +96,7 @@ def package_submission(*, run_dir, traces, git_url, campus, class_name, contribu
         "pdf_pages": pages, "pdf_sha256": hashlib.sha256(pdf).hexdigest(),
         "trace_files": [path.name for path in files],
         "real_run_confirmed": True, "visual_review_confirmed": True,
+        "human_review_pending": True,
     }
     with NamedTemporaryFile(dir=output_dir, suffix=".zip", delete=False) as stream:
         temporary = Path(stream.name)
@@ -94,6 +105,8 @@ def package_submission(*, run_dir, traces, git_url, campus, class_name, contribu
             archive.writestr("submission.json", json.dumps(manifest, ensure_ascii=False, indent=2))
             archive.writestr("report.md", markdown)
             archive.writestr(pdf_path.name, pdf)
+            for name, content in reviews.items():
+                archive.writestr(name, content)
             for path in files:
                 archive.write(path, path.name)
         temporary.replace(destination)

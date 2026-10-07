@@ -48,11 +48,19 @@ def main():
     parser.add_argument("--render", type=Path, help="Rewrite Markdown and PDF from a saved, validated run, no GPT calls")
     parser.add_argument("--agent-publish-request", type=Path,
                         help="Publish one Agent contract request from JSON, no GPT calls")
+    parser.add_argument("--agent", action="store_true", help="Run the team Supervisor with real research, writer and evaluator nodes")
+    parser.add_argument("--agent-resume", type=Path, help="With --agent, continue the same saved Agent checkpoint and call budget")
     parser.add_argument("--refresh-web", action="store_true")
     recovery = parser.add_mutually_exclusive_group()
     recovery.add_argument("--reuse-calls", type=Path, help="Rerun current graph; reuse only exact successful requests when non-code inputs match")
     recovery.add_argument("--resume", type=Path, help="Reuse exact-input successful calls from a compatible saved run")
     args = parser.parse_args()
+    if args.agent_resume and not args.agent:
+        parser.error("--agent-resume requires --agent")
+    if args.agent and (args.prepare or args.render or args.agent_publish_request or args.resume or args.reuse_calls):
+        parser.error("--agent cannot be combined with legacy RAG execution or call-cache modes")
+    if args.agent_resume and args.refresh_web:
+        parser.error("Agent checkpoint recovery cannot refresh source snapshots")
     settings = Settings.load()
     if args.agent_publish_request:
         if args.prepare or args.render or args.refresh_web or args.reuse_calls or args.resume:
@@ -91,6 +99,13 @@ def main():
     if args.prepare:
         print(json.dumps(index, ensure_ascii=False))
         return 0
+    if args.agent:
+        from rag.agent_runtime import execute_agent
+        result = execute_agent(config_path=args.config, settings=settings, corpus=corpus, index=index,
+                               retrieval_check=retrieval_check, resume=args.agent_resume,
+                               output_root=Path(settings.get("RAG_OUTPUT_DIR", "outputs")))
+        print(json.dumps({key: value for key, value in result.items() if key != "state"}, ensure_ascii=False))
+        return 0 if result["status"] == "completed" else 2
     from rag.llm import Gateway
     from rag.graph import Pipeline
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:6]

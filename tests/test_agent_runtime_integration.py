@@ -8,7 +8,7 @@ from pypdf import PdfReader
 from agents.state import Limits
 from agents.supervisor import Nodes
 from rag.agent_runtime import load_run_context, run_team_agent
-from rag.render import publish
+from rag.render import build_report_markdown, publish
 from rag.settings import Settings
 from test_team_contracts import response
 from test_team_supervisor import AdaptiveDecider, FakeNodes, quality_rework
@@ -18,13 +18,23 @@ CONFIG = Path(__file__).resolve().parents[1] / "config/run.yaml"
 RUN_ID = "offline-issue-4"
 
 
+def canonical_writer(callback):
+    def write(request):
+        result = callback(request)
+        if result["status"] == "ok":
+            result["markdown"], _ = build_report_markdown(
+                result["report"], result["joined"], result["sources"], request["context"])
+        return result
+    return write
+
+
 def execute(tmp_path, *, overrides=None, limits=None, decider=None):
     root = tmp_path / RUN_ID
     fake = FakeNodes(root, overrides=overrides)
     callbacks = fake.nodes()
     settings = Settings({"LANGSMITH_TRACING": "false"})
     events = []
-    nodes = Nodes(callbacks.research, callbacks.write_report, callbacks.evaluate_report,
+    nodes = Nodes(callbacks.research, canonical_writer(callbacks.write_report), callbacks.evaluate_report,
                   lambda request: publish(request, root, settings))
     state = run_team_agent(
         config_path=CONFIG, run_id=RUN_ID, identity="mock-node-code-data-config-v1",
@@ -63,6 +73,7 @@ def test_complete_graph_publishes_real_pdf_and_links_local_decisions(tmp_path):
     decisions = [event for event in events if event["node"] == "supervisor" and event.get("reason_code")]
     assert decisions and all(event["run_id"] == RUN_ID and event["request_id"] for event in decisions)
     assert any(event["next_action"] == "writer" and event["reason_code"] == "evidence_ready" for event in decisions)
+    assert all(event.get("evidence_sufficient") is True for event in decisions if event["next_action"] == "writer")
     assert any(event["next_action"] == "publish" and event["reason_code"] == "quality_passed" for event in decisions)
     saved = [json.loads(line) for line in (root / "events.jsonl").read_text(encoding="utf-8").splitlines()]
     assert any(event.get("reason") for event in saved if event["node"] == "supervisor")

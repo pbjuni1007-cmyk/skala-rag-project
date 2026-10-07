@@ -96,7 +96,7 @@ class Supervisor:
             try:
                 self.on_event({k: v for k, v in metadata.items()
                                if k in {"run_id", "node", "request_id", "attempt", "step_count",
-                                        "status", "next_action", "reason_code", "error_code"}})
+                                        "status", "next_action", "reason_code", "error_code", "evidence_sufficient"}})
             except Exception:
                 self.store.event(run_id=state["run_id"], node=role, status="telemetry_error")
 
@@ -172,7 +172,8 @@ class Supervisor:
             raise ValueError("Writing requires the Supervisor's explicit sufficiency judgment")
         self.store.put("supervisor", common["attempt"], decision)
         self._event(state, "supervisor", next_action=action,
-                    reason_code=decision["reason_code"], reason=decision["reason"])
+                    reason_code=decision["reason_code"], reason=decision["reason"],
+                    evidence_sufficient=decision["evidence_sufficient"])
         feedback = deepcopy(state["feedback"])
         if decision["feedback"]:
             feedback[action] = [s[:500] for s in decision["feedback"][:8]]
@@ -353,10 +354,13 @@ class Supervisor:
             try:
                 update = function(current)
             except Exception as exc:
+                from rag.llm import APIError
                 codes = {"APIError": "api_error", "BudgetExceeded": "budget_exceeded",
                          "InputBudgetExceeded": "input_budget_exceeded"}
                 code = "artifact_mismatch" if str(exc).startswith("artifact_mismatch:") else codes.get(type(exc).__name__, "invalid_response")
-                update = self._stop(code, f"{role} 처리 실패 ({type(exc).__name__})")
+                if isinstance(exc, APIError):
+                    code = exc.code
+                update = self._stop(code, f"{role} 처리 실패 ({type(exc).__name__})", uncertain=code == "uncertain_request")
             current.update(update)
             # Preserve a pending marker when the provider explicitly cannot confirm completion.
             if current["status"] != "needs_attention":

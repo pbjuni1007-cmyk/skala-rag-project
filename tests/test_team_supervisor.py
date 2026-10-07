@@ -451,7 +451,7 @@ def test_optional_observability_hook_gets_only_metadata_and_cannot_break_the_run
     assert run(supervisor)["status"] == "completed"
     assert records
     allowed = {"run_id", "node", "request_id", "attempt", "step_count", "status",
-               "next_action", "reason_code", "error_code"}
+               "next_action", "reason_code", "error_code", "evidence_sufficient"}
     assert all(set(record) <= allowed for record in records)
     assert example("research_ok")["chunks"][0]["text"] not in json.dumps(records)
     if hook_fails:

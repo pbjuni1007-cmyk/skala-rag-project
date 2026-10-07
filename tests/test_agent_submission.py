@@ -6,6 +6,7 @@ from zipfile import ZipFile
 import pytest
 
 from scripts.package_agent_submission import package_submission
+from rag.render import build_report_markdown
 from test_agent_runtime_integration import RUN_ID, execute
 
 
@@ -17,7 +18,12 @@ PNG = base64.b64decode(
 
 
 def inputs(tmp_path):
-    state, _, _, root = execute(tmp_path)
+    def canonical_writer(request, report):
+        report["markdown"], _ = build_report_markdown(
+            report["report"], report["joined"], report["sources"], request["context"])
+        return report
+
+    state, _, _, root = execute(tmp_path, overrides={"writer": canonical_writer})
     assert state["status"] == "completed"
     trace = tmp_path / "tracing-1.png"
     trace.write_bytes(PNG)
@@ -37,9 +43,13 @@ def test_package_checks_same_run_pdf_hash_pages_and_names(tmp_path):
         names = package.namelist()
         assert "submission.json" in names and "report.md" in names
         assert "tracing-1.png" in names and any(name.endswith(".pdf") for name in names)
+        for name in ("citation_review.md", "gap_review.md", "conflict_review.md"):
+            assert name in names
+        assert "판정: 미검수" in package.read("citation_review.md").decode("utf-8")
         manifest = json.loads(package.read("submission.json"))
         assert manifest["run_id"] == RUN_ID and 1 <= manifest["pdf_pages"] <= 10
         assert manifest["git_branch_url"] == GIT_URL
+        assert manifest["human_review_pending"] is True
 
 
 def test_package_requires_human_review_confirmations(tmp_path):
@@ -58,6 +68,22 @@ def test_package_rejects_tampered_pdf(tmp_path):
     (root / result["pdf_ref"]["path"]).write_bytes(b"changed")
     with pytest.raises(ValueError, match="Artifact content changed"):
         package_submission(**options)
+
+
+@pytest.mark.parametrize("damage", ["missing", "changed"])
+def test_package_rejects_missing_or_changed_review_files(tmp_path, damage):
+    options = inputs(tmp_path)
+    root = options["run_dir"]
+    state = json.loads((root / "snapshot.json").read_text(encoding="utf-8"))
+    result = json.loads((root / state["publication"]["path"]).read_text(encoding="utf-8"))
+    review = (root / result["markdown_ref"]["path"]).parent / "citation_review.md"
+    if damage == "missing":
+        review.unlink(missing_ok=True)
+    else:
+        review.write_text("평가와 무관한 검수 내용", encoding="utf-8")
+    with pytest.raises(ValueError, match="Review document|Artifact content changed"):
+        package_submission(**options)
+    assert not options["output_dir"].exists()
 
 
 @pytest.mark.parametrize("name", ["trace.png", "tracing-2.png"])

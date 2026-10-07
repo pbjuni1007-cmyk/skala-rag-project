@@ -92,7 +92,7 @@ def test_repeated_legacy_body_claims_appear_once_plus_summary(tmp_path, report_f
     assert body.count(joined["claims"]["claim-1"]["text"]) == 2
 
 
-def test_comparison_cells_link_full_conditions_and_escape_claim_pipes(tmp_path, report_fixture):
+def test_comparison_cells_keep_full_conditions_and_escape_claim_pipes(tmp_path, report_fixture):
     report, joined, sources, settings, config = report_fixture
     report["sections"][0]["claim_ids"] = []
     joined["claims"]["claim-1"].update(facet="costs", text="비용 | 선택 조건", conditions="A100 | batch 8", caveats="다른 설정과 비교 금지")
@@ -101,11 +101,14 @@ def test_comparison_cells_link_full_conditions_and_escape_claim_pipes(tmp_path, 
     body = Path(paths["markdown"]).read_text()
     assert "| 비교 질문 | KIVI | InfiniGen |" in body
     assert "비용 &#124; 선택 조건" in body
-    assert "A100" not in body
-    assert "다른 설정과 비교 금지" not in body
+    assert "A100 &#124; batch 8" in body
+    assert "다른 설정과 비교 금지" in body
     assert "[조건, 한계, 원문](citation_review.md#claim-1)" in body
     assert "**한계:** 다른 설정과 비교 금지" in Path(paths["citation_review"]).read_text()
     assert "**조건:** A100 | batch 8" in Path(paths["citation_review"]).read_text()
+    from pypdf import PdfReader
+    pdf_text = "\n".join(page.extract_text() for page in PdfReader(paths["pdf"]).pages)
+    assert "A100 | batch 8" in pdf_text and "다른 설정과 비교 금지" in pdf_text
 
 
 @pytest.mark.parametrize("technology, label", [("KIVI", "KIVI"), ("InfiniGen", "InfiniGen"), ("both", "KIVI / InfiniGen")])
@@ -117,7 +120,7 @@ def test_summary_names_technology_even_when_claim_uses_an_implicit_subject(tmp_p
     assert f"**{label}** [출처 사실] 운영자의 관리 부담을 함께 고려한다." in summary
 
 
-def test_table_moves_long_details_without_mutating_or_losing_originals(tmp_path, report_fixture):
+def test_long_table_conditions_are_not_hidden_to_fit_the_page_limit(tmp_path, report_fixture):
     report, joined, sources, settings, config = report_fixture
     report["sections"][0]["claim_ids"] = []
     target = joined["claims"]["claim-1"]
@@ -125,15 +128,25 @@ def test_table_moves_long_details_without_mutating_or_losing_originals(tmp_path,
                   caveats="남은 확인 항목 " + "다른 실험 조건\n" * 200)
     joined["claims"]["claim-2"]["facet"] = "costs"
     before = deepcopy(joined)
-    paths = render_report(tmp_path, report, joined, sources, settings, config)
-    body, annex = Path(paths["markdown"]).read_text(), Path(paths["citation_review"]).read_text()
-    assert "a" * 64 not in body
-    assert target["conditions"] in annex and target["caveats"] in annex
-    assert target["text"] in body and target["text"] in annex
-    assert target["references"][0]["quote"] in annex
+    body, _ = build_report_markdown(report, joined, sources, config)
+    assert target["conditions"].replace("|", "&#124;").replace("\n", "<br>") in body
+    assert target["caveats"].replace("\n", "<br>") in body
+    assert target["text"] in body
     assert "[1, 물리 p.1]" in body
     assert "[조건, 한계, 원문](citation_review.md#claim-1)" in body
+    with pytest.raises(ValueError, match="10-page submission limit"):
+        render_report(tmp_path, report, joined, sources, settings, config)
+    assert not list(tmp_path.glob("*.pdf"))
     assert joined == before
+
+
+def test_unresolved_conflict_is_visible_in_main_report(tmp_path, report_fixture):
+    report, joined, sources, settings, config = report_fixture
+    joined["conflicts"] = ["성능 향상 주장과 운영 비용 부담이 상충하며 원문 확인이 필요하다."]
+    paths = render_report(tmp_path, report, joined, sources, settings, config)
+    body = Path(paths["markdown"]).read_text()
+    assert joined["conflicts"][0] in body
+    assert "unresolved" in body
 
 
 def test_complete_report_keeps_every_body_claim_once_and_every_reference(tmp_path):

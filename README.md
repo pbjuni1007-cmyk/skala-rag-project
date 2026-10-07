@@ -6,7 +6,20 @@ Agent 협업의 입력·출력과 연결 규칙: [계약 v1](docs/agent-contract
 
 ## Agent Supervisor — 이슈 #1
 
-박병준 담당 [이슈 #1](https://github.com/pbjuni1007-cmyk/skala-rag-project/issues/1)은 공통 자료형, State와 Supervisor를 구현한다. 조사·보고서·평가·출력 담당자가 제공한 함수를 연결하며, 기존 `app.py`의 RAG 실행은 아래 Overview 이후에 설명한다.
+박병준 담당 [이슈 #1](https://github.com/pbjuni1007-cmyk/skala-rag-project/issues/1)은 공통 자료형, State와 Supervisor를 구현한다. 팀의 조사·보고서·평가·출력 함수는 `app.py --agent`로 함께 실행한다. 옵션 없는 실행은 기존 RAG 그래프를 사용한다.
+
+환경과 자료 준비는 아래 실행 안내를 따른다. Agent 실행과 재개 명령은 다음과 같다.
+
+```bash
+uv run python app.py --agent
+uv run python app.py --agent --agent-resume outputs/<실행ID>
+```
+
+재개는 같은 실행 ID, 완료한 노드, 누적 호출 횟수와 비용 장부를 유지한다. 하위 디렉터리를 포함한 코드·프롬프트·설정, 원문·검색 인덱스, 모델·호출 제한, 장부 식별자가 달라지면 거부한다. 장부를 지우거나 과거 예약·정산 내역을 제거해도 거부한다. 이전 노드의 완료 여부가 불명확하면 `needs_attention`으로 멈추며 자동 재호출하지 않는다. 기존 RAG의 `--resume`·`--reuse-calls`는 완료 응답 캐시를 쓰는 별도 기능이므로 Agent 모드와 함께 사용할 수 없다.
+
+실행 폴더의 `snapshot.json`은 제어 상태이고, `artifacts/<역할>/<시도>.json`은 완전한 역할별 결과다. `manifest.json`은 실행 입력을, `events.jsonl`은 결정과 오류를 기록한다. 게시 결과가 가리키는 `report/<게시ID>/`에 같은 본문의 Markdown·PDF와 인용·공백·상충 검수표가 저장된다. PDF는 10페이지 이하여야 하며, 조건과 한계를 본문에 보존한다. `completed` 후에도 `human_review_pending=true`다.
+
+`--agent-publish-request`로 저장된 요청을 게시할 때도 해당 실행의 `snapshot.json`과 해시로 검증된 보고서·평가 원본이 필요하다. 평가 뒤 본문과 Markdown을 함께 수정해 이전 평가를 재사용하면 거부한다. 이 검사는 v1 요청 형식을 유지하면서 기존 RunStore 원본에 연결한다. 재개 식별값에는 사용자 지정 폰트의 내용과 LangSmith 활성화·전송 목적지도 포함한다.
 
 Supervisor는 현재 수집된 관점과 근거를 보고 다음 작업을 고른다. 기술 조사 이후 세 관점의 순서를 고정하지 않는다. 모든 관점이 `ok`여도 Supervisor가 근거 충분성을 명시적으로 승인해야 작성할 수 있다. 품질 평가가 보완 대상을 반환하면 해당 관점이나 writer에 이유·주장 ID·공백 ID를 전달한다. 하위 역할은 다른 하위 역할을 호출하지 않으며, 성공·실패·출력 결과 모두 Supervisor로 돌아온다.
 
@@ -65,7 +78,7 @@ context = RunContext(
 state = coordinator.run(run_id, context, identity=execution_fingerprint)
 ```
 
-`execution_fingerprint`는 #4가 하위 노드 코드, 모델·설정, 고정 자료와 비용 장부를 묶어 만든 식별값이다. `agents/researchers/` 같은 하위 디렉터리의 코드 변경도 이 값에 반영해야 한다. Supervisor는 자신의 코드·프롬프트·잠금 파일, context, 실행 상한과 run ID를 자동으로 결합한다. 값이 달라지면 새 실행 폴더를 사용한다. 키를 식별값이나 로그 본문에 넣지 않는다.
+`execution_fingerprint`는 `rag/agent_runtime.py`가 하위 노드 코드, 모델·설정, 고정 자료와 비용 장부를 묶어 만든 식별값이다. `agents/researchers/`의 코드도 포함한다. Supervisor는 자신의 코드·프롬프트·잠금 파일, context, 실행 상한과 run ID를 자동으로 결합한다. 값이 달라지면 새 실행 폴더를 사용한다. 키를 식별값이나 로그 본문에 넣지 않는다.
 
 요청에는 `contract_version`, `run_id`, `request_id`, `attempt`, `context`가 공통으로 들어간다. 응답은 이를 그대로 돌려줘야 한다. 출처·청크 ID 충돌, 위조 인용, 다른 보고서의 평가, 원래 주장·근거·공백의 변경은 연결 단계에서 거부한다. 생성된 보고서의 구조 문제는 평가 대상이 될 수 있지만 긍정 평가가 기존 구조 검사 실패를 덮을 수는 없다.
 
@@ -93,9 +106,9 @@ uv run pytest -q tests/test_team_contracts.py tests/test_team_supervisor.py test
 
 테스트는 계약 문서의 가상 응답을 사용한다. 서로 다른 조사 순서, 근거 부족 재조사, 보고서·관점 재작업, 오류·상한, 중단 후 재개, 결과 변조와 경로 이탈을 검증한다. 모의 publisher가 만드는 파일은 실제 평가 PDF가 아니다.
 
-#2·#3·#4의 함수와 연결한 실제 모델 실행, PDF 조판·실제 페이지 수 검사, LangSmith 수신·화면 캡처는 아직 남아 있다. Supervisor는 출력 파일의 해시와 Markdown 일치 및 선언된 페이지 상한을 확인한다. 실제 PDF 내용 검수는 #4가 수행한다. `completed`도 사람의 의미·제출 검수 완료를 뜻하지 않는다.
+#2·#3·#4의 실제 함수를 연결한 오프라인 검사는 모델 통신과 자료 입출력만 가짜로 바꾸고 PDF 생성까지 수행한다. 실제 모델 실행, 원문과 주장 전수 대조, LangSmith 수신·화면 캡처와 최종 PDF 시각 검수는 별도 검증이다. 이전 RAG 보고서와 테스트용 PDF는 새 Agent 실행의 증거가 아니다.
 
-추적 연결은 `Supervisor(..., on_event=handler)`를 사용한다. hook 실패는 로컬 `telemetry_error`로 기록하며 업무 실행을 중단시키지 않는다. 기본 LangGraph 자동 추적은 State·요청 전문 노출을 막기 위해 실행 중 비활성화한다. 기존 `rag.tracing.safe_metadata()`는 새 결정 분류를 아직 허용하지 않으므로 #4가 명시적인 허용 목록으로 연결해야 한다.
+추적 연결은 `Supervisor(..., on_event=handler)`를 사용한다. hook 실패는 로컬 `telemetry_error`로 기록하며 업무 실행을 중단시키지 않는다. 기본 LangGraph 자동 추적은 State·요청 전문 노출을 막기 위해 실행 중 비활성화한다. Agent 실행 계층은 결정 분류·다음 작업·근거 충분 여부와 공통 식별자만 명시적인 허용 목록으로 LangSmith에 전달한다. 결정 이유 전문과 원문은 로컬에 남긴다.
 
 ## Overview
 
@@ -104,7 +117,7 @@ uv run pytest -q tests/test_team_contracts.py tests/test_team_supervisor.py test
 [설계서](docs/design-report.md) | [평가 보고서](reports/latest/report.md) | [인용 검수표](reports/latest/citation_review.md) | [실행 검증](docs/validation.md) | [Markdown 출력 샘플](docs/report-markdown-sample.md)
 
 - **Objective:** KIVI와 InfiniGen을 기술 성숙도, 시장성, 이해관계자, 도메인 적용 관점에서 비교하고 조건에 따른 선택 근거와 상충을 설명합니다.
-- **Method:** LangGraph 기반 Multi-Agent와 Agentic RAG입니다. 기술 조사 뒤 시장성, 이해관계자, 도메인 관점을 병렬 평가하고 보고서를 작성한 다음 별도 품질 평가를 수행합니다.
+- **Method:** LangGraph Supervisor가 조사 순서와 재작업을 선택합니다. 역할은 한 번에 하나씩 호출하며, 역할 내부의 독립 검색·모델 요청은 공통 호출 제한 안에서 병렬 처리합니다. 옵션 없는 기존 RAG 실행은 세 관점을 병렬 평가하는 별도 그래프를 사용합니다.
 - **Tools:** 논문과 공식 웹 자료 수집, 로컬 임베딩 검색, 원문 인용 검증, Markdown과 PDF 보고서 생성, 선택적 LangSmith 추적을 사용합니다.
 
 ## Selected Technologies
@@ -241,7 +254,7 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider test
 
 ## Usage
 
-### 환경 준비와 실행
+### 환경 준비와 기존 RAG 실행
 
 Python 3.11~3.13과 [uv](https://docs.astral.sh/uv/)를 사용합니다. 모델과 패키지는 최초 준비 시 내려받습니다.
 

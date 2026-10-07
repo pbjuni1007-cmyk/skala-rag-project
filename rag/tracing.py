@@ -41,7 +41,7 @@ def safe_metadata(values):
         elif key in {'evidence_sufficient', 'passed'} and type(value) is bool:
             result[key] = value
         elif key == 'status' and value in ('research_ok', 'joined', 'report_drafted', 'revision_requested',
-                                            'validated', 'human_review_pending', 'incomplete', 'failed', 'completed'):
+                                            'validated', 'human_review_pending', 'incomplete', 'needs_attention', 'failed', 'completed'):
             result[key] = value
         elif key == 'cache_hit' and type(value) is bool:
             result[key] = value
@@ -145,7 +145,7 @@ def span(name, run_type='chain', **metadata):
     finally:
         if tree is not None:
             try:
-                tree.end(outputs={}, error='execution_failed' if failed or values.get('status') in ('incomplete', 'failed') else None,
+                tree.end(outputs={}, error='execution_failed' if failed or values.get('status') in ('incomplete', 'needs_attention', 'failed') else None,
                          metadata=safe_metadata(values))
                 session.enqueue(tree, 'patch')
             except Exception:

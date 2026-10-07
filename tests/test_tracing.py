@@ -10,7 +10,7 @@ import pytest
 from rag.settings import Settings
 from rag.tracing import trace_agent_call, trace_decision, trace_run, span, submit, traced_node
 from rag.llm import Gateway, APIError
-from rag.render import publish
+from rag.render import build_report_markdown, publish
 from test_gateway import settings, completed, no_network_or_retry_wait
 
 
@@ -186,8 +186,12 @@ def test_contract_worker_traces_pydantic_results(client, role, example_name, mod
 
 
 def test_publish_trace_links_request_without_report_or_evaluation_text(client, tmp_path):
+    from test_render import save_evaluated_fixture
     examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
     request = json.loads(examples.read_text(encoding='utf-8'))['examples']['publish_request']['payload']
+    report = request['report_result']
+    report['markdown'], _ = build_report_markdown(report['report'], report['joined'], report['sources'], request['context'])
+    save_evaluated_fixture(request, tmp_path)
     failed = json.loads(json.dumps(request))
     failed['evaluation_result']['passed'] = False
     failed['evaluation_result']['checks']['coverage']['reason'] = 'RAW_SENTINEL'
@@ -211,13 +215,14 @@ def test_real_supervisor_graph_links_mock_node_and_decision_spans(client, tmp_pa
     from rag.agent_runtime import run_team_agent
     from test_team_contracts import example
     from test_team_supervisor import AdaptiveDecider, FakeNodes
+    from test_agent_runtime_integration import canonical_writer
 
     run_id = 'mock-graph-trace'
     root = tmp_path / run_id
     fake = FakeNodes(root)
     callbacks = fake.nodes()
     settings = enabled()
-    nodes = Nodes(callbacks.research, callbacks.write_report, callbacks.evaluate_report,
+    nodes = Nodes(callbacks.research, canonical_writer(callbacks.write_report), callbacks.evaluate_report,
                   lambda request: publish(request, root, settings))
     state = run_team_agent(
         config_path=Path(__file__).resolve().parents[1] / 'config/run.yaml',

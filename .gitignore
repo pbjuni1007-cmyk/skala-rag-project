@@ -243,3 +243,5 @@
 !/tests/fixtures/research/stakeholder.json
 !/tests/fixtures/research/domain.json
 !/tests/test_research_samples.py
+!/tests/test_research_supervisor_integration.py
+!/tests/test_agent_execution_integration.py

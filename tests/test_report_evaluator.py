@@ -10,6 +10,28 @@ from test_pipeline_improvements import report_fixture
 from test_pipeline_improvements import chunks as report_chunks
 
 
+def test_judge_request_schema_requires_all_nested_fields(tmp_path):
+    from rag.schemas import QualityJudgeDraft
+    from test_pipeline_improvements import pipeline
+    p = pipeline(tmp_path, [judge_result()])
+    p.structured('report_quality_judge', QualityJudgeDraft, 'test', {})
+    schema = p.gateway.calls[0][3]
+    def check(value):
+        if isinstance(value, dict):
+            if value.get('type') == 'object':
+                assert value.get('additionalProperties') is False
+                assert set(value['required']) == set(value['properties'])
+            for item in value.values():
+                check(item)
+        elif isinstance(value, list):
+            for item in value:
+                check(item)
+    check(schema)
+    assert set(schema['$defs']['QualityFinding']['properties']) == {
+        'criterion', 'target', 'claim_ids', 'evidence_ids', 'issue',
+        'revision_request', 'missing_perspectives'}
+
+
 def judge_result(overrides=None):
     overrides = overrides or {}
     return {"criteria": [

@@ -210,17 +210,22 @@ def trace_agent_call(role, request, function):
     """Run a contract worker in a metadata-only span and return its response."""
     if role not in _WORKER_ROLES:
         raise ValueError('Unsupported traced Agent role')
+
+    def field(value, name):
+        return value.get(name) if isinstance(value, dict) else getattr(value, name, None)
+
     with span(role, role=role, run_id=request.get('run_id'),
               request_id=request.get('request_id'), attempt=request.get('attempt')) as metadata:
         result = function(request)
-        if isinstance(result, dict):
-            metadata['result_status'] = result.get('status')
-            metadata['status'] = 'failed' if result.get('status') == 'failed' else 'completed'
+        status = field(result, 'status')
+        if isinstance(status, str) and status in _CONTROL_CODES['result_status']:
+            metadata['result_status'] = status
+            metadata['status'] = 'failed' if status == 'failed' else 'completed'
             if role == 'evaluator':
-                metadata['passed'] = result.get('passed')
-            error = result.get('error')
-            if isinstance(error, dict):
-                metadata['error_code'] = error.get('code')
+                metadata['passed'] = field(result, 'passed')
+            error = field(result, 'error')
+            if error is not None:
+                metadata['error_code'] = field(error, 'code')
         return result
 
 

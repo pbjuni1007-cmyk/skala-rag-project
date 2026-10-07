@@ -162,6 +162,29 @@ def test_contract_worker_rejects_unrecognized_role_before_tracing():
         trace_agent_call('RAW_SENTINEL', {}, lambda request: request)
 
 
+@pytest.mark.parametrize('role,example_name,model_name', [
+    ('market', 'market_insufficient', 'ResearchResult'),
+    ('evaluator', 'evaluation_error', 'EvaluationResult'),
+])
+def test_contract_worker_traces_pydantic_results(client, role, example_name, model_name):
+    from agents import contracts
+
+    examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
+    payload = json.loads(examples.read_text(encoding='utf-8'))['examples'][example_name]['payload']
+    result = getattr(contracts, model_name).model_validate(payload)
+    request = {key: payload[key] for key in ('run_id', 'request_id', 'attempt')}
+    with trace_run(enabled(), payload['run_id']):
+        assert trace_agent_call(role, request, lambda received: result) is result
+    updates = [data for kind, data in client.records if kind == 'update']
+    worker = next(data for data in updates if data['name'] == role)
+    metadata = worker['extra']['metadata']
+    assert metadata['result_status'] == result.status
+    assert metadata['status'] == ('failed' if result.status == 'failed' else 'completed')
+    if role == 'evaluator':
+        assert metadata['passed'] is False
+        assert metadata['error_code'] == result.error.code
+
+
 def test_publish_trace_links_request_without_report_or_evaluation_text(client, tmp_path):
     examples = Path(__file__).resolve().parents[1] / 'docs/agent-contract-examples.json'
     request = json.loads(examples.read_text(encoding='utf-8'))['examples']['publish_request']['payload']

@@ -34,7 +34,7 @@ def execute(tmp_path, *, overrides=None, limits=None, decider=None):
     return state, fake, events, root
 
 
-def assert_real_publication(state, fake, root):
+def assert_real_publication(state, root):
     assert state["status"] == "completed"
     result = json.loads((root / state["publication"]["path"]).read_text(encoding="utf-8"))
     assert result["status"] == "ok" and result["human_review_pending"] is True
@@ -58,7 +58,7 @@ def test_config_context_is_validated_before_agent_execution(tmp_path):
 
 def test_complete_graph_publishes_real_pdf_and_links_local_decisions(tmp_path):
     state, fake, events, root = execute(tmp_path)
-    assert_real_publication(state, fake, root)
+    assert_real_publication(state, root)
     assert [role for role, _ in fake.calls] == ["research", "domain", "market", "stakeholder", "writer", "evaluator"]
     decisions = [event for event in events if event["node"] == "supervisor" and event.get("reason_code")]
     assert decisions and all(event["run_id"] == RUN_ID and event["request_id"] for event in decisions)
@@ -74,7 +74,7 @@ def test_insufficient_market_reinvestigates_then_publishes(tmp_path):
         return response("market_insufficient", request) if request["attempt"] == 1 else payload
 
     state, fake, events, root = execute(tmp_path, overrides={"market": insufficient_once})
-    assert_real_publication(state, fake, root)
+    assert_real_publication(state, root)
     assert [request["attempt"] for request in fake.requests("market")] == [1, 2]
     assert any(event.get("reason_code") == "evidence_gap" and event.get("next_action") == "market"
                for event in events)
@@ -91,7 +91,7 @@ def test_failed_evaluation_rewrites_and_reevaluates_before_pdf(tmp_path):
 
     state, fake, events, root = execute(tmp_path, overrides={"evaluator": quality_rework},
                                         decider=decide)
-    assert_real_publication(state, fake, root)
+    assert_real_publication(state, root)
     assert len(fake.requests("writer")) == len(fake.requests("evaluator")) == 2
     assert any(event.get("reason_code") == "quality_rework" and event.get("next_action") == "writer"
                for event in events)

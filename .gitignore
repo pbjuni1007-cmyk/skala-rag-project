@@ -204,6 +204,7 @@
 !/agents/researchers/contract.py
 !/agents/researchers/result.py
 !/agents/researchers/prompts.py
+!/agents/researchers/maturity.py
 !/tests/test_research_contract.py
 !/tests/test_research_trace.py
 !/tests/test_research_status.py
